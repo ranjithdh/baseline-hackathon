@@ -1,0 +1,60 @@
+{
+    "status": "success",
+    "message": "Baseline score get successfully",
+    "data": {
+        "score_details": {
+            "original_baseline_score": 70.15,
+            "normalized_baseline_score": 65,
+            "inference": "Normal",
+            "ranges": [
+                {
+                    "range": "0-50",
+                    "display_rating": "Compromised",
+                    "rating_rank": 2,
+                    "display_description": "Your Baseline Score is X/100, which means your body systems are under strain and not working efficiently together. Your body is compensating to keep things running, which reduces resilience."
+                },
+                {
+                    "range": "50.0001-65",
+                    "display_rating": "Constrained",
+                    "rating_rank": 3,
+                    "display_description": "Your Baseline Score is X/100, which means some systems are working well, while others are lagging. Your body is functioning, but overall stability and resilience are still developing."
+                },
+                {
+                    "range": "65.0001-75",
+                    "display_rating": "Stable",
+                    "rating_rank": 4,
+                    "display_description": "Your Baseline Score is X/100, which means your body systems are generally balanced and functioning well. You're in a stable zone, with clear room to improve efficiency further."
+                },
+                {
+                    "range": "75.0001-85",
+                    "display_rating": "Robust",
+                    "rating_rank": 5,
+                    "display_description": "Your body systems are working efficiently and consistently. Your body is resilient, with minimal internal friction."
+                },
+                {
+                    "range": "85.0001-100",
+                    "display_rating": "Elite",
+                    "rating_rank": 6,
+                    "display_description": "Your body is functioning at a very high level of efficiency and precision. This reflects exceptional balance and resilience."
+                }
+            ],
+            "baseline_score_description": "Your Baseline Score is 65/100, which means some systems are working well, while others are lagging."
+        },
+        "contributors": {
+            "positive": [
+                {"display_name": "HbA1c", "current_value": 5.4, "unit": "%", "inference": "Optimal"},
+                {"display_name": "Fasting Insulin", "current_value": 7.6, "unit": "µU/mL", "inference": "Optimal"},
+                {"display_name": "VO2 Max", "current_value": 41, "unit": "mL/kg/min", "inference": "Good"}
+            ],
+            "negative": [
+                {"display_name": "Vitamin D", "current_value": 19.69, "unit": "ng/mL", "inference": "Very Low"},
+                {"display_name": "Body Fat %", "current_value": 33.7, "unit": "%", "inference": "Poor (Obese)"},
+                {"display_name": "TSH", "current_value": 5, "unit": "µIU/mL", "inference": "High"}
+            ],
+            "positive_count": 25,
+            "negative_count": 9
+        },
+        "age": 34,
+        "biological_age": 27
+    }
+}
