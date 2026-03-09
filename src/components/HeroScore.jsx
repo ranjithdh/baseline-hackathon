@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import healthData from '../data.json';
+import { motion, AnimatePresence } from 'framer-motion';
+import BaselineScoreDeepDive from './BaselineScoreDeepDive';
 
 const HeroScore = ({ onSetGoal }) => {
   const { score_details } = healthData.data;
+  const [showDeepDive, setShowDeepDive] = useState(false);
 
   return (
     <div className="hero-section">
@@ -15,6 +18,17 @@ const HeroScore = ({ onSetGoal }) => {
             <div className="score-delta">
               <p className="delta-text">Status: {score_details.inference}</p>
             </div>
+            
+            {/* Creative Explanation Tag */}
+            <motion.button 
+              whileHover={{ scale: 1.05, backgroundColor: '#FEF3C7' }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowDeepDive(true)}
+              className="mt-6 flex items-center gap-2 px-4 py-2 rounded-full border border-amber-200/50 bg-amber-50/50 text-[10px] font-black tracking-[0.2em] text-amber-600 uppercase shadow-sm transition-all"
+            >
+              <span className="material-symbols-outlined text-sm">rocket_launch</span>
+              Deep Dive
+            </motion.button>
           </div>
         </div>
         {/* Atmospheric Glows */}
@@ -31,6 +45,13 @@ const HeroScore = ({ onSetGoal }) => {
           </svg>
         </button>
       </div>
+
+      {/* Immersive Explanation Overlay */}
+      <AnimatePresence>
+        {showDeepDive && (
+          <BaselineScoreDeepDive onClose={() => setShowDeepDive(false)} />
+        )}
+      </AnimatePresence>
 
       <style jsx>{`
         .hero-section {
@@ -84,6 +105,9 @@ const HeroScore = ({ onSetGoal }) => {
         }
 
         .score-box {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
           text-align: center;
           z-index: 3;
         }

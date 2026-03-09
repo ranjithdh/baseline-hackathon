@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const ActionPlan = ({ onBack }) => {
+const ActionPlan = ({ onBack, onAnalyze }) => {
+  const scrollContainerRef = useRef(null);
+  const lastScrollY = useRef(0);
+  const [isFooterVisible, setIsFooterVisible] = useState(true);
+  const baseScore = 72;
+
   const protocolPool = {
     exercises: ["Strength Training", "Endurance", "HIIT"],
     nutrition: ["Anti inflammatory", "Antioxidant", "Cruciferous", "Detox Support", "Good fat", "High Fat", "High fiber", "High Glycemic", "High Oxalate", "High protein", "High Purine", "Low fat", "Low Glycemic", "Pro Inflammatory", "Alcohol", "Probiotics", "Food fat", "High Sodium", "Low Fiber", "Polyphenol", "Low fibre"],
@@ -52,6 +57,31 @@ const ActionPlan = ({ onBack }) => {
     return new Set(allItems);
   });
 
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const currentScrollY = container.scrollTop;
+      const scrollDiff = currentScrollY - lastScrollY.current;
+
+      if (currentScrollY <= 0) {
+        setIsFooterVisible(true);
+      } else if (scrollDiff > 5) {
+        // Scrolling Down - Hide Footer
+        setIsFooterVisible(false);
+      } else if (scrollDiff < -5) {
+        // Scrolling Up - Show Footer
+        setIsFooterVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const toggleProtocol = (item) => {
     setCompletedProtocols(prev => {
       const next = new Set(prev);
@@ -71,12 +101,21 @@ const ActionPlan = ({ onBack }) => {
     return { width: `${percentage}%` };
   };
 
+  const getTargetScore = () => {
+    const allItems = selectedProtocols.flatMap(g => g.items);
+    const completedCount = allItems.filter(item => completedProtocols.has(item)).length;
+    return baseScore + completedCount;
+  };
+
   return (
     <div className="bg-[#FDFCFB] text-slate-900 font-sans h-screen flex justify-center overflow-hidden">
       <main className="w-full max-w-[430px] h-full bg-[#FDFCFB] flex flex-col relative shadow-2xl">
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto px-8 pt-12 pb-8 custom-scrollbar relative z-10">
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto px-8 pt-12 pb-8 custom-scrollbar relative z-10"
+        >
           <nav className="flex justify-between items-center mb-12">
             <button
               onClick={onBack}
@@ -88,9 +127,18 @@ const ActionPlan = ({ onBack }) => {
           </nav>
 
           <header className="mb-10">
-            <h1 className="text-5xl font-black text-slate-900 mb-4 tracking-tighter uppercase leading-none">
-              Action<br />Plan
-            </h1>
+            <div className="flex justify-between items-end mb-4">
+              <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase leading-none">
+                Action<br />Plan
+              </h1>
+              <div className="text-right">
+                <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-1">Target Score</p>
+                <div className="flex items-baseline gap-1 justify-end">
+                  <span className="text-4xl font-black text-amber-500 leading-none">{getTargetScore()}</span>
+                  <span className="text-sm font-bold text-slate-300">/ 100</span>
+                </div>
+              </div>
+            </div>
             <p className="text-slate-500 text-sm leading-relaxed max-w-[95%] font-medium">
               Your path to peak vitality. These protocols are prioritized for your unique biometric signature.
             </p>
@@ -136,9 +184,12 @@ const ActionPlan = ({ onBack }) => {
                           style={{ cursor: 'pointer' }}
                         >
                           <span className={`text-[13px] font-bold tracking-tight ${isCompleted ? 'text-slate-900' : 'text-slate-500'}`}>{item}</span>
-                          <button className={`w-6 h-6 rounded-full border-2 transition-all duration-500 flex items-center justify-center ${isCompleted ? 'bg-amber-500 border-amber-500 text-white shadow-[0_4px_12px_rgba(230,126,34,0.3)]' : 'border-slate-200 text-transparent'}`}>
-                            <span className="material-symbols-outlined text-[16px] font-black">{isCompleted ? 'check' : ''}</span>
-                          </button>
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-black text-emerald-500 mb-0.5">+1</span>
+                            <button className={`w-6 h-6 rounded-full border-2 transition-all duration-500 flex items-center justify-center ${isCompleted ? 'bg-amber-500 border-amber-500 text-white shadow-[0_4px_12px_rgba(230,126,34,0.3)]' : 'border-slate-200 text-transparent'}`}>
+                              <span className="material-symbols-outlined text-[16px] font-black">{isCompleted ? 'check' : ''}</span>
+                            </button>
+                          </div>
                         </li>
                       );
                     })}
@@ -151,7 +202,7 @@ const ActionPlan = ({ onBack }) => {
 
         {/* Static Footer Area */}
         <footer className="px-8 pt-8 pb-14 bg-white/80 backdrop-blur-xl border-t border-slate-100 relative z-20">
-          <div className="flex flex-col gap-6">
+          <div className={`flex flex-col gap-6 overflow-hidden transition-all duration-500 ease-in-out ${isFooterVisible ? 'max-h-[500px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 translate-y-8 pointer-events-none'}`}>
             <div className="bg-amber-50/50 border border-amber-100/50 rounded-2xl p-4">
               <p className="text-[10px] text-amber-700/80 text-center leading-relaxed font-medium">
                 <span className="font-black mr-1 uppercase tracking-widest text-[9px]">Disclaimer:</span>
@@ -160,16 +211,10 @@ const ActionPlan = ({ onBack }) => {
             </div>
             <div className="flex flex-col gap-3">
               <button
-                className="w-full bg-amber-500 text-white py-5 rounded-3xl font-black text-[12px] tracking-[0.2em] uppercase shadow-[0_10px_20px_rgba(230,126,34,0.2)] active:scale-[0.98] transition-all hover:bg-amber-600 hover:shadow-[0_15px_30px_rgba(230,126,34,0.3)]"
-                onClick={() => alert('Booking Consultation...')}
-              >
-                Book Consultation
-              </button>
-              <button
                 className="w-full bg-slate-900 text-white py-5 rounded-3xl font-black text-[12px] tracking-[0.2em] uppercase shadow-xl active:scale-[0.98] transition-all hover:bg-black"
-                onClick={() => alert('Sending to Nutritionist...')}
+                onClick={onAnalyze}
               >
-                Nutritionist Review
+                Analyze & Book
               </button>
             </div>
           </div>
