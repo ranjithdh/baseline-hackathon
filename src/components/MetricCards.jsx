@@ -7,44 +7,66 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
       <div className="card-header">
         <div className="card-title-group">
           {variant === 'caution' ? (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" strokeWidth="3" style={{ marginRight: '10px' }}>
-              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-              <line x1="12" y1="9" x2="12" y2="13" />
-              <line x1="12" y1="17" x2="12.01" y2="17" />
-            </svg>
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-100/50">
+                <span className="material-symbols-outlined text-orange-600 text-[18px]">warning</span>
+            </div>
           ) : (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" strokeWidth="3" style={{ marginRight: '10px' }}>
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-100/50">
+                <span className="material-symbols-outlined text-emerald-600 text-[18px]">check_circle</span>
+            </div>
           )}
-          <span className="card-title text-slate-900">{title}</span>
+          <span className="card-title">{title}</span>
         </div>
       </div>
       <div className="card-content">
         <div className="main-stat flex-1">
           <div className="flex items-center justify-between pointer-events-none">
-            <h1 className="stat-value text-slate-900">{mainValue < 10 ? `0${mainValue}` : mainValue}</h1>
-            <span className="material-symbols-outlined text-4xl text-amber-500/40">keyboard_arrow_right</span>
+            <h1 className="stat-value">{mainValue < 10 ? `0${mainValue}` : mainValue}</h1>
+            <span className="material-symbols-outlined text-3xl text-slate-200">dock_to_right</span>
           </div>
-          <p className="stat-label text-slate-500">{label}</p>
+          <p className="stat-label">
+            <span className={`w-1.5 h-1.5 rounded-full ${variant === 'caution' ? 'bg-orange-500 shadow-[0_0_8px_rgba(230,126,34,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.5)]'}`} />
+            {label}
+          </p>
         </div>
       </div>
 
       <style jsx>{`
         .card-white {
-          background: #FFFFFF;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
           width: 100%;
           padding: 30px;
-          border-radius: 24px;
+          border-radius: 28px;
           margin-bottom: 24px;
-          box-shadow: var(--shadow-md);
-          border: 1px solid rgba(230, 126, 34, 0.05);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          border: 1px solid rgba(255, 255, 255, 0.8);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .card-white::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(230, 126, 34, 0.2), transparent);
+          opacity: 0;
+          transition: opacity 0.3s;
         }
 
         .card-white:hover {
-          transform: translateY(-4px);
-          box-shadow: var(--shadow-lg);
+          transform: translateY(-6px) scale(1.01);
+          border-color: rgba(230, 126, 34, 0.2);
+          box-shadow: 0 20px 40px rgba(230, 126, 34, 0.05);
+        }
+
+        .card-white:hover::before {
+          opacity: 1;
         }
 
         .card-header {
@@ -57,14 +79,16 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
         .card-title-group {
           display: flex;
           align-items: center;
+          gap: 12px;
         }
 
         .card-title {
-          font-family: var(--font-heading);
+          font-family: 'Inter', sans-serif;
           font-weight: 800;
-          font-size: 0.8rem;
+          font-size: 0.75rem;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.2em;
+          color: #64748B;
         }
 
         .card-content {
@@ -74,19 +98,33 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
         }
 
         .stat-value {
-          font-size: 5rem;
+          font-family: 'Space Mono', monospace;
+          font-size: 4.8rem;
           font-weight: 900;
           line-height: 1;
-          letter-spacing: -2px;
+          letter-spacing: -4px;
+          color: #1A1A1B;
         }
 
         .stat-label {
-          font-family: var(--font-heading);
+          font-family: 'Inter', sans-serif;
           font-weight: 700;
-          font-size: 0.7rem;
+          font-size: 0.65rem;
           text-transform: uppercase;
-          margin-top: 10px;
-          letter-spacing: 0.05em;
+          margin-top: 12px;
+          letter-spacing: 0.15em;
+          color: #94A3B8;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .status-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: full;
+          background: var(--accent-color);
+          box-shadow: 0 0 8px var(--accent-color);
         }
       `}</style>
     </div>

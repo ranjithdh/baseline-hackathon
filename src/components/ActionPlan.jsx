@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import ActionDetail from './ActionDetail';
 
 const ActionPlan = ({ onBack, onAnalyze }) => {
   const scrollContainerRef = useRef(null);
   const lastScrollY = useRef(0);
   const [isFooterVisible, setIsFooterVisible] = useState(true);
+  const [selectedAction, setSelectedAction] = useState(null);
   const baseScore = 72;
 
   const protocolPool = {
@@ -180,13 +183,24 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
                         <li
                           key={i}
                           className={`flex items-center justify-between transition-all duration-300 ${isCompleted ? 'opacity-100 scale-100' : 'opacity-60 grayscale hover:grayscale-0 hover:opacity-100'}`}
-                          onClick={() => toggleProtocol(item)}
                           style={{ cursor: 'pointer' }}
                         >
-                          <span className={`text-[13px] font-bold tracking-tight ${isCompleted ? 'text-slate-900' : 'text-slate-500'}`}>{item}</span>
+                          <div 
+                            className="flex-1 py-1"
+                            onClick={() => setSelectedAction({ item, category: group.category })}
+                          >
+                            <span className={`text-[13px] font-bold tracking-tight ${isCompleted ? 'text-slate-900' : 'text-slate-500'}`}>{item}</span>
+                          </div>
+                          
                           <div className="flex items-center gap-3">
                             <span className="text-[10px] font-black text-emerald-500 mb-0.5">+1</span>
-                            <button className={`w-6 h-6 rounded-full border-2 transition-all duration-500 flex items-center justify-center ${isCompleted ? 'bg-amber-500 border-amber-500 text-white shadow-[0_4px_12px_rgba(230,126,34,0.3)]' : 'border-slate-200 text-transparent'}`}>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleProtocol(item);
+                              }}
+                              className={`w-6 h-6 rounded-full border-2 transition-all duration-500 flex items-center justify-center ${isCompleted ? 'bg-amber-500 border-amber-500 text-white shadow-[0_4px_12px_rgba(230,126,34,0.3)]' : 'border-slate-200 text-transparent'}`}
+                            >
                               <span className="material-symbols-outlined text-[16px] font-black">{isCompleted ? 'check' : ''}</span>
                             </button>
                           </div>
@@ -198,10 +212,20 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
               </div>
             ))}
           </section>
+          
+          <AnimatePresence>
+            {selectedAction && (
+                <ActionDetail 
+                    item={selectedAction.item}
+                    category={selectedAction.category}
+                    onClose={() => setSelectedAction(null)}
+                />
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Static Footer Area */}
-        <footer className="px-8 pt-8 pb-14 bg-white/80 backdrop-blur-xl border-t border-slate-100 relative z-20">
+        <footer className={`px-8 pt-8 pb-14 bg-white/80 backdrop-blur-xl border-t border-slate-100 relative z-20 transition-all duration-500 ${selectedAction ? 'opacity-0 translate-y-20 pointer-events-none' : 'opacity-100 translate-y-0'}`}>
           <div className={`flex flex-col gap-6 overflow-hidden transition-all duration-500 ease-in-out ${isFooterVisible ? 'max-h-[500px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 translate-y-8 pointer-events-none'}`}>
             <div className="bg-amber-50/50 border border-amber-100/50 rounded-2xl p-4">
               <p className="text-[10px] text-amber-700/80 text-center leading-relaxed font-medium">

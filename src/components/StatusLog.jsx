@@ -20,60 +20,74 @@ const LogItem = ({ icon, title, subtitle, xp, variant }) => {
       <style jsx>{`
         .status-row {
           width: 100%;
-          border: 1px solid #333;
-          padding: 16px;
+          padding: 20px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 8px;
-          background: transparent;
+          margin-bottom: 12px;
+          border-radius: 20px;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.7);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+          transition: all 0.3s ease;
         }
 
-        .status-row.white {
-          background: #FFFFFF;
-          color: #000;
-          border: none;
+        .status-row:hover {
+          transform: translateX(4px);
+          border-color: rgba(230, 126, 34, 0.2);
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
         }
 
         .log-left {
           display: flex;
           align-items: center;
-          gap: 15px;
+          gap: 16px;
         }
 
         .log-icon {
-          width: 32px;
-          height: 32px;
+          width: 36px;
+          height: 36px;
           display: flex;
           align-items: center;
           justify-content: center;
+          border-radius: 12px;
+          background: rgba(230, 126, 34, 0.08);
+          color: #E67E22;
         }
 
         .log-title {
-          font-family: 'Outfit', sans-serif;
-          font-weight: 700;
-          font-size: 0.85rem;
+          font-family: 'Inter', sans-serif;
+          font-weight: 800;
+          font-size: 0.8rem;
           text-transform: uppercase;
+          letter-spacing: 0.1em;
+          color: #1A1A1B;
+          margin-bottom: 4px;
         }
 
         .log-subtitle {
-          font-size: 0.6rem;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.65rem;
+          font-weight: 600;
           text-transform: uppercase;
-          opacity: 0.7;
+          color: #64748B;
+          letter-spacing: 0.05em;
+          display: flex;
+          align-items: center;
+          gap: 6px;
         }
 
         .xp-tag {
           font-family: 'Space Mono', monospace;
-          font-size: 0.75rem;
-          font-weight: bold;
-        }
-
-        .white .log-subtitle {
-          color: #444;
-        }
-
-        .white .xp-tag {
-          color: #000;
+          font-size: 0.8rem;
+          font-weight: 900;
+          color: #E67E22;
+          background: rgba(230, 126, 34, 0.05);
+          padding: 4px 10px;
+          border-radius: 8px;
+          border: 1px solid rgba(230, 126, 34, 0.1);
         }
       `}</style>
     </div>
@@ -85,15 +99,23 @@ const StatusLog = () => {
 
   return (
     <div className="status-log-section" style={{ width: '100%', paddingBottom: '40px' }}>
-      <p className="section-label mono-text" style={{ marginBottom: '16px', fontSize: '0.7rem', color: '#888', letterSpacing: '0.1em' }}>High Impact</p>
+      <p className="section-label" style={{
+        marginBottom: '20px',
+        fontSize: '0.65rem',
+        color: '#94A3B8',
+        letterSpacing: '0.3em',
+        fontWeight: '900',
+        textTransform: 'uppercase',
+        borderLeft: '2px solid #E67E22',
+        paddingLeft: '12px'
+      }}>High Impact</p>
 
       {contributors.negative.map((item, idx) => (
         <LogItem
           key={idx}
-          variant="white"
-          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>}
-          title={`${item.display_name} ${item.inference}`}
-          subtitle={`Impact Detail: ${item.current_value} ${item.unit}`}
+          icon={<span className="material-symbols-outlined text-[18px]">emergency_home</span>}
+          title={`${item.display_name} • ${item.inference}`}
+          subtitle={`${item.current_value}${item.unit}`}
           xp="-12.0"
         />
       ))}
