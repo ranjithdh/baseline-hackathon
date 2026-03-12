@@ -5,7 +5,7 @@ import DesktopScoreHero      from './DesktopScoreHero';
 import DesktopBiomarkerRow   from './DesktopBiomarkerRow';
 import DesktopPlanPanel      from './DesktopPlanPanel';
 import DesktopConsultBanner  from './DesktopConsultBanner';
-import DesktopDownloadStrip  from './DesktopDownloadStrip';
+
 
 const DesktopDashboard = () => {
   const [activeNav, setActiveNav]  = useState('dashboard');
@@ -64,10 +64,6 @@ const DesktopDashboard = () => {
         {/* ── Plan panel (goal slider + accordion) ── */}
         <DesktopPlanPanel planPanelRef={planPanelRef} />
 
-        {/* ── Download strip ── */}
-        <div style={{ marginTop: '48px' }}>
-          <DesktopDownloadStrip />
-        </div>
       </main>
     </div>
   );

@@ -38,6 +38,9 @@ const DesktopTopBar = ({ onBookConsult }) => {
             cursor: 'pointer',
             letterSpacing: '0.02em',
             transition: 'all 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
           }}
           onMouseEnter={e => {
             e.currentTarget.style.transform = 'translateY(-1px)';
@@ -48,7 +51,7 @@ const DesktopTopBar = ({ onBookConsult }) => {
             e.currentTarget.style.opacity = '1';
           }}
         >
-          Download your plan
+          <span>↓</span> Download your plan
         </button>
       </div>
     </div>
