@@ -48,7 +48,7 @@ const DesktopTopBar = ({ onBookConsult }) => {
             e.currentTarget.style.opacity = '1';
           }}
         >
-          Book Consult →
+          Download your plan
         </button>
       </div>
     </div>
