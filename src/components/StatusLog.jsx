@@ -26,18 +26,18 @@ const LogItem = ({ icon, title, subtitle, xp, variant }) => {
           align-items: center;
           margin-bottom: 12px;
           border-radius: 20px;
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.7);
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+          background: var(--card-bg-translucent);
+          backdrop-filter: blur(var(--glass-blur));
+          -webkit-backdrop-filter: blur(var(--glass-blur));
+          border: 1px solid var(--border-color);
+          box-shadow: var(--shadow-sm);
           transition: all 0.3s ease;
         }
 
         .status-row:hover {
           transform: translateX(4px);
-          border-color: rgba(230, 126, 34, 0.2);
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
+          border-color: rgba(var(--brand-color), 0.2);
+          background: var(--card-bg);
         }
 
         .log-left {
@@ -53,26 +53,26 @@ const LogItem = ({ icon, title, subtitle, xp, variant }) => {
           align-items: center;
           justify-content: center;
           border-radius: 12px;
-          background: rgba(230, 126, 34, 0.08);
-          color: #E67E22;
+          background: var(--primary-bg);
+          color: var(--primary);
         }
 
         .log-title {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-heading);
           font-weight: 800;
           font-size: 0.8rem;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          color: #1A1A1B;
+          color: var(--foreground);
           margin-bottom: 4px;
         }
 
         .log-subtitle {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-main);
           font-size: 0.65rem;
           font-weight: 600;
           text-transform: uppercase;
-          color: #64748B;
+          color: var(--muted-foreground);
           letter-spacing: 0.05em;
           display: flex;
           align-items: center;
@@ -80,14 +80,14 @@ const LogItem = ({ icon, title, subtitle, xp, variant }) => {
         }
 
         .xp-tag {
-          font-family: 'Space Mono', monospace;
+          font-family: var(--font-mono);
           font-size: 0.8rem;
           font-weight: 900;
-          color: #E67E22;
-          background: rgba(230, 126, 34, 0.05);
+          color: var(--primary);
+          background: var(--primary-bg);
           padding: 4px 10px;
           border-radius: 8px;
-          border: 1px solid rgba(230, 126, 34, 0.1);
+          border: 1px solid var(--primary-border);
         }
       `}</style>
     </div>
@@ -102,12 +102,13 @@ const StatusLog = () => {
       <p className="section-label" style={{
         marginBottom: '20px',
         fontSize: '0.65rem',
-        color: '#94A3B8',
+        color: 'var(--muted-foreground)',
         letterSpacing: '0.3em',
         fontWeight: '900',
         textTransform: 'uppercase',
-        borderLeft: '2px solid #E67E22',
-        paddingLeft: '12px'
+        borderLeft: '2px solid var(--primary)',
+        paddingLeft: '12px',
+        fontFamily: 'var(--font-heading)'
       }}>High Impact</p>
 
       {contributors.negative.map((item, idx) => (

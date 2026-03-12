@@ -1,23 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@400;600;900&family=Space+Mono&display=swap');
+@import './theme/tokens.css';
 
 :root {
-  --bg-color: #FDFCFB;
-  --text-primary: #1A1A1B;
-  --text-secondary: #7F8C8D;
-  --accent-color: #E67E22;
-  /* Solar Gold */
-  --accent-secondary: #D4AF37;
-  /* Metallic Gold */
-  --border-color: #EAEAEA;
-  --card-bg: #FFFFFF;
-  --font-main: 'Inter', sans-serif;
-  --font-heading: 'Outfit', sans-serif;
-  --font-mono: 'Space Mono', monospace;
+  /* Shadow Mappings & Legacy Variables */
+  --bg-color: rgb(var(--background));
+  --text-primary: rgb(var(--foreground));
+  --text-secondary: rgb(var(--muted-foreground));
+  --accent-color: rgb(var(--primary));
+  --accent-secondary: rgb(var(--primary));
+  --border-color: rgb(var(--border));
+  --card-bg-rgb: var(--card);
+  --card-bg: rgb(var(--card));
+  --card-bg-translucent: rgba(var(--card), 0.7);
 
-  /* Claymorphism / Soft Premium Shadows */
-  --shadow-sm: 0 2px 8px rgba(230, 126, 34, 0.05);
-  --shadow-md: 0 10px 30px rgba(230, 126, 34, 0.08);
-  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.04);
+  /* Centralized shadow mapping */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.2);
+  --shadow-lg: var(--shadow-lg-token, 0 20px 60px rgba(0, 0, 0, 0.5));
 }
 
 * {
@@ -69,13 +67,14 @@ h3 {
   color: var(--text-secondary);
 }
 
-/* UI Elements */
 .card-white {
-  background: #FFFFFF;
-  color: #000000;
+  background: var(--card-bg);
+  color: var(--text-primary);
   width: 100%;
-  padding: 20px;
-  border-radius: 4px;
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 .status-row {
@@ -85,6 +84,8 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: var(--card-bg-translucent);
+  border-radius: 12px;
 }
 
 .xp-tag {

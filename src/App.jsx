@@ -6,10 +6,24 @@ import ActionPlan from './components/ActionPlan';
 import ContributorDetail from './components/ContributorDetail';
 import BookConsultation from './components/BookConsultation';
 import ActionPlanTimeline from './components/ActionPlanTimeline';
+import Settings from './components/Settings';
 
 function App() {
   const [view, setView] = useState('dashboard');
   const [detailTab, setDetailTab] = useState('positive');
+  const [theme, setTheme] = React.useState(() => {
+    return localStorage.getItem('theme') || 'dark';
+  });
+
+  React.useLayoutEffect(() => {
+    document.documentElement.className = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
 
   const onHandleDetail = (tab) => {
     setDetailTab(tab);
@@ -30,9 +44,20 @@ function App() {
             <Dashboard
               onSetGoal={() => setView('goal')}
               onDetail={onHandleDetail}
+              onSettings={() => setView('settings')}
             />
           </motion.div>
         )}
+        {view === 'settings' && (
+          <motion.div key="settings" variants={pageVariants} initial="initial" animate="enter" exit="exit">
+            <Settings 
+              onBack={() => setView('dashboard')} 
+              currentTheme={theme}
+              onToggleTheme={toggleTheme}
+            />
+          </motion.div>
+        )}
+
         {view === 'goal' && (
           <motion.div key="goal" variants={pageVariants} initial="initial" animate="enter" exit="exit">
             <GoalPage

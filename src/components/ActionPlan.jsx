@@ -111,8 +111,8 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
   };
 
   return (
-    <div className="bg-[#FDFCFB] text-slate-900 font-sans h-screen flex justify-center overflow-hidden">
-      <main className="w-full max-w-[430px] h-full bg-[#FDFCFB] flex flex-col relative shadow-2xl">
+    <div className="bg-background text-foreground font-main h-screen flex justify-center overflow-hidden">
+      <main className="w-full max-w-[430px] h-full bg-background flex flex-col relative shadow-2xl">
 
         {/* Scrollable Content Area */}
         <div
@@ -122,7 +122,7 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
           <nav className="flex justify-between items-center mb-12">
             <button
               onClick={onBack}
-              className="flex items-center gap-2 text-[10px] font-extrabold tracking-[0.2em] text-slate-400 uppercase hover:text-amber-600 transition-all group"
+              className="flex items-center gap-2 text-[10px] font-extrabold tracking-[0.2em] text-muted-foreground uppercase hover:text-primary transition-all group"
             >
               <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back_ios</span>
               RE-ADJUST GOAL
@@ -131,18 +131,18 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
 
           <header className="mb-10">
             <div className="flex justify-between items-end mb-4">
-              <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase leading-none">
+              <h1 className="text-5xl font-black text-foreground tracking-tighter uppercase leading-none font-heading">
                 Action<br />Plan
               </h1>
               <div className="text-right">
-                <p className="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-1">Target Score</p>
+                <p className="text-[10px] font-black tracking-widest text-muted-foreground uppercase mb-1">Target Score</p>
                 <div className="flex items-baseline gap-1 justify-end">
-                  <span className="text-4xl font-black text-amber-500 leading-none">{getTargetScore()}</span>
-                  <span className="text-sm font-bold text-slate-300">/ 100</span>
+                  <span className="text-4xl font-black text-primary leading-none font-heading">{getTargetScore()}</span>
+                  <span className="text-sm font-bold opacity-30">/ 100</span>
                 </div>
               </div>
             </div>
-            <p className="text-slate-500 text-sm leading-relaxed max-w-[95%] font-medium">
+            <p className="text-muted-foreground text-sm leading-relaxed max-w-[95%] font-medium">
               Your path to peak vitality. These protocols are prioritized for your unique biometric signature.
             </p>
           </header>
@@ -151,7 +151,7 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
             {selectedProtocols.map((group, idx) => (
               <div
                 key={idx}
-                className="rounded-[32px] relative group overflow-hidden shadow-[0_10px_30px_rgba(230,126,34,0.05)] border border-slate-50"
+                className="rounded-[32px] relative group overflow-hidden shadow-md border border-border"
                 style={{
                   backgroundImage: `url(${group.bgImage})`,
                   backgroundSize: 'cover',
@@ -159,19 +159,19 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
                 }}
               >
                 {/* Readability Overlay - Solar Vitality Frosted Glass */}
-                <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] z-0"></div>
+                <div className="absolute inset-0 bg-background/80 backdrop-blur-[2px] z-0"></div>
 
                 <div className="relative z-10 p-7">
                   <div className="flex justify-between items-center mb-8">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-                        <span className="material-symbols-outlined text-amber-600">{group.icon}</span>
+                      <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                        <span className="material-symbols-outlined text-primary">{group.icon}</span>
                       </div>
-                      <h2 className="text-[11px] font-black tracking-[0.2em] text-slate-900 uppercase">{group.category}</h2>
+                      <h2 className="text-[11px] font-black tracking-[0.2em] text-foreground uppercase font-heading">{group.category}</h2>
                     </div>
-                    <div className="h-1.5 w-16 bg-slate-100/50 rounded-full overflow-hidden">
+                    <div className="h-1.5 w-16 bg-muted rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-amber-500 shadow-[0_0_10px_rgba(230,126,34,0.4)] transition-all duration-1000"
+                        className="h-full bg-primary shadow-[0_0_10px_rgba(var(--primary),0.4)] transition-all duration-1000"
                         style={getProgressStyle(group.items)}
                       ></div>
                     </div>
@@ -189,7 +189,7 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
                             className="flex-1 py-1"
                             onClick={() => setSelectedAction({ item, category: group.category })}
                           >
-                            <span className={`text-[13px] font-bold tracking-tight ${isCompleted ? 'text-slate-900' : 'text-slate-500'}`}>{item}</span>
+                            <span className={`text-[13px] font-bold tracking-tight ${isCompleted ? 'text-foreground' : 'text-muted-foreground'}`}>{item}</span>
                           </div>
                           
                           <div className="flex items-center gap-3">
@@ -199,7 +199,7 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
                                 e.stopPropagation();
                                 toggleProtocol(item);
                               }}
-                              className={`w-6 h-6 rounded-full border-2 transition-all duration-500 flex items-center justify-center ${isCompleted ? 'bg-amber-500 border-amber-500 text-white shadow-[0_4px_12px_rgba(230,126,34,0.3)]' : 'border-slate-200 text-transparent'}`}
+                              className={`w-6 h-6 rounded-full border-2 transition-all duration-500 flex items-center justify-center ${isCompleted ? 'bg-primary border-primary text-primary-foreground shadow-md' : 'border-border text-transparent'}`}
                             >
                               <span className="material-symbols-outlined text-[16px] font-black">{isCompleted ? 'check' : ''}</span>
                             </button>
@@ -225,17 +225,17 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
         </div>
 
         {/* Static Footer Area */}
-        <footer className={`px-8 pt-8 pb-14 bg-white/80 backdrop-blur-xl border-t border-slate-100 relative z-20 transition-all duration-500 ${selectedAction ? 'opacity-0 translate-y-20 pointer-events-none' : 'opacity-100 translate-y-0'}`}>
+        <footer className={`px-8 pt-8 pb-14 bg-card/80 backdrop-blur-xl border-t border-border relative z-20 transition-all duration-500 ${selectedAction ? 'opacity-0 translate-y-20 pointer-events-none' : 'opacity-100 translate-y-0'}`}>
           <div className={`flex flex-col gap-6 overflow-hidden transition-all duration-500 ease-in-out ${isFooterVisible ? 'max-h-[500px] opacity-100 translate-y-0' : 'max-h-0 opacity-0 translate-y-8 pointer-events-none'}`}>
-            <div className="bg-amber-50/50 border border-amber-100/50 rounded-2xl p-4">
-              <p className="text-[10px] text-amber-700/80 text-center leading-relaxed font-medium">
+            <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
+              <p className="text-[10px] text-primary-text text-center leading-relaxed font-medium">
                 <span className="font-black mr-1 uppercase tracking-widest text-[9px]">Disclaimer:</span>
                 This action plan is based on your current biometric data and is intended for informational purposes only. Consult with a qualified healthcare professional before starting any new health protocol.
               </p>
             </div>
             <div className="flex flex-col gap-3">
               <button
-                className="w-full bg-slate-900 text-white py-5 rounded-3xl font-black text-[12px] tracking-[0.2em] uppercase shadow-xl active:scale-[0.98] transition-all hover:bg-black"
+                className="w-full bg-primary text-primary-foreground py-5 rounded-3xl font-black text-[12px] tracking-[0.2em] uppercase shadow-xl active:scale-[0.98] transition-all hover:opacity-90 font-heading"
                 onClick={onAnalyze}
               >
                 Analyze & Book
@@ -245,8 +245,8 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
         </footer>
 
         {/* Decorative Elements */}
-        <div className="absolute top-20 right-[-100px] w-[300px] h-[300px] bg-amber-500/5 rounded-full blur-[100px] pointer-events-none"></div>
-        <div className="absolute bottom-[20%] left-[-150px] w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute top-20 right-[-100px] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute bottom-[20%] left-[-150px] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
       </main>
     </div>
   );

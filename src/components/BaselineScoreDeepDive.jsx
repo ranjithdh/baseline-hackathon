@@ -68,29 +68,18 @@ const BiomarkerBubble = ({ data, index }) => {
         left: '50%', top: '50%',
         marginLeft: -data.size / 2, marginTop: -data.size / 2,
         background: isAlert
-          ? 'linear-gradient(135deg, rgba(255,244,237,0.8), rgba(255,244,237,0.4))'
-          : 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.4))',
-        borderColor: isAlert ? 'rgba(230,126,34,0.3)' : 'rgba(255,255,255,0.8)',
-        backdropBlur: '12px',
+          ? 'linear-gradient(135deg, rgba(var(--primary), 0.1), rgba(var(--primary), 0.05))'
+          : 'var(--card-bg-translucent)',
+        borderColor: isAlert ? 'rgb(var(--primary))' : 'var(--border-color)',
+        backdropFilter: 'blur(12px)',
         boxShadow: isAlert
-          ? '0 8px 32px rgba(230,126,34,0.1), inset 0 0 10px rgba(255,255,255,0.5)'
-          : '0 8px 32px rgba(0,0,0,0.03), inset 0 0 10px rgba(255,255,255,0.8)'
+          ? '0 8px 32px rgba(var(--primary), 0.1), inset 0 0 10px rgba(var(--primary), 0.2)'
+          : 'var(--shadow-sm)'
       }}
     >
-      <span className="text-[7px] font-black uppercase tracking-tighter text-slate-400 mb-0.5 font-['Inter']">{data.name}</span>
-      <span className={`text-[10px] font-black font-['Outfit'] ${isAlert ? 'text-[#E67E22]' : 'text-slate-900'}`}>{data.value}</span>
-      <AnimatePresence>
-        {isHovered && (
-          <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 0.15, scaleX: 1 }}
-            exit={{ opacity: 0, scaleX: 0 }}
-            className="absolute h-[1px] bg-orange-500 origin-right transition-all"
-            style={{ width: radius + 20, right: '50%', rotate: (angle * 180 / Math.PI) + 180, pointerEvents: 'none' }}
-          />
-        )}
-      </AnimatePresence>
-      <div className={`absolute -bottom-1 w-2 h-2 rounded-full border-2 border-white shadow-sm ${isAlert ? 'bg-orange-500' : 'bg-emerald-400'}`} />
+      <span className="text-[7px] font-black uppercase tracking-tighter text-muted-foreground mb-0.5 font-main">{data.name}</span>
+      <span className={`text-[10px] font-black font-heading ${isAlert ? 'text-primary' : 'text-foreground'}`}>{data.value}</span>
+      <div className={`absolute -bottom-1 w-2 h-2 rounded-full border-2 border-background shadow-sm ${isAlert ? 'bg-[rgb(var(--inference-yellow))]' : 'bg-[rgb(var(--inference-green))]'}`} />
     </motion.div>
   );
 };
@@ -100,8 +89,8 @@ const BiomarkerStrip = () => {
   return (
     <div className="w-full relative py-8 overflow-hidden pointer-events-auto">
       {/* Edge Fades */}
-      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#FDFCFB] to-transparent z-10" />
-      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#FDFCFB] to-transparent z-10" />
+      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
+      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
 
       <motion.div
         animate={{ x: [0, -1500] }}
@@ -111,14 +100,14 @@ const BiomarkerStrip = () => {
         {doubleStream.map((name, i) => (
           <div
             key={i}
-            className="px-4 py-2 bg-white/60 border border-white rounded-xl shadow-sm flex flex-col items-center min-w-[100px]"
+            className="px-4 py-2 bg-card border border-border rounded-xl shadow-sm flex flex-col items-center min-w-[100px]"
           >
-            <span className="text-[6px] font-black text-slate-300 uppercase tracking-widest mb-1">{name}</span>
+            <span className="text-[6px] font-black text-muted-foreground uppercase tracking-widest mb-1">{name}</span>
             <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/30 flex items-center justify-center">
-                <div className="w-0.5 h-0.5 bg-emerald-500 rounded-full" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[rgb(var(--inference-green))]/30 flex items-center justify-center">
+                <div className="w-0.5 h-0.5 bg-[rgb(var(--inference-green))] rounded-full" />
               </div>
-              <span className="text-[10px] font-black text-slate-800 font-['Space_Mono']">
+              <span className="text-[10px] font-black text-foreground font-mono">
                 {(Math.random() * 100 + 10).toFixed(1)}
               </span>
             </div>
@@ -127,7 +116,7 @@ const BiomarkerStrip = () => {
       </motion.div>
 
       <div className="flex justify-center mt-6">
-        <span className="text-slate-300 text-[8px] font-black uppercase tracking-[0.4em] opacity-40">100+ Systems Biomarkers Interaction Layer</span>
+        <span className="text-muted-foreground text-[8px] font-black uppercase tracking-[0.4em] opacity-40">Clinical Systems Interaction Layer</span>
       </div>
     </div>
   );
@@ -156,24 +145,32 @@ const BaselineScoreDeepDive = ({ onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[1000] bg-[#FDFCFB] overflow-hidden flex flex-col items-center"
+      className="fixed inset-0 z-[1000] overflow-hidden flex flex-col items-center"
+      style={{ backgroundColor: 'rgb(var(--zinc-950))' }}
     >
+      {/* Close Button - Top Right Fixed */}
+      <button 
+        onClick={onClose}
+        className="fixed top-8 right-8 z-[1100] w-12 h-12 rounded-full border border-border flex items-center justify-center bg-card/80 backdrop-blur-md shadow-lg hover:border-primary transition-all group pointer-events-auto"
+      >
+        <span className="material-symbols-outlined text-xl text-muted-foreground group-hover:text-primary transition-colors">close</span>
+      </button>
       {/* Parallax Cloud Background */}
       <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#E2E8F0 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }} />
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-orange-200/20 rounded-full blur-[140px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[700px] h-[700px] bg-amber-100/10 rounded-full blur-[160px]" />
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(var(--border) 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }} />
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[140px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[700px] h-[700px] bg-primary/5 rounded-full blur-[160px]" />
       </div>
 
-      <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-slate-200/30 z-0 pointer-events-none" />
-      <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-slate-200/30 z-0 pointer-events-none" />
+      <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-border/20 z-0 pointer-events-none" />
+      <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-border/20 z-0 pointer-events-none" />
 
       {/* The Cloud Container */}
       <motion.div
         style={{ x: moveX, y: moveY, top: '35%' }}
         className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
       >
-        <div className="absolute w-[240px] h-[240px] rounded-full border border-orange-500/10 shadow-[inset_0_0_80px_rgba(230,126,34,0.03)]" />
+        <div className="absolute w-[240px] h-[240px] rounded-full border border-primary/10 shadow-[inset_0_0_80px_rgba(var(--primary),0.05)]" />
         {cloudBiomarkers.map((data, i) => (
           <BiomarkerBubble key={data.name} data={data} index={i} />
         ))}
@@ -187,31 +184,31 @@ const BaselineScoreDeepDive = ({ onClose }) => {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 border border-orange-500/10 rounded-[38%] opacity-50"
+            className="absolute inset-0 border border-primary/10 rounded-[38%] opacity-50"
           />
-          <div className="relative z-10 flex flex-col items-center bg-white/60 backdrop-blur-2xl w-[140px] h-[140px] rounded-full border border-white shadow-[0_20px_40px_rgba(0,0,0,0.05)] flex items-center justify-center">
-            <span className="text-slate-900 text-7xl font-black font-['Outfit'] tracking-tighter leading-none">65</span>
+          <div className="relative z-10 flex flex-col items-center bg-card/80 backdrop-blur-2xl w-[140px] h-[140px] rounded-full border border-border shadow-2xl flex items-center justify-center">
+            <span className="text-foreground text-7xl font-black font-heading tracking-tighter leading-none">65</span>
           </div>
-          <div className="absolute inset-0 bg-orange-400 rounded-full blur-[50px] opacity-10 animate-pulse pointer-events-none" />
+          <div className="absolute inset-0 bg-primary rounded-full blur-[50px] opacity-10 animate-pulse pointer-events-none" />
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-[-10px] border-t-2 border-orange-500/20 rounded-full pointer-events-none"
+            className="absolute inset-[-10px] border-t-2 border-primary/30 rounded-full pointer-events-none"
           />
         </div>
 
         <div className="mt-20 max-w-[340px] px-6 text-center pointer-events-auto">
-          <h2 className="text-[#1A1A1B] text-2xl font-black tracking-[-0.04em] uppercase mb-2 leading-tight font-['Outfit']">
+          <h2 className="text-foreground text-2xl font-black tracking-[-0.04em] uppercase mb-2 leading-tight font-heading">
             Baseline<br />Score
           </h2>
           <div className="space-y-4">
-            <p className="text-[#4A4A4A] text-[13px] leading-relaxed font-semibold font-['Inter']">
-              The <span className="text-[#E67E22]">Baseline Score</span> is Deep Holistics’ proprietary health score, developed through clinical research, systems-based analysis, and years of preventive health insight.
+            <p className="text-foreground opacity-90 text-[13px] leading-relaxed font-semibold font-main">
+              The <span className="text-primary">Baseline Score</span> is Deep Holistics’ proprietary health score, developed through clinical research, systems-based analysis, and years of preventive health insight.
             </p>
-            <p className="text-[#64748B] text-[12px] leading-relaxed font-medium font-['Inter']">
+            <p className="text-muted-foreground text-[12px] leading-relaxed font-medium font-main">
               Instead of looking at individual markers in isolation, it brings together data across key body systems to reflect how your body is actually functioning today.
             </p>
-            <p className="text-[#64748B] text-[12px] leading-relaxed font-medium font-['Inter']">
+            <p className="text-muted-foreground text-[12px] leading-relaxed font-medium font-main">
               This allows you to move beyond “normal” ranges and focus on what needs attention now.
             </p>
           </div>
@@ -222,28 +219,15 @@ const BaselineScoreDeepDive = ({ onClose }) => {
           <BiomarkerStrip />
         </div>
 
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          onClick={onClose}
-          className="mt-4 mb-24 group relative flex flex-col items-center pointer-events-auto"
-        >
-          <div className="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center group-hover:border-orange-500 transition-all mb-3 text-slate-400 bg-white/80 backdrop-blur-sm shadow-md">
-            <span className="material-symbols-outlined text-xl group-hover:text-orange-500 transition-colors">close</span>
-          </div>
-          <span className="text-slate-400 text-[7px] font-black uppercase tracking-[0.5em] group-hover:text-slate-600 transition-colors">
-            Exit Experience
-          </span>
-        </motion.button>
+        <div className="mt-12 h-24" />{/* Bottom Spacer */}
       </div>
 
       {/* Decorative Branding */}
       <div className="fixed top-12 left-12 flex items-center gap-2 pointer-events-none z-50">
-        <div className="w-5 h-5 rounded-xs border border-orange-500/20 flex items-center justify-center rotate-45">
-          <div className="w-2 h-2 bg-orange-500/80 rounded-full" />
+        <div className="w-5 h-5 rounded-xs border border-primary/20 flex items-center justify-center rotate-45">
+          <div className="w-2 h-2 bg-primary/80 rounded-full" />
         </div>
-        <span className="text-slate-400 text-[8px] font-black uppercase tracking-[0.6em] font-['Space_Mono']">Baseline Labs / Deep Dive</span>
+        <span className="text-muted-foreground text-[8px] font-black uppercase tracking-[0.6em] font-mono">Baseline Labs / Deep Dive</span>
       </div>
 
       <style jsx>{`

@@ -29,14 +29,14 @@ const CircularGauge = ({ value, status }) => {
           strokeLinecap="round"
           style={{
             transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-            filter: 'drop-shadow(0 0 8px rgba(230, 126, 34, 0.3))'
+            filter: 'drop-shadow(0 0 8px rgba(var(--brand-color), 0.3))'
           }}
           transform="rotate(-90 120 120)"
         />
       </svg>
       <div className="gauge-text">
-        <h2 className="text-slate-900">{value}</h2>
-        <span className="label text-slate-500">TARGET_SCORE</span>
+        <h2 className="text-primary-text">{value}</h2>
+        <span className="label text-muted-foreground">TARGET_SCORE</span>
       </div>
       <style jsx>{`
         .gauge-container {
@@ -104,17 +104,17 @@ const GeneratingOverlay = () => {
     <div className="generating-overlay">
       <div className="anim-content">
         <div className="scanner-line"></div>
-        <div className="progress-value text-slate-900">{progress}%</div>
-        <div className="stage-text text-amber-600">{stage}</div>
-        <div className="progress-bar-outer bg-slate-100">
-          <div className="progress-bar-fill bg-amber-500 shadow-[0_0_20px_rgba(230,126,34,0.4)]" style={{ width: `${progress}%` }}></div>
+        <div className="progress-value text-primary-text">{progress}%</div>
+        <div className="stage-text text-primary">{stage}</div>
+        <div className="progress-bar-outer bg-muted">
+          <div className="progress-bar-fill bg-primary shadow-[0_0_20px_rgba(var(--brand-color),0.4)]" style={{ width: `${progress}%` }}></div>
         </div>
       </div>
       <style jsx>{`
         .generating-overlay {
           position: absolute;
           inset: 0;
-          background: #FDFCFB;
+          background: var(--bg-color);
           z-index: 100;
           display: flex;
           align-items: center;
@@ -174,11 +174,11 @@ const GoalPage = ({ onBack, onNext }) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const getStatus = (val) => {
-    if (val <= 50) return { label: 'Compromised', color: '#7F8C8D' };
-    if (val <= 65) return { label: 'Constrained', color: '#7F8C8D' };
-    if (val <= 75) return { label: 'Stable', color: '#E67E22' };
-    if (val <= 85) return { label: 'Robust', color: '#E67E22' };
-    return { label: 'Elite', color: '#E67E22' };
+    if (val <= 50) return { label: 'Compromised', color: 'var(--text-secondary)' };
+    if (val <= 65) return { label: 'Constrained', color: 'var(--text-secondary)' };
+    if (val <= 75) return { label: 'Stable', color: 'var(--accent-color)' };
+    if (val <= 85) return { label: 'Robust', color: 'var(--accent-color)' };
+    return { label: 'Elite', color: 'var(--accent-color)' };
   };
 
   const currentStatus = getStatus(goalScore);
@@ -209,9 +209,9 @@ const GoalPage = ({ onBack, onNext }) => {
         </header>
 
         <main className="main-setter">
-          <div className="status-badge">
+          <div className="status-badge shadow-sm">
             <span className="dot" style={{ backgroundColor: currentStatus.color }}></span>
-            <span className="text-slate-900">{currentStatus.label}</span>
+            <span className="text-primary-text">{currentStatus.label}</span>
           </div>
 
           <div className="visualization">
@@ -270,8 +270,9 @@ const GoalPage = ({ onBack, onNext }) => {
         .grid {
           position: absolute;
           inset: 0;
-          background-image: radial-gradient(rgba(230, 126, 34, 0.05) 1px, transparent 1px);
+          background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
           background-size: 40px 40px;
+          opacity: 0.1;
         }
 
         .glow-orb {
@@ -330,15 +331,15 @@ const GoalPage = ({ onBack, onNext }) => {
           align-items: center;
           gap: 12px;
           padding: 8px 20px;
-          border: 1px solid var(--accent-secondary);
+          border: 1px solid var(--border-color);
           border-radius: 40px;
           font-family: var(--font-mono);
           font-size: 0.75rem;
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 1.5px;
-          background: rgba(255,255,255,0.8);
-          backdrop-filter: blur(10px);
+          background: var(--card-bg-translucent);
+          backdrop-filter: blur(var(--glass-blur));
           box-shadow: var(--shadow-sm);
         }
 
@@ -416,12 +417,12 @@ const GoalPage = ({ onBack, onNext }) => {
           letter-spacing: 2px;
           cursor: pointer;
           transition: all 0.3s ease;
-          box-shadow: 0 10px 20px rgba(230, 126, 34, 0.2);
+          box-shadow: 0 10px 20px rgba(var(--brand-color), 0.2);
         }
 
         .next-btn:hover {
           transform: translateY(-2px);
-          box-shadow: 0 15px 30px rgba(230, 126, 34, 0.3);
+          box-shadow: 0 15px 30px rgba(var(--brand-color), 0.3);
         }
       `}</style>
     </div>
