@@ -50,33 +50,14 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
         boxShadow: isSelected ? '0 0 0 4px rgba(43,127,255,0.08)' : 'none',
       }}
     >
-      {/* Row 0: ✓ Added — own row, top-right, only when selected */}
-      {isSelected && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: '5px',
-            padding: '4px 12px', borderRadius: '100px',
-            fontSize: '10px', fontWeight: 600,
-            fontFamily: 'var(--font-mono)',
-            background: 'rgba(43,127,255,0.18)',
-            color: 'rgb(43,127,255)',
-            border: '1px solid rgba(43,127,255,0.3)',
-            letterSpacing: '0.04em',
-            whiteSpace: 'nowrap',
-          }}>
-            ✓ Added
-          </span>
-        </div>
-      )}
-
-      {/* Row 1: Title + ★ needed (left)  |  +X points (right) — same horizontal line */}
+      {/* Row 1: Title + ★ needed (left)  |  +X points or ✓ Added (right) */}
       <div style={{
         display: 'flex',
         alignItems: 'flex-start',
         justifyContent: 'space-between',
         gap: '12px',
       }}>
-        {/* Left: name + needed chip */}
+        {/* Left: name + timeline + needed chip */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
             <span style={{
@@ -87,6 +68,20 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
             }}>
               {item.name}
             </span>
+            {item.timeline && item.gain > 0 && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                padding: '3px 9px', borderRadius: '100px',
+                fontSize: '10px', color: 'rgba(255,255,255,0.45)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                background: 'rgba(255,255,255,0.04)',
+                fontFamily: 'var(--font-mono)',
+                whiteSpace: 'nowrap',
+              }}>
+                <span style={{ opacity: 0.6, fontSize: '16px', lineHeight: 1 }}>⊙</span>
+                {item.timeline}
+              </span>
+            )}
             {isNeeded && (
               <span style={{
                 display: 'inline-flex', alignItems: 'center', gap: '3px',
@@ -105,26 +100,43 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
           </div>
         </div>
 
-        {/* Right: +X points */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', flexShrink: 0 }}>
+        {/* Right: ✓ Added chip (selected) or +X points (unselected) */}
+        {isSelected ? (
           <span style={{
-            fontFamily: 'var(--font-heading)',
-            fontSize: item.gain > 0 ? '22px' : '15px',
-            fontWeight: 700,
-            color: item.gain > 0 ? 'rgb(48,164,108)' : 'rgba(255,255,255,0.2)',
-            lineHeight: 1,
+            display: 'inline-flex', alignItems: 'center', gap: '5px',
+            padding: '4px 12px', borderRadius: '100px',
+            fontSize: '10px', fontWeight: 600,
+            fontFamily: 'var(--font-mono)',
+            background: 'rgba(43,127,255,0.18)',
+            color: 'rgb(43,127,255)',
+            border: '1px solid rgba(43,127,255,0.3)',
+            letterSpacing: '0.04em',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
           }}>
-            {item.gain > 0 ? `+${item.gain}` : '—'}
+            ✓ Added
           </span>
-          {item.gain > 0 && (
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', flexShrink: 0 }}>
             <span style={{
-              fontSize: '10px', color: 'rgba(255,255,255,0.3)',
-              fontFamily: 'var(--font-mono)',
+              fontFamily: 'var(--font-heading)',
+              fontSize: item.gain > 0 ? '22px' : '15px',
+              fontWeight: 700,
+              color: item.gain > 0 ? 'rgb(48,164,108)' : 'rgba(255,255,255,0.2)',
+              lineHeight: 1,
             }}>
-              points
+              {item.gain > 0 ? `+${item.gain}` : '—'}
             </span>
-          )}
-        </div>
+            {item.gain > 0 && (
+              <span style={{
+                fontSize: '10px', color: 'rgba(255,255,255,0.3)',
+                fontFamily: 'var(--font-mono)',
+              }}>
+                points
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Row 2: Description */}
@@ -135,20 +147,8 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
         {item.detail}
       </p>
 
-      {/* Row 3: Chips only */}
+      {/* Row 3: Chips only (tags) */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: 'auto' }}>
-        {item.timeline && item.gain > 0 && (
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: '5px',
-            padding: '4px 10px', borderRadius: '100px',
-            fontSize: '10px', color: 'rgba(255,255,255,0.45)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            background: 'rgba(255,255,255,0.04)',
-            fontFamily: 'var(--font-mono)',
-          }}>
-            <span style={{ opacity: 0.6, fontSize: '16px', lineHeight: 1 }}>⊙</span> {item.timeline}
-          </span>
-        )}
         {item.tags && item.tags.map(tag => (
           <span key={tag} style={{
             padding: '4px 10px', borderRadius: '100px',
