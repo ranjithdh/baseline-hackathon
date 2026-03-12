@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Dashboard from './components/Dashboard';
+import { IS_DESKTOP } from './config';
+import Dashboard        from './components/Dashboard';
+import DesktopDashboard from './components/desktop/DesktopDashboard';
 import GoalPage from './components/GoalPage';
 import ActionPlan from './components/ActionPlan';
 import ContributorDetail from './components/ContributorDetail';
@@ -20,6 +22,11 @@ function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Apply layout mode once on launch based on IS_DESKTOP in config.js
+  React.useLayoutEffect(() => {
+    document.body.classList.toggle('desktop', IS_DESKTOP);
+  }, []);
+
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
@@ -35,6 +42,11 @@ function App() {
     enter: { opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } },
     exit: { opacity: 0, x: -20, transition: { duration: 0.2, ease: "easeIn" } }
   };
+
+  // ── If desktop mode, render the full desktop layout directly ──
+  if (IS_DESKTOP) {
+    return <DesktopDashboard />;
+  }
 
   return (
     <div className="App">

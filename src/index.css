@@ -93,3 +93,23 @@ h3 {
   font-size: 0.8rem;
   font-weight: bold;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   DESKTOP LAYOUT OVERRIDES
+   These rules activate only when IS_DESKTOP = true in config.js
+   which adds class "desktop" to <body> on app launch.
+   ═══════════════════════════════════════════════════════════ */
+
+/* 1. Remove the mobile 430px cap — go full width */
+body.desktop #root {
+  max-width: 100%;
+  box-shadow: none;
+}
+
+/* 2. Dashboard container — wider, centered content area */
+body.desktop .dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 48px;
+  gap: 32px;
+}
