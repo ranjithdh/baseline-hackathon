@@ -95,6 +95,14 @@
   --green-11: 33 131 88;
   --green-12: 25 59 45;
 
+  /* Rank Colors - Light */
+  --rating-rank-0: 100 116 139; /* Slate 500 */
+  --rating-rank-1: 71 85 105;  /* Slate 600 */
+  --rating-rank-2: 239 68 68;  /* Red 500 */
+  --rating-rank-3: 249 115 22;  /* Orange 500 */
+  --rating-rank-4: 234 179 8;   /* Yellow 500 */
+  --rating-rank-5: 34 197 94;   /* Green 500 */
+  --rating-rank-6: 16 185 129;  /* Emerald 500 */
 }
 
 .dark,
@@ -181,6 +189,14 @@
   --green-11: 61 214 140;
   --green-12: 177 241 203;
 
+  /* Rank Colors - Dark */
+  --rating-rank-0: 100 116 139;
+  --rating-rank-1: 71 85 105;
+  --rating-rank-2: 248 113 113; /* Red 400 */
+  --rating-rank-3: 251 146 60;  /* Orange 400 */
+  --rating-rank-4: 250 204 21;  /* Yellow 400 */
+  --rating-rank-5: 74 222 128;  /* Green 400 */
+  --rating-rank-6: 52 211 153;  /* Emerald 400 */
 }
 
 :root {
