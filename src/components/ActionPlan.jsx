@@ -86,7 +86,7 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
   };
 
   return (
-    <div className="bg-background text-foreground font-main h-screen flex justify-center overflow-hidden">
+    <div className="bg-background text-foreground font-main flex justify-center overflow-hidden" style={{ height: '100dvh' }}>
       <main className="w-full max-w-[430px] h-full bg-background flex flex-col relative shadow-2xl overflow-hidden text-[#f2f2f2]">
 
         {/* Scrollable Content Area */}
@@ -99,9 +99,9 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
             <nav className="flex justify-between items-center mb-8">
               <button
                 onClick={onBack}
-                className="flex items-center gap-3 text-[10px] font-black tracking-[0.3em] text-muted-foreground hover:text-primary transition-all group px-4 py-2 bg-zinc-900/50 rounded-full border border-zinc-800/50"
+                className="flex items-center gap-2 text-[10px] font-extrabold tracking-[0.2em] text-muted-foreground uppercase hover:text-primary transition-all group"
               >
-                <span className="material-symbols-outlined text-sm">arrow_back_ios</span>
+                <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back_ios</span>
                 ADJUST GOAL
               </button>
             </nav>
@@ -109,9 +109,8 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
             <header className="relative">
               <div className="flex justify-between items-end">
                 <div>
-                  <h1 className="text-4xl font-black text-foreground tracking-tighter uppercase leading-[0.85] font-heading">
-                    Action<br />
-                    <span className="text-primary">Plan</span>
+                  <h1 className="text-[22px] font-medium text-[#E4E4E7] tracking-tight uppercase leading-tight font-heading">
+                    Action Plan
                   </h1>
                 </div>
                 <div className="text-right pb-1">
@@ -161,7 +160,7 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
                           <span className={`material-symbols-outlined text-xl transition-colors duration-500 ${isOpen ? 'text-primary' : 'text-primary/40'}`}>{group.icon}</span>
                         </div>
                         <div>
-                          <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground">{group.category}</h3>
+                          <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-[#E4E4E7]">{group.category}</h3>
                           <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1.5 flex items-center gap-2">
                             <span className="text-primary">{progress.completed} of {progress.total}</span> SELECTED
                           </p>
@@ -235,28 +234,25 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
                 );
               })}
             </section>
-
-            <AnimatePresence>
-              {selectedAction && (
-                <ActionDetail
-                  item={selectedAction.item}
-                  category={selectedAction.category}
-                  onClose={() => setSelectedAction(null)}
-                />
-              )}
-            </AnimatePresence>
           </div>
         </div>
 
-        {/* Glass Bottom Action Area */}
-        <div className={`absolute bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-t border-zinc-800/20 px-8 pt-5 pb-[12px] flex flex-col items-center gap-4 transition-transform duration-500 overflow-hidden ${selectedAction ? 'translate-y-full' : 'translate-y-0'}`}>
-          <p className="text-[8px] sm:text-[9px] text-muted-foreground/50 text-center leading-relaxed font-bold tracking-widest max-w-[320px]">
+        {/* Glass Bottom Action Area - Absolute positioned for stability */}
+        <div
+          className={`absolute bottom-0 left-0 right-0 z-40 bg-zinc-950/80 backdrop-blur-xl border-t border-zinc-800/20 px-8 pt-6 flex flex-col items-center gap-4 transition-transform duration-500 touch-none ${selectedAction ? 'translate-y-full' : 'translate-y-0'}`}
+          style={{
+            paddingBottom: 'calc(24px + env(safe-area-inset-bottom))',
+            // Mask for dynamic address bar gaps
+            boxShadow: '0 50px 0 0 rgb(9, 9, 11)'
+          }}
+        >
+          <p className="text-[8px] sm:text-[9px] text-[#E4E4E7]/40 text-center leading-relaxed font-bold tracking-widest max-w-[320px]">
             Disclaimer: Informational Only. Consult a Healthcare Professional before starting any new protocol.
           </p>
 
           <button
             onClick={onAnalyze}
-            className="w-full bg-primary text-zinc-950 font-black text-[12px] tracking-[0.25em] uppercase py-5 rounded-full shadow-2xl shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all font-heading"
+            className="w-full bg-[#E4E4E7] text-zinc-950 font-black text-[12px] tracking-[0.25em] uppercase py-5 rounded-full shadow-2xl shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all font-heading"
           >
             Analyze & Book
           </button>
@@ -265,6 +261,17 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
         {/* Decorative Elements */}
         <div className="absolute top-20 right-[-100px] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-[20%] left-[-150px] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
+        
+        {/* Action Detail Overlay */}
+        <AnimatePresence>
+          {selectedAction && (
+            <ActionDetail
+              item={selectedAction.item}
+              category={selectedAction.category}
+              onClose={() => setSelectedAction(null)}
+            />
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

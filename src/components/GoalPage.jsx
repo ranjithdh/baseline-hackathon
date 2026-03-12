@@ -30,7 +30,8 @@ const CircularGauge = ({ value, status }) => {
           strokeLinecap="round"
           style={{
             transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-            filter: 'drop-shadow(0 0 8px rgba(var(--brand-color), 0.3))'
+            filter: 'drop-shadow(0 0 4px rgba(var(--brand-color), 0.2))',
+            willChange: 'stroke-dashoffset'
           }}
           transform="rotate(-90 120 120)"
         />
@@ -191,7 +192,7 @@ const GoalPage = ({ onBack, onNext }) => {
   };
 
   return (
-    <div className="minimal-goal-page bg-background text-foreground font-main h-screen flex justify-center overflow-hidden">
+    <div className="minimal-goal-page bg-background text-foreground font-main flex justify-center overflow-hidden">
       {isGenerating && <GeneratingOverlay />}
       <main className="w-full max-w-[430px] h-full bg-background flex flex-col relative shadow-2xl overflow-hidden text-[#f2f2f2]">
         <div className="bg-effects z-0">
@@ -204,31 +205,29 @@ const GoalPage = ({ onBack, onNext }) => {
             <nav className="flex justify-between items-center mb-10">
               <button
                 onClick={onBack}
-                className="flex items-center gap-2 text-[10px] font-black tracking-[0.3em] text-muted-foreground hover:text-primary transition-all group px-4 py-2 bg-zinc-900/50 rounded-full border border-zinc-700/30"
+                className="flex items-center gap-2 text-[10px] font-extrabold tracking-[0.2em] text-muted-foreground uppercase hover:text-primary transition-all group"
               >
-                <span className="material-symbols-outlined text-sm">arrow_back_ios</span>
-                BACK
+                <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back_ios</span>
+                DASHBOARD
               </button>
             </nav>
-
-
           </header>
 
-          <main className="main-setter px-8 pb-32">
-            <motion.div 
-              animate={{ 
+          <main className="main-setter px-8 pb-48">
+            <motion.div
+              animate={{
                 borderColor: `rgb(${currentStatus.color})`,
                 boxShadow: `0 0 20px rgb(${currentStatus.color} / 0.15)`
               }}
               transition={{ duration: 0.4 }}
               className="status-badge shadow-sm mb-12 bg-zinc-900/60 backdrop-blur-md"
-              style={{ 
+              style={{
                 border: `1px solid rgb(${currentStatus.color})`,
                 boxShadow: `0 0 15px rgb(${currentStatus.color} / 0.15)`
               }}
             >
-              <motion.span 
-                className="dot" 
+              <motion.span
+                className="dot"
                 animate={{ backgroundColor: `rgb(${currentStatus.color})` }}
                 transition={{ duration: 0.4 }}
               />
@@ -276,17 +275,23 @@ const GoalPage = ({ onBack, onNext }) => {
           </main>
         </div>
 
-        {/* Glass Bottom Action Area */}
-        <div className="absolute bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-t border-zinc-800/20 px-8 pt-6 pb-[12px] flex flex-col items-center gap-5 overflow-hidden">
-          <p className="text-[8px] sm:text-[9px] text-muted-foreground/50 text-center leading-relaxed font-bold tracking-widest max-w-[320px]">
-            Ready to generate your personalized wellness protocols?
-          </p>
+        {/* Static Glass Bottom Action Area - Absolute positioned for stability */}
+        <div
+          className="absolute bottom-0 left-0 right-0 z-40 bg-zinc-950/80 backdrop-blur-md border-t border-zinc-800/20 px-8 pt-6 flex flex-col items-center gap-5 touch-none"
+          style={{
+            paddingBottom: 'calc(24px + env(safe-area-inset-bottom))',
+            // Mask for dynamic address bar gaps
+            boxShadow: '0 50px 0 0 rgb(9, 9, 11)',
+            willChange: 'transform'
+          }}
+        >
+
 
           <button
             onClick={handleNext}
             className="w-full bg-primary text-zinc-950 font-black text-[12px] tracking-[0.25em] uppercase py-5 rounded-full shadow-2xl shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all font-heading"
           >
-            Generate Protocol
+            Next
           </button>
         </div>
       </main>
@@ -296,7 +301,10 @@ const GoalPage = ({ onBack, onNext }) => {
           position: relative;
           width: 100vw;
           height: 100vh;
+          height: 100dvh;
           overflow: hidden;
+          background-color: #09090b;
+          will-change: transform;
         }
 
         .bg-effects {
@@ -319,12 +327,14 @@ const GoalPage = ({ onBack, onNext }) => {
           top: 40%;
           left: 50%;
           transform: translate(-50%, -50%);
-          width: 600px;
-          height: 600px;
+          width: 400px;
+          height: 400px;
           border-radius: 50%;
-          filter: blur(120px);
-          opacity: 0.1;
+          filter: blur(80px);
+          opacity: 0.08;
           transition: transform 0.8s ease;
+          will-change: transform, opacity;
+          pointer-events: none;
         }
 
         .main-setter {

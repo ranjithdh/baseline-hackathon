@@ -31,7 +31,15 @@ const ContributorDetail = ({ initialTab = 'positive', onBack }) => {
     };
 
     const getContributors = () => {
-        return activeTab === 'positive' ? contributors.positive : contributors.negative;
+        if (activeTab === 'positive') return contributors.positive;
+        if (activeTab === 'negative') return contributors.negative;
+
+        // Mock "Watch Closely" markers
+        return [
+            { "display_name": "C-Reactive Protein", "current_value": 2.1, "unit": "mg/L", "inference": "Borderline High", "category": "Inflammation" },
+            { "display_name": "Homocysteine", "current_value": 11.4, "unit": "µmol/L", "inference": "Optimal but rising", "category": "Heart" },
+            { "display_name": "Uric Acid", "current_value": 6.8, "unit": "mg/dL", "inference": "Near threshold", "category": "Metabolic" }
+        ];
     };
 
     return (
@@ -51,10 +59,10 @@ const ContributorDetail = ({ initialTab = 'positive', onBack }) => {
                     </nav>
 
                     <header className="mb-8">
-                        <h1 className="text-4xl sm:text-5xl font-black text-foreground mb-4 tracking-tighter uppercase leading-none font-heading">
-                            System<br />Factors
+                        <h1 className="text-[22px] font-medium text-[#E4E4E7] mb-4 tracking-tight uppercase leading-tight font-heading">
+                            System Factors
                         </h1>
-                        <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed max-w-[95%] mb-8 font-medium">
+                        <p className="text-[#A1A1AA] text-[12px] leading-relaxed max-w-[95%] mb-8 font-normal">
                             Explore the core biometrics driving your health index. Optimizing these markers is the most efficient path to peak vitality.
                         </p>
 
@@ -64,14 +72,21 @@ const ContributorDetail = ({ initialTab = 'positive', onBack }) => {
                                 onClick={() => setActiveTab('positive')}
                                 className={`pb-4 text-[10px] font-black tracking-[0.25em] uppercase transition-all relative ${activeTab === 'positive' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                             >
-                                ROBUST
+                                Working well
                                 {activeTab === 'positive' && <div className="absolute bottom-0 left-0 w-full h-1 bg-primary shadow-md"></div>}
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('watch')}
+                                className={`pb-4 text-[10px] font-black tracking-[0.25em] uppercase transition-all relative ${activeTab === 'watch' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                            >
+                                WATCH
+                                {activeTab === 'watch' && <div className="absolute bottom-0 left-0 w-full h-1 bg-primary shadow-md"></div>}
                             </button>
                             <button
                                 onClick={() => setActiveTab('negative')}
                                 className={`pb-4 text-[10px] font-black tracking-[0.25em] uppercase transition-all relative ${activeTab === 'negative' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
                             >
-                                ATTENTION
+                                Needs attention
                                 {activeTab === 'negative' && <div className="absolute bottom-0 left-0 w-full h-1 bg-primary shadow-md"></div>}
                             </button>
                         </div>
@@ -122,14 +137,7 @@ const ContributorDetail = ({ initialTab = 'positive', onBack }) => {
                     </div>
                 </div>
 
-                {/* Decorative Elements */}
-                <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/5 rounded-full blur-[100px] pointer-events-none"></div>
-                <div className="absolute bottom-40 -left-20 w-80 h-80 bg-amber-500/5 rounded-full blur-[100px] pointer-events-none"></div>
 
-                {/* Footer info */}
-                <div className="p-5 sm:p-6 text-center border-t border-border bg-background/80 backdrop-blur-md relative z-20">
-                    <p className="text-[8px] font-black text-muted-foreground tracking-[0.4em] uppercase">SYSTEM_DIAGNOSTICS_SIGMA // SOLAR_VAR_A</p>
-                </div>
 
                 <style jsx>{`
                     .factor-grid {

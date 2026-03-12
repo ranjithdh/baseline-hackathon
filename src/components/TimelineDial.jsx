@@ -1,22 +1,17 @@
 import React, { useState } from 'react';
 
-const TimelineDial = ({ compact = false }) => {
-  const [selectedItem, setSelectedItem] = useState({
-    time: "11:43 PM",
-    title: "Water",
-    icon: "water_drop",
-    color: "bg-primary"
-  });
+const timelineItems = [
+    { angle: -60, time: "7:00 AM", title: "Wake Up", icon: "sunny", color: "bg-[#F59E0B]" },
+    { angle: -30, time: "8:00 AM", title: "Vitamin D", icon: "pill", color: "bg-[#F97316]" },
+    { angle: 30, time: "12:00 PM", title: "Balanced Meal", icon: "restaurant", color: "bg-[#10B981]" },
+    { angle: 90, time: "3:00 PM", title: "Hydration", icon: "water_drop", color: "bg-[#3B82F6]" },
+    { angle: 150, time: "7:00 PM", title: "Evening Walk", icon: "fitness_center", color: "bg-[#14B8A6]" },
+    { angle: 210, time: "9:00 PM", title: "Magnesium", icon: "pill", color: "bg-[#6366F1]" },
+    { angle: 240, time: "11:00 PM", title: "Sleep", icon: "nights_stay", color: "bg-[#334155]" },
+];
 
-  const timelineItems = [
-    { angle: -60, time: "7:00 AM", title: "Wake Up", icon: "sunny", color: "bg-primary" },
-    { angle: -30, time: "8:00 AM", title: "Vitamin D", icon: "pill", color: "bg-primary" },
-    { angle: 30, time: "12:00 PM", title: "Balanced Meal", icon: "restaurant", color: "bg-emerald-500" },
-    { angle: 90, time: "3:00 PM", title: "Hydration", icon: "water_drop", color: "bg-primary" },
-    { angle: 150, time: "7:00 PM", title: "Evening Walk", icon: "fitness_center", color: "bg-primary" },
-    { angle: 210, time: "9:00 PM", title: "Magnesium", icon: "pill", color: "bg-primary" },
-    { angle: 240, time: "11:00 PM", title: "Sleep", icon: "nights_stay", color: "bg-foreground" },
-  ];
+const TimelineDial = ({ compact = false }) => {
+  const [selectedItem, setSelectedItem] = useState(timelineItems[0]);
 
   const getPosition = (angle, radius) => {
     const radian = (angle - 90) * (Math.PI / 180);
@@ -33,10 +28,10 @@ const TimelineDial = ({ compact = false }) => {
   return (
     <div className={`relative w-full aspect-square ${dialSize} transition-all duration-500`}>
       {/* Outer Circle Ring */}
-      <div className="absolute inset-0 rounded-full border-[12px] border-card shadow-inner"></div>
+      <div className="absolute inset-0 rounded-full border-[12px] border-[#27272A] shadow-[inset_0_4px_20px_rgba(0,0,0,0.5)] bg-background/50 backdrop-blur-md"></div>
       
       {/* Clock Face Inner Shadow Area */}
-      <div className="absolute inset-[12px] rounded-full bg-card/30 flex items-center justify-center">
+      <div className="absolute inset-[12px] rounded-full bg-[#09090B]/40 flex items-center justify-center">
         
         {/* Hour Markers */}
         {[12, 3, 6, 9].map((num, i) => {
@@ -45,7 +40,7 @@ const TimelineDial = ({ compact = false }) => {
           return (
             <div 
               key={num} 
-              className="absolute text-[9px] font-black text-muted-foreground opacity-30"
+              className="absolute text-[9px] font-black text-muted-foreground opacity-40"
               style={{ left: pos.left, top: pos.top, transform: 'translate(-50%, -50%)' }}
             >
               {num}
@@ -54,7 +49,7 @@ const TimelineDial = ({ compact = false }) => {
         })}
 
         {/* Center Display */}
-        <div className={`${innerSize} rounded-full bg-card shadow-2xl flex flex-col items-center justify-center text-center p-4 border border-border relative z-10 transition-all duration-500`}>
+        <div className={`${innerSize} rounded-full bg-[#18181B] shadow-2xl flex flex-col items-center justify-center text-center p-4 border border-[#3F3F46] relative z-10 transition-all duration-500`}>
           <span className={`${compact ? 'text-sm' : 'text-xl'} font-black text-primary mb-0.5 font-heading`}>{selectedItem.time}</span>
           <span className={`${compact ? 'text-[10px]' : 'text-sm'} font-bold text-foreground mb-2 truncate max-w-full font-main`}>{selectedItem.title}</span>
           <div className={`${compact ? 'w-6 h-6' : 'w-8 h-8'} rounded-lg ${selectedItem.color} flex items-center justify-center shadow-lg transition-all`}>

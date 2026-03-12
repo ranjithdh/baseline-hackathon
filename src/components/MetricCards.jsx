@@ -3,11 +3,12 @@ import healthData from '../data.json';
 
 const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
   const isCaution = variant === 'caution';
-  const statusColor = isCaution ? 'var(--red-9)' : 'var(--green-9)';
-  
+  const isWatch = variant === 'watch';
+  const statusColor = isCaution ? 'var(--red-9)' : isWatch ? '245, 158, 11' : 'var(--green-9)';
+
   return (
-    <div 
-      className={`card-white ${variant}`} 
+    <div
+      className={`card-white ${variant}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -15,11 +16,11 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
       <div className="card-header">
         <div className="card-title-group">
           <div className="status-icon-container">
-            <span 
+            <span
               className="material-symbols-outlined text-[18px]"
               style={{ color: `rgb(${statusColor})` }}
             >
-              {isCaution ? 'warning' : 'check_circle'}
+              {isCaution ? 'warning' : isWatch ? 'visibility' : 'check_circle'}
             </span>
             <div className="icon-glow" style={{ '--glow-color': `rgb(${statusColor})` }} />
           </div>
@@ -152,6 +153,13 @@ const MetricCards = ({ onDetail }) => {
         mainValue={contributors.positive_count}
         label="POSITIVE FACTORS"
         onClick={() => onDetail('positive')}
+      />
+      <MetricCard
+        title="Watch Closely"
+        mainValue={3}
+        label="MONITORING REQUIRED"
+        variant="watch"
+        onClick={() => onDetail('watch')}
       />
       <MetricCard
         title="Needs Attention"

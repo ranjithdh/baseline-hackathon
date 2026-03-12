@@ -18,9 +18,9 @@ const HeroScore = ({ onSetGoal }) => {
             <div className="score-delta">
               <p className="delta-text">Status: {score_details.inference}</p>
             </div>
-            
+
             {/* Creative Explanation Tag */}
-            <motion.button 
+            <motion.button
               whileHover={{ scale: 1.05, backgroundColor: 'rgba(var(--brand-color), 0.1)' }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowDeepDive(true)}
