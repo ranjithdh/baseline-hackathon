@@ -46,30 +46,67 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
         transition: 'background 0.18s, border-color 0.18s',
         display: 'flex',
         flexDirection: 'column',
-        gap: '14px',
+        gap: '12px',
         boxShadow: isSelected ? '0 0 0 4px rgba(43,127,255,0.08)' : 'none',
       }}
     >
-      {/* Row 1: Added badge (left) + Gain (right) */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        {isSelected ? (
+      {/* Row 0: ✓ Added — own row, top-right, only when selected */}
+      {isSelected && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: '5px',
-            padding: '3px 10px', borderRadius: '100px',
+            padding: '4px 12px', borderRadius: '100px',
             fontSize: '10px', fontWeight: 600,
             fontFamily: 'var(--font-mono)',
             background: 'rgba(43,127,255,0.18)',
             color: 'rgb(43,127,255)',
             border: '1px solid rgba(43,127,255,0.3)',
             letterSpacing: '0.04em',
+            whiteSpace: 'nowrap',
           }}>
             ✓ Added
           </span>
-        ) : (
-          <div style={{ width: '1px' }} />
-        )}
+        </div>
+      )}
 
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+      {/* Row 1: Title + ★ needed (left)  |  +X points (right) — same horizontal line */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        gap: '12px',
+      }}>
+        {/* Left: name + needed chip */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{
+              fontSize: '15px', fontWeight: 700,
+              color: 'rgb(var(--zinc-100))',
+              fontFamily: 'var(--font-main)',
+              lineHeight: 1.3,
+            }}>
+              {item.name}
+            </span>
+            {isNeeded && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '3px',
+                padding: '2px 8px', borderRadius: '100px',
+                fontSize: '9px', fontWeight: 600,
+                fontFamily: 'var(--font-mono)',
+                letterSpacing: '0.07em', textTransform: 'uppercase',
+                background: 'rgba(255,197,61,0.14)',
+                color: 'rgb(255,197,61)',
+                border: '1px solid rgba(255,197,61,0.28)',
+                whiteSpace: 'nowrap',
+              }}>
+                ★ needed
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Right: +X points */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', flexShrink: 0 }}>
           <span style={{
             fontFamily: 'var(--font-heading)',
             fontSize: item.gain > 0 ? '22px' : '15px',
@@ -90,46 +127,16 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
         </div>
       </div>
 
-      {/* Row 2: Title + "★ needed" chip */}
-      <div>
-        <div style={{
-          display: 'flex', alignItems: 'flex-start',
-          gap: '8px', flexWrap: 'wrap', marginBottom: '8px',
-        }}>
-          <span style={{
-            fontSize: '15px', fontWeight: 700,
-            color: 'rgb(var(--zinc-100))',
-            fontFamily: 'var(--font-main)',
-            lineHeight: 1.3,
-          }}>
-            {item.name}
-          </span>
-          {isNeeded && (
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: '3px',
-              padding: '2px 8px', borderRadius: '100px',
-              fontSize: '9px', fontWeight: 600,
-              fontFamily: 'var(--font-mono)',
-              letterSpacing: '0.07em', textTransform: 'uppercase',
-              background: 'rgba(255,197,61,0.14)',
-              color: 'rgb(255,197,61)',
-              border: '1px solid rgba(255,197,61,0.28)',
-              whiteSpace: 'nowrap', marginTop: '2px',
-            }}>
-              ★ needed
-            </span>
-          )}
-        </div>
-        <p style={{
-          fontSize: '12px', color: 'rgba(228,228,231,0.42)',
-          lineHeight: 1.65, margin: 0,
-        }}>
-          {item.detail}
-        </p>
-      </div>
+      {/* Row 2: Description */}
+      <p style={{
+        fontSize: '12px', color: 'rgba(228,228,231,0.42)',
+        lineHeight: 1.65, margin: 0,
+      }}>
+        {item.detail}
+      </p>
 
-      {/* Row 3: Bottom chips */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: 'auto', paddingTop: '2px' }}>
+      {/* Row 3: Chips only */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: 'auto' }}>
         {item.timeline && item.gain > 0 && (
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: '5px',
@@ -142,14 +149,6 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
             <span style={{ opacity: 0.6, fontSize: '11px' }}>⊙</span> {item.timeline}
           </span>
         )}
-        <span style={{
-          padding: '4px 10px', borderRadius: '100px',
-          fontSize: '10px', color: 'rgba(255,255,255,0.38)',
-          border: '1px solid rgba(255,255,255,0.09)',
-          background: 'rgba(255,255,255,0.03)',
-        }}>
-          {catType}
-        </span>
         {item.tags && item.tags.map(tag => (
           <span key={tag} style={{
             padding: '4px 10px', borderRadius: '100px',
@@ -457,9 +456,24 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
                 }}
               >
                 <span style={{ fontSize: '15px', lineHeight: 1 }}>{cat.icon}</span>
-                {cat.name}
 
-                {/* Green dot for tabs with selected items */}
+                {/* Name + count inline */}
+                <span>
+                  {cat.name}
+                  {catSelected > 0 && (
+                    <span style={{
+                      marginLeft: '5px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: isActive ? 'rgb(43,127,255)' : 'rgb(48,164,108)',
+                      fontFamily: 'var(--font-mono)',
+                    }}>
+                      ({catSelected})
+                    </span>
+                  )}
+                </span>
+
+                {/* Green dot — items selected */}
                 {catSelected > 0 && (
                   <span style={{
                     width: '7px', height: '7px', borderRadius: '50%',
@@ -468,7 +482,7 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
                   }} />
                 )}
 
-                {/* Amber dot for tabs with "needed" items and no selections yet */}
+                {/* Amber dot — needed but nothing selected yet */}
                 {catSelected === 0 && catNeeded && (
                   <span style={{
                     width: '7px', height: '7px', borderRadius: '50%',

@@ -1,6 +1,4 @@
 // ── Desktop Plan Data ─────────────────────────────────────────────
-// Categories and action items used in the DesktopPlanPanel accordion.
-
 export const BASE_SCORE     = 65;
 export const MAX_ACHIEVABLE = 80;
 
@@ -51,7 +49,8 @@ export const CATEGORIES = [
     ],
   },
   {
-    id: 'movement', icon: '🏃', name: 'Movement', type: 'Exercise',
+    // Renamed from "Movement" → "Exercise"
+    id: 'exercise', icon: '🏃', name: 'Exercise', type: 'Exercise',
     items: [
       {
         id: 'cardio', icon: '🚶', name: 'Zone 2 Cardio', gain: 4, timeline: '8 wks',
@@ -66,7 +65,8 @@ export const CATEGORIES = [
     ],
   },
   {
-    id: 'sleep', icon: '😴', name: 'Sleep', type: 'Lifestyle',
+    // Merged: Sleep + Stress Management + Reduce Alcohol → Lifestyle
+    id: 'lifestyle', icon: '🌿', name: 'Lifestyle', type: 'Lifestyle',
     items: [
       {
         id: 'sleep', icon: '🌙', name: 'Sleep Protocol', gain: 2, timeline: '4 wks',
@@ -78,11 +78,6 @@ export const CATEGORIES = [
         tags: ['Sleep'],
         detail: 'Room temperature 16–19°C, blackout curtains, no devices charging near bed. Highest-ROI sleep intervention with zero cost.',
       },
-    ],
-  },
-  {
-    id: 'stress', icon: '🧘', name: 'Stress Management', type: 'Lifestyle',
-    items: [
       {
         id: 'breath', icon: '🌬️', name: 'Breathwork (Daily)', gain: 1, timeline: '2 wks',
         tags: ['HRV', 'Cortisol'],
@@ -93,11 +88,6 @@ export const CATEGORIES = [
         tags: ['HRV'],
         detail: 'Track morning HRV with a wearable. HRV data gives you a daily readiness signal — telling you whether to push or rest.',
       },
-    ],
-  },
-  {
-    id: 'alcohol', icon: '🍷', name: 'Reduce Alcohol', type: 'Lifestyle',
-    items: [
       {
         id: 'alc', icon: '🍷', name: 'Alcohol Reduction', gain: 0, timeline: '4 wks',
         tags: ['General'],
