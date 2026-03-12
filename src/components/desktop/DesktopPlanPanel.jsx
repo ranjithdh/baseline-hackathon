@@ -146,7 +146,7 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
             background: 'rgba(255,255,255,0.04)',
             fontFamily: 'var(--font-mono)',
           }}>
-            <span style={{ opacity: 0.6, fontSize: '11px' }}>⊙</span> {item.timeline}
+            <span style={{ opacity: 0.6, fontSize: '16px', lineHeight: 1 }}>⊙</span> {item.timeline}
           </span>
         )}
         {item.tags && item.tags.map(tag => (
