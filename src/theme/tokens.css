@@ -123,6 +123,8 @@
   --zinc-900: 24 24 27;
   --zinc-950: 9 9 11;
 
+  --secondary: 16 185 129;
+
 
   --slate-1: 17 17 19;
   --slate-2: 24 25 27;
@@ -189,14 +191,14 @@
   --green-11: 61 214 140;
   --green-12: 177 241 203;
 
-  /* Rank Colors - Dark */
+  /* Rank Colors - Dark (Synced with Reference Image) */
   --rating-rank-0: 100 116 139;
   --rating-rank-1: 71 85 105;
-  --rating-rank-2: 248 113 113; /* Red 400 */
-  --rating-rank-3: 251 146 60;  /* Orange 400 */
-  --rating-rank-4: 250 204 21;  /* Yellow 400 */
-  --rating-rank-5: 74 222 128;  /* Green 400 */
-  --rating-rank-6: 52 211 153;  /* Emerald 400 */
+  --rating-rank-2: 236 123 103; /* Compromised - Salmon */
+  --rating-rank-3: 244 180 84;  /* Constrained - Mustard */
+  --rating-rank-4: 134 239 172; /* Stable - Mint Green */
+  --rating-rank-5: 47 124 87;   /* Robust - Deep Forest */
+  --rating-rank-6: 16 185 129;  /* Elite - Emerald Teal */
 }
 
 :root {
@@ -210,6 +212,7 @@
   
   --primary: var(--brand-color);
   --primary-text: var(--brand-color-text);
+  --secondary-color: rgb(var(--secondary));
   
   --muted: var(--zinc-900);
   --muted-foreground: var(--zinc-400);

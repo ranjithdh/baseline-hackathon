@@ -7,8 +7,8 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
   const lastScrollY = useRef(0);
   const [isFooterVisible, setIsFooterVisible] = useState(true);
   const [selectedAction, setSelectedAction] = useState(null);
-  const [expandedCategory, setExpandedCategory] = useState("Nutrition");
-  const baseScore = 72;
+  const [expandedCategory, setExpandedCategory] = useState(null);
+  const baseScore = 70;
 
   const protocolPool = {
     exercises: ["Strength Training", "Endurance", "HIIT"],
@@ -29,7 +29,7 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
       {
         category: "Nutrition",
         icon: "restaurant",
-        items: getRandom(protocolPool.nutrition, 4),
+        items: getRandom(protocolPool.nutrition, 5),
         bgImage: "file:///Users/apple/.gemini/antigravity/brain/a9f9dd11-ca93-4dde-a11f-e8700f653cb0/nutrition_bg_bw_1772713086135.png"
       },
       {
@@ -47,13 +47,15 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
       {
         category: "Lifestyle",
         icon: "nights_stay",
-        items: [...getRandom(protocolPool.sleep, 2), ...getRandom(protocolPool.stress, 1)],
+        items: [...getRandom(protocolPool.sleep, 1), ...getRandom(protocolPool.stress, 1)],
         bgImage: "file:///Users/apple/.gemini/antigravity/brain/a9f9dd11-ca93-4dde-a11f-e8700f653cb0/lifestyle_bg_bw_1772713120099.png"
       }
     ];
   });
 
-  const [completedProtocols, setCompletedProtocols] = useState(new Set());
+  const [completedProtocols, setCompletedProtocols] = useState(() => {
+    return new Set(selectedProtocols.flatMap(group => group.items));
+  });
 
   useEffect(() => {
     // No-op for scroll visibility - footer is now absolute and conditional
@@ -85,7 +87,7 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
 
   return (
     <div className="bg-background text-foreground font-main h-screen flex justify-center overflow-hidden">
-      <main className="w-full max-w-[430px] h-full bg-background flex flex-col relative shadow-2xl overflow-hidden">
+      <main className="w-full max-w-[430px] h-full bg-background flex flex-col relative shadow-2xl overflow-hidden text-[#f2f2f2]">
 
         {/* Scrollable Content Area */}
         <div
@@ -130,151 +132,135 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
             </header>
           </div>
 
-          <div className="px-6 sm:px-8 pt-8 pb-48">
-            <section className="space-y-5">
-            {selectedProtocols.map((group, idx) => {
-              const isOpen = expandedCategory === group.category;
-              const progress = getProgressInfo(group);
+          <div className="px-6 sm:px-8 pt-8 pb-64">
+            <section className="space-y-4">
+              {selectedProtocols.map((group, idx) => {
+                const isOpen = expandedCategory === group.category;
+                const progress = getProgressInfo(group);
 
-              return (
-                <div
-                  key={idx}
-                  className={`rounded-[40px] border transition-all duration-700 overflow-hidden relative ${isOpen ? 'bg-zinc-950 border-zinc-700/40 shadow-2xl' : 'bg-zinc-900/40 border-zinc-800/40 hover:border-zinc-700/50'
-                    }`}
-                >
-                  {/* Category Image Overlay */}
-                  <div className={`absolute top-0 right-0 pointer-events-none overflow-hidden transition-all duration-700 ${isOpen ? 'w-full h-[100px] opacity-10' : 'w-full h-full opacity-5'
-                    }`}>
-                    <img src={group.bgImage} alt="" className="w-full h-full object-cover grayscale brightness-200" />
-                    <div className="absolute inset-0 bg-gradient-to-l from-transparent via-zinc-950/80 to-zinc-950" />
-                  </div>
-
-                  <button
-                    onClick={() => setExpandedCategory(isOpen ? null : group.category)}
-                    className="w-full p-8 flex justify-between items-center relative z-10 group"
+                return (
+                  <div
+                    key={idx}
+                    className={`rounded-[32px] border transition-all duration-700 overflow-hidden relative ${isOpen ? 'bg-zinc-950 border-zinc-700/40 shadow-2xl' : 'bg-zinc-900 border-zinc-700/60 hover:border-zinc-700/80'
+                      }`}
                   >
-                    <div className="flex items-center gap-6 text-left">
-                      <div className={`w-14 h-14 rounded-[22px] flex items-center justify-center border transition-all duration-500 shadow-xl overflow-hidden bg-zinc-950 ${isOpen ? 'border-primary shadow-[0_0_15px_rgba(var(--brand-color),0.2)]' : 'border-zinc-800'
-                        }`}>
-                        <span className={`material-symbols-outlined text-2xl transition-colors duration-500 ${isOpen ? 'text-primary' : 'text-primary/40'}`}>{group.icon}</span>
-                      </div>
-                      <div>
-                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground">{group.category}</h3>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1.5 flex items-center gap-2">
-                          <span className="text-primary">{progress.completed} of {progress.total}</span> SELECTED
-                        </p>
-                      </div>
+                    {/* Category Image Overlay */}
+                    <div className={`absolute top-0 right-0 pointer-events-none overflow-hidden transition-all duration-700 ${isOpen ? 'w-full h-[80px] opacity-10' : 'w-full h-full opacity-5'
+                      }`}>
+                      <img src={group.bgImage} alt="" className="w-full h-full object-cover grayscale brightness-200" />
+                      <div className="absolute inset-0 bg-gradient-to-l from-transparent via-zinc-950/80 to-zinc-950" />
                     </div>
 
-                    <div className="flex items-center gap-4">
-                      <span className={`material-symbols-outlined transition-transform duration-700 text-muted-foreground ${isOpen ? 'rotate-180 text-primary scale-110' : 'group-hover:translate-y-1'}`}>
-                        {isOpen ? 'expand_less' : 'expand_more'}
-                      </span>
-                    </div>
-                  </button>
-
-                  <AnimatePresence>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                      >
-                        <div className="px-8 pb-10 pt-2">
-                          <ul className="space-y-3.5 relative">
-                            {/* Connection Line */}
-                            <div className="absolute left-7 top-0 bottom-0 w-px bg-zinc-800/50" />
-
-                            {group.items.map((item, i) => {
-                              const isCompleted = completedProtocols.has(item);
-                              return (
-                                <li
-                                  key={i}
-                                  className={`flex items-center justify-between p-6 rounded-[30px] border transition-all duration-300 relative ${isCompleted
-                                    ? 'bg-zinc-900/80 border-emerald-500/20 shadow-lg'
-                                    : 'bg-zinc-950/40 border-zinc-800/60 hover:border-zinc-700'
-                                    }`}
-                                >
-                                  <div
-                                    className="flex-1 cursor-pointer"
-                                    onClick={() => setSelectedAction({ item, category: group.category })}
-                                  >
-                                    <span className={`text-[15px] font-bold tracking-tight block ${isCompleted ? 'text-foreground' : 'text-foreground/60'}`}>
-                                      {item}
-                                    </span>
-                                  </div>
-
-                                  <div className="flex items-center gap-4">
-                                    <span className={`text-[10px] font-black uppercase tracking-widest transition-opacity ${isCompleted ? 'text-emerald-500' : 'text-muted-foreground opacity-30'}`}>
-                                      +1 POINT
-                                    </span>
-                                    <button
-                                      onClick={() => toggleProtocol(item)}
-                                      className={`w-9 h-9 rounded-full border-2 transition-all duration-500 flex items-center justify-center ${isCompleted
-                                        ? 'bg-emerald-500 border-emerald-500 text-zinc-950 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
-                                        : 'border-zinc-800 text-transparent hover:border-zinc-600'
-                                        }`}
-                                    >
-                                      <span className="material-symbols-outlined text-[20px] font-black">
-                                        {isCompleted ? 'check' : ''}
-                                      </span>
-                                    </button>
-                                  </div>
-                                </li>
-                              );
-                            })}
-                          </ul>
+                    <button
+                      onClick={() => setExpandedCategory(isOpen ? null : group.category)}
+                      className="w-full p-6 flex justify-between items-center relative z-10 group"
+                    >
+                      <div className="flex items-center gap-5 text-left">
+                        <div className={`w-12 h-12 rounded-[18px] flex items-center justify-center border transition-all duration-500 shadow-xl overflow-hidden bg-zinc-950 ${isOpen ? 'border-primary shadow-[0_0_15px_rgba(var(--brand-color),0.2)]' : 'border-zinc-800'
+                          }`}>
+                          <span className={`material-symbols-outlined text-xl transition-colors duration-500 ${isOpen ? 'text-primary' : 'text-primary/40'}`}>{group.icon}</span>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              );
-            })}
-          </section>
+                        <div>
+                          <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-foreground">{group.category}</h3>
+                          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                            <span className="text-primary">{progress.completed} of {progress.total}</span> SELECTED
+                          </p>
+                        </div>
+                      </div>
 
-          <AnimatePresence>
-            {selectedAction && (
-              <ActionDetail
-                item={selectedAction.item}
-                category={selectedAction.category}
-                onClose={() => setSelectedAction(null)}
-              />
-            )}
-          </AnimatePresence>
+                      <div className="flex items-center gap-4">
+                        <span className={`material-symbols-outlined transition-transform duration-700 text-muted-foreground ${isOpen ? 'rotate-180 text-primary scale-110' : 'group-hover:translate-y-1'}`}>
+                          {isOpen ? 'expand_less' : 'expand_more'}
+                        </span>
+                      </div>
+                    </button>
+
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        >
+                          <div className="px-5 pb-6 pt-0">
+                            <ul className="space-y-2 relative">
+                              {/* Connection Line */}
+                              <div className="absolute left-[26px] top-0 bottom-0 w-px bg-zinc-800/20" />
+
+                              {group.items.map((item, i) => {
+                                const isCompleted = completedProtocols.has(item);
+                                return (
+                                  <li
+                                    key={i}
+                                    className={`flex items-center justify-between p-[14px] rounded-[24px] border transition-all duration-300 relative ${isCompleted
+                                      ? 'bg-zinc-900/80 border-emerald-500/20 shadow-lg'
+                                      : 'bg-zinc-900/40 border-zinc-700/50 hover:border-zinc-600'
+                                      }`}
+                                  >
+                                    <div
+                                      className="flex-1 cursor-pointer"
+                                      onClick={() => setSelectedAction({ item, category: group.category })}
+                                    >
+                                      <span className={`text-[13px] font-bold tracking-tight block pl-3 ${isCompleted ? 'text-foreground' : 'text-foreground/60'}`}>
+                                        {item}
+                                      </span>
+                                    </div>
+
+                                    <div className="flex items-center gap-2.5 pr-1">
+                                      <span className={`text-[8px] font-black uppercase tracking-widest transition-opacity ${isCompleted ? 'text-emerald-500' : 'text-muted-foreground opacity-30'}`}>
+                                        +1 PT
+                                      </span>
+                                      <button
+                                        onClick={() => toggleProtocol(item)}
+                                        className={`w-7 h-7 rounded-full border-[1.5px] transition-all duration-500 flex items-center justify-center ${isCompleted
+                                          ? 'bg-emerald-500 border-emerald-500 text-zinc-950 shadow-[0_0_15px_rgba(16,185,129,0.3)] opacity-100'
+                                          : 'border-zinc-500 bg-zinc-900/50 text-transparent hover:border-zinc-400/80 opacity-100'
+                                          }`}
+                                      >
+                                        <span className="material-symbols-outlined text-[16px] font-black">
+                                          {isCompleted ? 'check' : ''}
+                                        </span>
+                                      </button>
+                                    </div>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </section>
+
+            <AnimatePresence>
+              {selectedAction && (
+                <ActionDetail
+                  item={selectedAction.item}
+                  category={selectedAction.category}
+                  onClose={() => setSelectedAction(null)}
+                />
+              )}
+            </AnimatePresence>
+          </div>
         </div>
-      </div>
 
-        {/* Conditional & Absolute Footer Area */}
-        <AnimatePresence>
-          {completedProtocols.size > 0 && !selectedAction && (
-            <motion.footer
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 100 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute bottom-0 left-0 right-0 px-8 pt-8 pb-14 bg-card/90 backdrop-blur-2xl border-t border-border z-40"
-            >
-              <div className="flex flex-col gap-6">
-                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
-                  <p className="text-[10px] text-primary-text text-center leading-relaxed font-medium">
-                    <span className="font-black mr-1 uppercase tracking-widest text-[9px]">Disclaimer:</span>
-                    This action plan is based on your current biometric data and is intended for informational purposes only. Consult with a qualified healthcare professional before starting any new health protocol.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <button
-                    className="w-full bg-primary text-primary-foreground py-5 rounded-3xl font-black text-[12px] tracking-[0.2em] uppercase shadow-xl active:scale-[0.98] transition-all hover:opacity-90 font-heading"
-                    onClick={onAnalyze}
-                  >
-                    Analyze & Book
-                  </button>
-                </div>
-              </div>
-            </motion.footer>
-          )}
-        </AnimatePresence>
+        {/* Glass Bottom Action Area */}
+        <div className={`absolute bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-t border-zinc-800/20 px-8 pt-5 pb-[12px] flex flex-col items-center gap-4 transition-transform duration-500 overflow-hidden ${selectedAction ? 'translate-y-full' : 'translate-y-0'}`}>
+          <p className="text-[8px] sm:text-[9px] text-muted-foreground/50 text-center leading-relaxed font-bold tracking-widest max-w-[320px]">
+            Disclaimer: Informational Only. Consult a Healthcare Professional before starting any new protocol.
+          </p>
+
+          <button
+            onClick={onAnalyze}
+            className="w-full bg-primary text-zinc-950 font-black text-[12px] tracking-[0.25em] uppercase py-5 rounded-full shadow-2xl shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all font-heading"
+          >
+            Analyze & Book
+          </button>
+        </div>
 
         {/* Decorative Elements */}
         <div className="absolute top-20 right-[-100px] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
