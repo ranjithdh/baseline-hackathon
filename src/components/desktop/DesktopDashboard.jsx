@@ -1,9 +1,11 @@
 import React, { useRef, useState } from 'react';
-import DesktopSidebar       from './DesktopSidebar';
-import DesktopTopBar        from './DesktopTopBar';
-import DesktopScoreHero     from './DesktopScoreHero';
-import DesktopPlanPanel     from './DesktopPlanPanel';
-import DesktopDownloadStrip from './DesktopDownloadStrip';
+import DesktopSidebar        from './DesktopSidebar';
+import DesktopTopBar         from './DesktopTopBar';
+import DesktopScoreHero      from './DesktopScoreHero';
+import DesktopBiomarkerRow   from './DesktopBiomarkerRow';
+import DesktopPlanPanel      from './DesktopPlanPanel';
+import DesktopConsultBanner  from './DesktopConsultBanner';
+import DesktopDownloadStrip  from './DesktopDownloadStrip';
 
 const DesktopDashboard = () => {
   const [activeNav, setActiveNav]  = useState('dashboard');
@@ -36,13 +38,33 @@ const DesktopDashboard = () => {
         {/* Top bar */}
         <DesktopTopBar onBookConsult={() => setActiveNav('consult')} />
 
-        {/* Score hero (2-col grid: arc card + summary cards) */}
-        <DesktopScoreHero onSimulate={scrollToPlanPanel} />
+        {/* ── Row 1: Score Card + Consult Banner (side-by-side) ── */}
+        <>
+          <style>{`
+            .hero-consult-row {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 28px;
+              padding: 48px 48px 0;
+              align-items: stretch;
+            }
+            @media (max-width: 900px) {
+              .hero-consult-row { grid-template-columns: 1fr; }
+            }
+          `}</style>
+          <div className="hero-consult-row">
+            <DesktopScoreHero onSimulate={scrollToPlanPanel} />
+            <DesktopConsultBanner onBookNow={() => setActiveNav('consult')} />
+          </div>
+        </>
 
-        {/* Plan panel (goal slider + accordion) */}
+        {/* ── Row 2: Biomarker cards (Working For You / Needs Attention / Watch Closely) ── */}
+        <DesktopBiomarkerRow />
+
+        {/* ── Plan panel (goal slider + accordion) ── */}
         <DesktopPlanPanel planPanelRef={planPanelRef} />
 
-        {/* Download strip */}
+        {/* ── Download strip ── */}
         <div style={{ marginTop: '48px' }}>
           <DesktopDownloadStrip />
         </div>
