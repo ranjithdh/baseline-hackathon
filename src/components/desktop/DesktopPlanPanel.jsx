@@ -3,8 +3,8 @@ import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlan
 import ExpertGuidanceCard from './ExpertGuidanceCard';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
-const GOAL_MIN  = BASE_SCORE;
-const GOAL_MAX  = 100;
+const GOAL_MIN = BASE_SCORE;
+const GOAL_MAX = 100;
 
 const getScoreStatus = (score) => {
   if (score >= 86) return { text: 'Elite', color: 'rgb(48, 164, 108)', bg: 'rgba(48, 164, 108, 0.12)', border: 'rgba(48, 164, 108, 0.3)' };
@@ -176,23 +176,23 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
 
 // ── Main Component ───────────────────────────────────────────────
 const DesktopPlanPanel = ({ planPanelRef }) => {
-  const [goalTarget,  setGoalTarget]  = useState(70);
+  const [goalTarget, setGoalTarget] = useState(70);
   const [selectedIds, setSelectedIds] = useState(() => computeNeeded(70));
-  const [activeTab,   setActiveTab]   = useState(CATEGORIES[0].id);
+  const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
 
-  const neededIds   = useMemo(() => computeNeeded(goalTarget), [goalTarget]);
-  const ptsNeeded   = Math.min(goalTarget, MAX_ACHIEVABLE) - BASE_SCORE;
-  const gained      = ALL_ITEMS.filter(i => selectedIds.has(i.id)).reduce((s, i) => s + i.gain, 0);
-  const projScore   = Math.min(100, BASE_SCORE + gained);
-  const toGoal      = goalTarget - projScore;
+  const neededIds = useMemo(() => computeNeeded(goalTarget), [goalTarget]);
+  const ptsNeeded = Math.min(goalTarget, MAX_ACHIEVABLE) - BASE_SCORE;
+  const gained = ALL_ITEMS.filter(i => selectedIds.has(i.id)).reduce((s, i) => s + i.gain, 0);
+  const projScore = Math.min(100, BASE_SCORE + gained);
+  const toGoal = goalTarget - projScore;
   const progressPct = ptsNeeded > 0 ? Math.min(100, (gained / ptsNeeded) * 100) : 100;
-  const sliderPct   = ((goalTarget - GOAL_MIN) / (GOAL_MAX - GOAL_MIN)) * 100;
+  const sliderPct = ((goalTarget - GOAL_MIN) / (GOAL_MAX - GOAL_MIN)) * 100;
 
   const badge = ptsNeeded <= 7
-    ? { text: 'Achievable · 8 wks',  bg: 'rgba(48,164,108,0.15)',  color: 'rgb(48,164,108)',  border: 'rgba(48,164,108,0.28)' }
+    ? { text: 'Achievable · 8 wks', bg: 'rgba(48,164,108,0.15)', color: 'rgb(48,164,108)', border: 'rgba(48,164,108,0.28)' }
     : ptsNeeded <= 12
-    ? { text: 'Stretch · 12 wks',    bg: 'rgba(255,197,61,0.15)',  color: 'rgb(255,197,61)', border: 'rgba(255,197,61,0.28)' }
-    : { text: 'Ambitious · 16+ wks', bg: 'rgba(241,121,104,0.15)', color: 'rgb(241,121,104)', border: 'rgba(241,121,104,0.28)' };
+      ? { text: 'Stretch · 12 wks', bg: 'rgba(255,197,61,0.15)', color: 'rgb(255,197,61)', border: 'rgba(255,197,61,0.28)' }
+      : { text: 'Ambitious · 16+ wks', bg: 'rgba(241,121,104,0.15)', color: 'rgb(241,121,104)', border: 'rgba(241,121,104,0.28)' };
 
   const activeCategory = CATEGORIES.find(c => c.id === activeTab);
 
@@ -214,25 +214,26 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
   };
 
   return (
-    <div
-      ref={planPanelRef}
-      style={{
-        margin: '32px 48px 0',
-        background: 'rgb(var(--zinc-950))',
-        borderRadius: '28px',
-        position: 'relative',
-      }}
-    >
-      {/* Background gradient */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
-        background: `radial-gradient(ellipse at 5% 0%, rgba(241,121,104,0.10) 0%, transparent 45%),
-                     radial-gradient(ellipse at 95% 100%, rgba(255,197,61,0.06) 0%, transparent 45%)`,
-      }} />
-
+    <>
       {goalTarget > MAX_ACHIEVABLE && (
         <ExpertGuidanceCard targetScore={goalTarget} />
       )}
+
+      <div
+        ref={planPanelRef}
+        style={{
+          margin: '32px 48px 0',
+          background: 'rgb(var(--zinc-950))',
+          borderRadius: '28px',
+          position: 'relative',
+        }}
+      >
+        {/* Background gradient */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
+          background: `radial-gradient(ellipse at 5% 0%, rgba(241,121,104,0.10) 0%, transparent 45%),
+                       radial-gradient(ellipse at 95% 100%, rgba(255,197,61,0.06) 0%, transparent 45%)`,
+        }} />
 
       {/* ── GOAL SETTER ── */}
       <div style={{
@@ -349,12 +350,12 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
             fontFamily: 'var(--font-mono)',
             color: gained === 0 ? 'rgba(228,228,231,0.25)'
               : projScore >= goalTarget ? 'rgb(48,164,108)'
-              : 'rgb(255,197,61)',
+                : 'rgb(255,197,61)',
             transition: 'color 0.3s',
           }}>
             {gained === 0 ? 'Select actions below'
               : projScore >= goalTarget ? `+${gained} pts · Goal ✓`
-              : `+${gained} pts · ${toGoal} more`}
+                : `+${gained} pts · ${toGoal} more`}
           </div>
         </div>
       </div>
@@ -439,9 +440,9 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
           display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap',
         }}>
           {CATEGORIES.map(cat => {
-            const isActive   = cat.id === activeTab;
+            const isActive = cat.id === activeTab;
             const catSelected = cat.items.filter(i => selectedIds.has(i.id)).length;
-            const catNeeded   = cat.items.some(i => neededIds.has(i.id));
+            const catNeeded = cat.items.some(i => neededIds.has(i.id));
 
             return (
               <button
@@ -454,8 +455,8 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
                   border: isActive
                     ? '1px solid rgba(43,127,255,0.5)'
                     : catNeeded
-                    ? '1px solid rgba(255,197,61,0.25)'
-                    : '1px solid rgba(255,255,255,0.10)',
+                      ? '1px solid rgba(255,197,61,0.25)'
+                      : '1px solid rgba(255,255,255,0.10)',
                   background: isActive
                     ? 'rgba(43,127,255,0.18)'
                     : 'rgba(255,255,255,0.04)',
@@ -528,7 +529,8 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
           </div>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -20,7 +20,7 @@ const DesktopDashboard = () => {
     <div style={{
       display: 'grid',
       gridTemplateColumns: '260px 1fr',
-      minHeight: '100vh',
+      height: '100vh',
       width: '100%',
     }}>
       {/* ── Sidebar ── */}
@@ -32,7 +32,7 @@ const DesktopDashboard = () => {
       {/* ── Main content ── */}
       <main style={{
         background: 'var(--bg-color)',
-        minHeight: '100vh',
+        height: '100vh',
         overflowY: 'auto',
       }}>
         {/* Top bar */}
