@@ -213,6 +213,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
 
   return (
     <>
+      {/* ── PLAYGROUND / GOAL SETTER CONTAINER ── */}
       <div
         ref={planPanelRef}
         style={{
@@ -393,7 +394,14 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
         </div>
       </div> */}
 
-      {/* ── ACTION PLAN: header + tabs + cards ── */}
+      </div>
+      {/* ── ACTION PLAN: separate section ── */}
+      <div style={{
+        margin: '20px 48px 0',
+        background: 'rgb(var(--zinc-950))',
+        borderRadius: '28px',
+        position: 'relative',
+      }}>
       <div style={{ padding: '28px 44px 40px', position: 'relative', zIndex: 1 }}>
 
         {/* Section header */}
