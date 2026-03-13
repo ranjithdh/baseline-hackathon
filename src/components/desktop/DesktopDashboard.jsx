@@ -5,10 +5,13 @@ import DesktopScoreHero      from './DesktopScoreHero';
 import DesktopBiomarkerRow   from './DesktopBiomarkerRow';
 import DesktopPlanPanel      from './DesktopPlanPanel';
 import DesktopConsultBanner  from './DesktopConsultBanner';
+import ExpertGuidanceCard    from './ExpertGuidanceCard';
+import { MAX_ACHIEVABLE }    from './desktopPlanData';
 
 
 const DesktopDashboard = () => {
   const [activeNav, setActiveNav]  = useState('dashboard');
+  const [goalTarget, setGoalTarget] = useState(70);
   const planPanelRef               = useRef(null);
 
   const scrollToPlanPanel = () => {
@@ -35,6 +38,13 @@ const DesktopDashboard = () => {
         height: '100vh',
         overflowY: 'auto',
       }}>
+         {/* ── Expert Guidance sticky banner (only when goal exceeds achievable) ── */}
+        {goalTarget > MAX_ACHIEVABLE && (
+          <div style={{ width:'calc(100% - 260px)',position: 'fixed', top: 0, zIndex: 100, padding:'0px 48px' }}>
+            <ExpertGuidanceCard targetScore={goalTarget} />
+          </div>
+        )}
+
         {/* Top bar */}
         <DesktopTopBar onBookConsult={() => setActiveNav('consult')} />
 
@@ -61,8 +71,14 @@ const DesktopDashboard = () => {
         {/* ── Row 2: Biomarker cards (Working For You / Needs Attention / Watch Closely) ── */}
         <DesktopBiomarkerRow />
 
+       
+
         {/* ── Plan panel (goal slider + accordion) ── */}
-        <DesktopPlanPanel planPanelRef={planPanelRef} />
+        <DesktopPlanPanel
+          planPanelRef={planPanelRef}
+          goalTarget={goalTarget}
+          onGoalChange={setGoalTarget}
+        />
 
       </main>
     </div>

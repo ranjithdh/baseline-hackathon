@@ -3,18 +3,11 @@ import React from 'react';
 const ExpertGuidanceCard = ({ targetScore }) => {
   return (
     <div style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 1000,
       width: '100%',
       marginBottom: '0',
-      borderRadius: 0,
-      overflow: 'hidden',
-      background: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.45)), url('file:///Users/apple/.gemini/antigravity/brain/fa9c577f-ab0a-43f9-9bfe-3bd313206db4/media__1773387580265.png')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backdropFilter: 'blur(8px)',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+      borderRadius: '10px',
+      background: 'linear-gradient(135deg, rgba(60,60,90,0.95) 0%, rgba(90,60,130,0.95) 100%)',
+      backdropFilter: 'blur(2px)',
       boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
       display: 'flex',
       flexDirection: 'column',
@@ -54,7 +47,8 @@ const ExpertGuidanceCard = ({ targetScore }) => {
           cursor: 'pointer',
           fontFamily: 'var(--font-main)',
           transition: 'transform 0.2s, background 0.2s',
-          width: 'fit-content'
+          width: 'fit-content',
+          zIndex:9999
         }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'scale(1.02)';

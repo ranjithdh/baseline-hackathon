@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
-import ExpertGuidanceCard from './ExpertGuidanceCard';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
 const GOAL_MIN = BASE_SCORE;
@@ -175,9 +174,8 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
 };
 
 // ── Main Component ───────────────────────────────────────────────
-const DesktopPlanPanel = ({ planPanelRef }) => {
-  const [goalTarget, setGoalTarget] = useState(70);
-  const [selectedIds, setSelectedIds] = useState(() => computeNeeded(70));
+const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
+  const [selectedIds, setSelectedIds] = useState(() => computeNeeded(goalTarget));
   const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
 
   const neededIds = useMemo(() => computeNeeded(goalTarget), [goalTarget]);
@@ -201,7 +199,7 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
 
   const handleGoalChange = (val) => {
     const g = parseInt(val);
-    setGoalTarget(g);
+    onGoalChange(g);
     setSelectedIds(new Set(computeNeeded(g)));
   };
 
@@ -215,10 +213,6 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
 
   return (
     <>
-      {goalTarget > MAX_ACHIEVABLE && (
-        <ExpertGuidanceCard targetScore={goalTarget} />
-      )}
-
       <div
         ref={planPanelRef}
         style={{
