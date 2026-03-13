@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ActionDetail from './ActionDetail';
 
-const ActionPlan = ({ onBack, onAnalyze }) => {
+
+const ActionPlan = ({ onBack, onAnalyze, onViewDetailed }) => {
   const scrollContainerRef = useRef(null);
   const lastScrollY = useRef(0);
-  const [isFooterVisible, setIsFooterVisible] = useState(true);
-  const [selectedAction, setSelectedAction] = useState(null);
+
   const [expandedCategory, setExpandedCategory] = useState(null);
   const baseScore = 70;
 
@@ -112,6 +111,13 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
                   <h1 className="text-[22px] font-medium text-[#E4E4E7] tracking-tight uppercase leading-tight font-heading">
                     Action Plan
                   </h1>
+                  <button
+                    onClick={() => onViewDetailed({ selectedProtocols, completedProtocols })}
+                    className="text-[10px] font-bold text-[#2b7fff] mt-1 hover:underline cursor-pointer flex items-center gap-1 group"
+                  >
+                    View Action Details
+                    <span className="material-symbols-outlined text-[10px] group-hover:translate-x-0.5 transition-transform">arrow_forward_ios</span>
+                  </button>
                 </div>
                 <div className="text-right pb-1">
                   <p className="text-[9px] font-black tracking-widest text-muted-foreground uppercase mb-2 opacity-50">Target Score</p>
@@ -197,10 +203,7 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
                                       : 'bg-zinc-900/40 border-zinc-700/50 hover:border-zinc-600'
                                       }`}
                                   >
-                                    <div
-                                      className="flex-1 cursor-pointer"
-                                      onClick={() => setSelectedAction({ item, category: group.category })}
-                                    >
+                                    <div className="flex-1">
                                       <span className={`text-[13px] font-bold tracking-tight block pl-3 ${isCompleted ? 'text-foreground' : 'text-foreground/60'}`}>
                                         {item}
                                       </span>
@@ -239,7 +242,7 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
 
         {/* Glass Bottom Action Area - Absolute positioned for stability */}
         <div
-          className={`absolute bottom-0 left-0 right-0 z-40 bg-zinc-950/80 backdrop-blur-xl border-t border-zinc-800/20 px-8 pt-6 flex flex-col items-center gap-4 transition-transform duration-500 touch-none ${selectedAction ? 'translate-y-full' : 'translate-y-0'}`}
+          className="absolute bottom-0 left-0 right-0 z-40 bg-zinc-950/80 backdrop-blur-xl border-t border-zinc-800/20 px-8 pt-6 flex flex-col items-center gap-4 transition-transform duration-500 touch-none translate-y-0"
           style={{
             paddingBottom: 'calc(24px + env(safe-area-inset-bottom))',
             // Mask for dynamic address bar gaps
@@ -261,17 +264,8 @@ const ActionPlan = ({ onBack, onAnalyze }) => {
         {/* Decorative Elements */}
         <div className="absolute top-20 right-[-100px] w-[300px] h-[300px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
         <div className="absolute bottom-[20%] left-[-150px] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px] pointer-events-none"></div>
-        
-        {/* Action Detail Overlay */}
-        <AnimatePresence>
-          {selectedAction && (
-            <ActionDetail
-              item={selectedAction.item}
-              category={selectedAction.category}
-              onClose={() => setSelectedAction(null)}
-            />
-          )}
-        </AnimatePresence>
+
+
       </main>
     </div>
   );

@@ -147,7 +147,7 @@ const MetricCards = ({ onDetail }) => {
   const { contributors } = healthData.data;
 
   return (
-    <div className="metrics-group" style={{ width: '100%', padding: '0 10px' }}>
+    <div className="metrics-group" style={{ width: '100%', padding: '0 1px' }}>
       <MetricCard
         title="What's Working Well"
         mainValue={contributors.positive_count}

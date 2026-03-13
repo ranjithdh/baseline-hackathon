@@ -6,11 +6,13 @@ import ActionPlan from './components/ActionPlan';
 import ContributorDetail from './components/ContributorDetail';
 import BookConsultation from './components/BookConsultation';
 import ActionPlanTimeline from './components/ActionPlanTimeline';
+import DetailedActionPlan from './components/DetailedActionPlan';
 import Settings from './components/Settings';
 
 function App() {
   const [view, setView] = useState('dashboard');
   const [detailTab, setDetailTab] = useState('positive');
+  const [actionPlanData, setActionPlanData] = useState(null);
   const [theme, setTheme] = React.useState(() => {
     return localStorage.getItem('theme') || 'dark';
   });
@@ -71,6 +73,18 @@ function App() {
             <ActionPlan 
               onBack={() => setView('goal')} 
               onAnalyze={() => setView('book-consultation')}
+              onViewDetailed={(data) => {
+                setActionPlanData(data);
+                setView('detailed-action-plan');
+              }}
+            />
+          </motion.div>
+        )}
+        {view === 'detailed-action-plan' && (
+          <motion.div key="detailed-action-plan" variants={pageVariants} initial="initial" animate="enter" exit="exit">
+            <DetailedActionPlan 
+              data={actionPlanData}
+              onBack={() => setView('action-plan')} 
             />
           </motion.div>
         )}
