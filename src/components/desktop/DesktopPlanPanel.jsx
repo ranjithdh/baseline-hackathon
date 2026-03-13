@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
+import ExpertGuidanceCard from './ExpertGuidanceCard';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
 const GOAL_MIN  = BASE_SCORE;
@@ -219,7 +220,6 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
         margin: '32px 48px 0',
         background: 'rgb(var(--zinc-950))',
         borderRadius: '28px',
-        overflow: 'hidden',
         position: 'relative',
       }}
     >
@@ -229,6 +229,10 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
         background: `radial-gradient(ellipse at 5% 0%, rgba(241,121,104,0.10) 0%, transparent 45%),
                      radial-gradient(ellipse at 95% 100%, rgba(255,197,61,0.06) 0%, transparent 45%)`,
       }} />
+
+      {goalTarget > MAX_ACHIEVABLE && (
+        <ExpertGuidanceCard targetScore={goalTarget} />
+      )}
 
       {/* ── GOAL SETTER ── */}
       <div style={{
@@ -316,20 +320,6 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
             }}
           />
           {/* Labels removed */}
-
-          {goalTarget > MAX_ACHIEVABLE && (
-            <div style={{
-              marginTop: '14px',
-              background: 'rgba(241,121,104,0.10)',
-              border: '1px solid rgba(241,121,104,0.18)',
-              borderRadius: '10px', padding: '10px 14px',
-              fontSize: '12px', color: 'rgba(228,228,231,0.5)', lineHeight: 1.6,
-            }}>
-              Reaching <strong style={{ color: 'rgb(var(--zinc-100))' }}>{goalTarget}</strong> requires improving markers beyond current interventions.{' '}
-              <span style={{ color: 'rgb(255,197,61)', cursor: 'pointer', textDecoration: 'underline' }}>Book a consult</span>{' '}
-              or retest in 8 weeks to unlock further gains.
-            </div>
-          )}
         </div>
 
         {/* Projected score card */}
@@ -370,7 +360,7 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
       </div>
 
       {/* ── PROGRESS BAR ── */}
-      <div style={{
+      {/* <div style={{
         padding: '18px 44px',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
         position: 'relative', zIndex: 1,
@@ -406,7 +396,7 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
             {badge.text}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* ── ACTION PLAN: header + tabs + cards ── */}
       <div style={{ padding: '28px 44px 40px', position: 'relative', zIndex: 1 }}>
