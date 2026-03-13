@@ -46,11 +46,15 @@ const CrownHeartIcon = ({ size = 28, color }) => (
     <path d="M9 15c0-1.7 1.3-3 3-3s3 1.3 3 3" />
   </svg>
 );
-const LockIcon = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-    stroke="rgba(255,255,255,0.85)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+const DragHandleIcon = () => (
+  <svg width="22" height="14" viewBox="0 0 22 14" fill="none"
+    stroke="rgba(255,255,255,0.82)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    {/* Left arrowhead */}
+    <polyline points="5,3 1,7 5,11" />
+    {/* Horizontal bar */}
+    <line x1="1" y1="7" x2="21" y2="7" />
+    {/* Right arrowhead */}
+    <polyline points="17,3 21,7 17,11" />
   </svg>
 );
 
@@ -240,7 +244,7 @@ const HealthScoreSlider = ({
           }}
         >
           <div style={{ ...S.markerGlow, background: `radial-gradient(circle, ${glowColor}20 0%, transparent 68%)` }} />
-          <div style={S.markerInner}><LockIcon /></div>
+          <div style={S.markerInner}><DragHandleIcon /></div>
         </div>
       </div>
 
