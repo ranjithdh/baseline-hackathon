@@ -195,25 +195,6 @@ const HealthScoreSlider = ({
   return (
     <div style={S.root}>
 
-      {/* ── Header row ── */}
-      <div style={S.headerRow}>
-        <span style={S.headerLabel}>Health Score</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {/* "I want to reach" badge — shown when score > maxRecommended */}
-          {showGoalMessage && (
-            <span style={{
-              ...S.goalBadge,
-              animation: 'hss-fadein 0.25s ease',
-            }}>
-              I want to reach&nbsp;<strong style={{ color: '#F2D94E' }}>{score}</strong>
-            </span>
-          )}
-          <span style={{ ...S.activeLabel, color: glowColor }}>
-            {score}&nbsp;·&nbsp;{activeSeg.label}
-          </span>
-        </div>
-      </div>
-
       {/* ── Track + Marker ── */}
       <div style={S.outerWrap} onClick={(e) => commit(e.clientX)}>
 
@@ -340,11 +321,6 @@ const HealthScoreSlider = ({
 const S = {
   root: {
     width: '100%',
-    padding: '20px 24px 16px',
-    background: 'linear-gradient(135deg, rgba(22,22,30,0.97) 0%, rgba(14,14,20,0.97) 100%)',
-    borderRadius: '20px',
-    border: '1px solid rgba(255,255,255,0.07)',
-    boxShadow: '0 0 0 1px rgba(255,255,255,0.03), 0 20px 56px rgba(0,0,0,0.5)',
     userSelect: 'none',
     WebkitUserSelect: 'none',
   },

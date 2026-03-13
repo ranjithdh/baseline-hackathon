@@ -238,7 +238,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
         padding: '40px 44px 32px',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
         position: 'relative', zIndex: 1,
-        alignItems: 'end',
+        alignItems: 'center',
       }}>
         <div>
            <div style={{
