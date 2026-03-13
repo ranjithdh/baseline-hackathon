@@ -2,8 +2,16 @@ import React, { useState, useMemo } from 'react';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
-const GOAL_MIN  = BASE_SCORE + 1;
+const GOAL_MIN  = BASE_SCORE;
 const GOAL_MAX  = 100;
+
+const getScoreStatus = (score) => {
+  if (score >= 86) return { text: 'Elite', color: 'rgb(48, 164, 108)', bg: 'rgba(48, 164, 108, 0.12)', border: 'rgba(48, 164, 108, 0.3)' };
+  if (score >= 71) return { text: 'Strong', color: 'rgb(48, 164, 108)', bg: 'rgba(48, 164, 108, 0.12)', border: 'rgba(48, 164, 108, 0.3)' };
+  if (score >= 66) return { text: 'Stable', color: 'rgb(48, 164, 108)', bg: 'rgba(48, 164, 108, 0.12)', border: 'rgba(48, 164, 108, 0.3)' };
+  if (score >= 51) return { text: 'Constrained', color: 'rgb(255, 197, 61)', bg: 'rgba(255, 197, 61, 0.12)', border: 'rgba(255, 197, 61, 0.3)' };
+  return { text: 'High Alert', color: 'rgb(241, 121, 104)', bg: 'rgba(241, 121, 104, 0.12)', border: 'rgba(241, 121, 104, 0.3)' };
+};
 
 // ── Helper: greedy pick of top-gain items to reach pts needed ────
 function computeNeeded(goalTarget) {
@@ -238,7 +246,7 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
             letterSpacing: '0.3em', textTransform: 'uppercase',
             color: 'rgba(228,228,231,0.3)', marginBottom: '8px',
           }}>
-            Your Goal
+            Playground
           </div>
           <div style={{
             display: 'flex', alignItems: 'baseline', gap: '12px',
@@ -254,24 +262,45 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
             }}>
               {goalTarget}
             </div>
+            {/* Status Tag */}
+            <div style={{
+              display: 'inline-flex', alignItems: 'center',
+              padding: '6px 14px', borderRadius: '100px',
+              fontSize: '13px', fontWeight: 600,
+              fontFamily: 'var(--font-mono)',
+              background: getScoreStatus(goalTarget).bg,
+              color: getScoreStatus(goalTarget).color,
+              border: `1px solid ${getScoreStatus(goalTarget).border}`,
+              height: 'fit-content', alignSelf: 'center',
+              marginLeft: '4px'
+            }}>
+              {getScoreStatus(goalTarget).text}
+            </div>
           </div>
 
           {/* Tick labels */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '7px' }}>
-            {TICK_VALS.map(v => (
-              <span
-                key={v}
-                onClick={() => handleGoalChange(v)}
-                style={{
-                  fontFamily: 'var(--font-mono)', fontSize: '9px', padding: '0 1px',
-                  color: v === goalTarget ? 'rgb(255,197,61)' : v <= MAX_ACHIEVABLE ? 'rgba(228,228,231,0.38)' : 'rgba(228,228,231,0.18)',
-                  fontWeight: v === goalTarget ? 700 : 400,
-                  cursor: 'pointer', transition: 'color 0.15s', userSelect: 'none',
-                }}
-              >
-                {v}
-              </span>
-            ))}
+          <div style={{ position: 'relative', height: '14px', marginBottom: '4px' }}>
+            {TICK_VALS.map(v => {
+              const pos = ((v - GOAL_MIN) / (GOAL_MAX - GOAL_MIN)) * 100;
+              return (
+                <span
+                  key={v}
+                  onClick={() => handleGoalChange(v)}
+                  style={{
+                    position: 'absolute',
+                    left: `${pos}%`,
+                    transform: 'translateX(-50%)',
+                    fontFamily: 'var(--font-mono)', fontSize: '9px',
+                    color: v === goalTarget ? 'rgb(255,197,61)' : v <= MAX_ACHIEVABLE ? 'rgba(228,228,231,0.38)' : 'rgba(228,228,231,0.18)',
+                    fontWeight: v === goalTarget ? 700 : 400,
+                    cursor: 'pointer', transition: 'color 0.15s', userSelect: 'none',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {v}
+                </span>
+              );
+            })}
           </div>
 
           {/* Slider */}
@@ -286,13 +315,7 @@ const DesktopPlanPanel = ({ planPanelRef }) => {
               background: `linear-gradient(90deg, rgb(255,197,61) ${sliderPct}%, rgba(255,255,255,0.08) ${sliderPct}%)`,
             }}
           />
-          <div style={{
-            display: 'flex', justifyContent: 'space-between', marginTop: '7px',
-            fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'rgba(228,228,231,0.22)',
-          }}>
-            <span>Current: {BASE_SCORE}</span>
-            <span>Max: 100</span>
-          </div>
+          {/* Labels removed */}
 
           {goalTarget > MAX_ACHIEVABLE && (
             <div style={{
