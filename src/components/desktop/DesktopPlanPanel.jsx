@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
+import HealthScoreSlider from '../HealthScoreSlider';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
 const GOAL_MIN = BASE_SCORE;
@@ -184,7 +185,6 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
   const projScore = Math.min(100, BASE_SCORE + gained);
   const toGoal = goalTarget - projScore;
   const progressPct = ptsNeeded > 0 ? Math.min(100, (gained / ptsNeeded) * 100) : 100;
-  const sliderPct = ((goalTarget - GOAL_MIN) / (GOAL_MAX - GOAL_MIN)) * 100;
 
   const badge = ptsNeeded <= 7
     ? { text: 'Achievable · 8 wks', bg: 'rgba(48,164,108,0.15)', color: 'rgb(48,164,108)', border: 'rgba(48,164,108,0.28)' }
@@ -241,14 +241,14 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
         alignItems: 'end',
       }}>
         <div>
-          <div style={{
+          {/* <div style={{
             fontFamily: 'var(--font-mono)', fontSize: '9px',
             letterSpacing: '0.3em', textTransform: 'uppercase',
             color: 'rgba(228,228,231,0.3)', marginBottom: '8px',
           }}>
             Playground
-          </div>
-          <div style={{
+          </div> */}
+          {/* <div style={{
             display: 'flex', alignItems: 'baseline', gap: '12px',
             marginBottom: '24px', flexWrap: 'wrap',
           }}>
@@ -262,7 +262,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
             }}>
               {goalTarget}
             </div>
-            {/* Status Tag */}
+            {/* Status Tag 
             <div style={{
               display: 'inline-flex', alignItems: 'center',
               padding: '6px 14px', borderRadius: '100px',
@@ -276,46 +276,18 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
             }}>
               {getScoreStatus(goalTarget).text}
             </div>
-          </div>
+          </div> */}
 
-          {/* Tick labels */}
-          <div style={{ position: 'relative', height: '14px', marginBottom: '4px' }}>
-            {TICK_VALS.map(v => {
-              const pos = ((v - GOAL_MIN) / (GOAL_MAX - GOAL_MIN)) * 100;
-              return (
-                <span
-                  key={v}
-                  onClick={() => handleGoalChange(v)}
-                  style={{
-                    position: 'absolute',
-                    left: `${pos}%`,
-                    transform: 'translateX(-50%)',
-                    fontFamily: 'var(--font-mono)', fontSize: '9px',
-                    color: v === goalTarget ? 'rgb(255,197,61)' : v <= MAX_ACHIEVABLE ? 'rgba(228,228,231,0.38)' : 'rgba(228,228,231,0.18)',
-                    fontWeight: v === goalTarget ? 700 : 400,
-                    cursor: 'pointer', transition: 'color 0.15s', userSelect: 'none',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {v}
-                </span>
-              );
-            })}
-          </div>
-
-          {/* Slider */}
-          <input
-            type="range"
-            min={GOAL_MIN} max={GOAL_MAX} value={goalTarget}
-            onChange={e => handleGoalChange(e.target.value)}
-            style={{
-              WebkitAppearance: 'none', appearance: 'none',
-              width: '100%', height: '5px', borderRadius: '3px',
-              outline: 'none', cursor: 'pointer',
-              background: `linear-gradient(90deg, rgb(255,197,61) ${sliderPct}%, rgba(255,255,255,0.08) ${sliderPct}%)`,
-            }}
+          {/* ── Health Score Slider ── */}
+          <HealthScoreSlider
+            min={GOAL_MIN}
+            max={GOAL_MAX}
+            score={goalTarget}
+            minAllowedScore={GOAL_MIN}
+            maxRecommended={MAX_ACHIEVABLE}
+            ticks={TICK_VALS}
+            onChange={handleGoalChange}
           />
-          {/* Labels removed */}
         </div>
 
         {/* Projected score card */}

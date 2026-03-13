@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 
-// ── Segment configuration ────────────────────────────────────────
+// ── Global segment palette (full 0–100 range) ────────────────────
 const SEGMENTS = [
   { min: 0,  max: 50,  label: 'High Alert',  color: '#B45A5A', dimColor: '#5C2E2E', icon: 'heartbeat'   },
   { min: 50, max: 65,  label: 'Constrained', color: '#C79A45', dimColor: '#6B5020', icon: 'restriction' },
@@ -9,17 +9,13 @@ const SEGMENTS = [
   { min: 85, max: 100, label: 'Elite',       color: '#2FA36B', dimColor: '#165432', icon: 'crown'       },
 ];
 
-// Total range
-const TOTAL = 100;
-
-// ── SVG Icons ────────────────────────────────────────────────────
+// ── SVG Icon library ─────────────────────────────────────────────
 const HeartbeatIcon = ({ size = 28, color }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
     stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
   </svg>
 );
-
 const RestrictionIcon = ({ size = 28, color }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
     stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -28,14 +24,12 @@ const RestrictionIcon = ({ size = 28, color }) => (
     <line x1="12" y1="14" x2="12" y2="16" />
   </svg>
 );
-
 const HeartIcon = ({ size = 28, color }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
     stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
 );
-
 const ShieldHeartIcon = ({ size = 28, color }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
     stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -44,7 +38,6 @@ const ShieldHeartIcon = ({ size = 28, color }) => (
       transform="translate(2.5 0.5)" />
   </svg>
 );
-
 const CrownHeartIcon = ({ size = 28, color }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
     stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -53,228 +46,341 @@ const CrownHeartIcon = ({ size = 28, color }) => (
     <path d="M9 15c0-1.7 1.3-3 3-3s3 1.3 3 3" />
   </svg>
 );
-
 const LockIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-    stroke="rgba(255,255,255,0.88)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+    stroke="rgba(255,255,255,0.85)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
   </svg>
 );
 
 const ICON_MAP = {
-  heartbeat:   HeartbeatIcon,
-  restriction: RestrictionIcon,
-  heart:       HeartIcon,
-  shield:      ShieldHeartIcon,
-  crown:       CrownHeartIcon,
+  heartbeat: HeartbeatIcon, restriction: RestrictionIcon, heart: HeartIcon,
+  shield: ShieldHeartIcon,  crown: CrownHeartIcon,
 };
 
 // ── Helpers ──────────────────────────────────────────────────────
-const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-/** Returns which segment "owns" this score. Uses [min, max) except last seg. */
-const getSegment = (score) => {
+/** Returns the segment that "owns" the score within [min, max]. */
+const getSegment = (score, min, max) => {
+  // Clip score to range first
+  const s = clamp(score, min, max);
   for (let i = 0; i < SEGMENTS.length - 1; i++) {
-    if (score >= SEGMENTS[i].min && score < SEGMENTS[i].max) return SEGMENTS[i];
+    if (s >= SEGMENTS[i].min && s < SEGMENTS[i].max) return SEGMENTS[i];
   }
-  return SEGMENTS[SEGMENTS.length - 1]; // 100 belongs to Elite
+  return SEGMENTS[SEGMENTS.length - 1];
+};
+
+/**
+ * Compute the slice of each global segment that falls within [min, max].
+ * Returns an array of { ...seg, visMin, visMax, widthPct }.
+ */
+const buildVisibleSegments = (min, max) => {
+  const span = max - min;
+  return SEGMENTS
+    .map(seg => {
+      const visMin = Math.max(seg.min, min);
+      const visMax = Math.min(seg.max, max);
+      if (visMin >= visMax) return null;
+      return { ...seg, visMin, visMax, widthPct: ((visMax - visMin) / span) * 100 };
+    })
+    .filter(Boolean);
 };
 
 // ── Component ────────────────────────────────────────────────────
-const HealthScoreSlider = ({ score: initScore = 65, minAllowedScore = 65, onChange }) => {
-  const [score, setScore] = useState(clamp(initScore, minAllowedScore, 100));
-  const trackRef  = useRef(null);
-  const dragging  = useRef(false);
+/**
+ * HealthScoreSlider
+ *
+ * @prop {number}   score            Controlled current value
+ * @prop {number}   min              Track minimum  (default 0)
+ * @prop {number}   max              Track maximum  (default 100)
+ * @prop {Function} onChange         (score: number) => void
+ * @prop {number}   [minAllowedScore]  Leftward drag boundary (forward-only)
+ * @prop {number}   [maxRecommended]   When score exceeds this, renders amber "I want to reach" badge
+ * @prop {number[]} [ticks]           Tick mark values rendered below the track
+ */
+const HealthScoreSlider = ({
+  score: scoreProp = 65,
+  min = 0,
+  max = 100,
+  onChange,
+  minAllowedScore,
+  maxRecommended,
+  ticks = [],
+}) => {
+  const floorVal = minAllowedScore != null ? clamp(minAllowedScore, min, max) : min;
+  const [score, setScore] = useState(clamp(scoreProp, floorVal, max));
+  const trackRef = useRef(null);
+  const dragging = useRef(false);
 
-  const activeSeg = getSegment(score);
+  // Keep in sync when controlled value changes from outside
+  useEffect(() => {
+    setScore(clamp(scoreProp, floorVal, max));
+  }, [scoreProp, floorVal, max]);
 
-  // Convert clientX → score, mapping across the usable track area
+  const activeSeg = getSegment(score, min, max);
+  const visSegs   = buildVisibleSegments(min, max);
+  const span      = max - min;
+
+  // Marker left % within the track
+  const markerPct = ((score - min) / span) * 100;
+
+  // Convert raw clientX → integer score value
   const clientXToScore = useCallback((clientX) => {
     const rect = trackRef.current?.getBoundingClientRect();
     if (!rect) return score;
-    const pct  = clamp((clientX - rect.left) / rect.width, 0, 1);
-    return Math.round(pct * TOTAL);
-  }, [score]);
+    const pct = clamp((clientX - rect.left) / rect.width, 0, 1);
+    return Math.round(pct * span + min);
+  }, [min, span, score]);
 
   const commit = useCallback((clientX) => {
-    const raw = clientXToScore(clientX);
-    const next = clamp(raw, minAllowedScore, 100);
+    const raw  = clientXToScore(clientX);
+    const next = clamp(raw, floorVal, max);
     setScore(next);
     onChange?.(next);
-  }, [clientXToScore, minAllowedScore, onChange]);
+  }, [clientXToScore, floorVal, max, onChange]);
 
-  // Mouse / touch events
+  // Global mouse + touch listeners
   useEffect(() => {
-    const onMove = (e) => { if (dragging.current) commit(e.clientX); };
+    const onMove      = (e) => { if (dragging.current) commit(e.clientX); };
     const onTouchMove = (e) => { if (dragging.current) commit(e.touches[0].clientX); };
-    const onUp = () => { dragging.current = false; };
+    const onUp        = () => { dragging.current = false; };
 
     window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup',   onUp);
+    window.addEventListener('mouseup', onUp);
     window.addEventListener('touchmove', onTouchMove, { passive: true });
-    window.addEventListener('touchend',  onUp);
+    window.addEventListener('touchend', onUp);
     return () => {
       window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup',   onUp);
+      window.removeEventListener('mouseup', onUp);
       window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend',  onUp);
+      window.removeEventListener('touchend', onUp);
     };
   }, [commit]);
 
-  // Keyboard control
+  // Keyboard navigation
   const onKeyDown = (e) => {
-    const delta = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1, Home: -100, End: 100 }[e.key];
-    if (!delta) return;
+    const delta = {
+      ArrowRight: 1, ArrowUp: 1,
+      ArrowLeft: -1, ArrowDown: -1,
+      Home: -(span), End: span,
+    }[e.key];
+    if (delta == null) return;
     e.preventDefault();
-    const next = clamp(score + delta, minAllowedScore, 100);
+    const next = clamp(score + delta, floorVal, max);
     setScore(next);
     onChange?.(next);
   };
 
-  const markerPct = score / TOTAL; // 0–1
+  // ── Dimming logic per visible segment ─────────────────────────
+  const getSegBg = (seg) => {
+    if (score <= seg.visMin) return seg.color;         // fully ahead  → lit
+    if (score >= seg.visMax) return seg.dimColor;      // fully behind → dim
+
+    // Marker straddles this segment → gradient split
+    const splitPct = ((score - seg.visMin) / (seg.visMax - seg.visMin)) * 100;
+    return `linear-gradient(90deg, ${seg.dimColor} ${splitPct}%, ${seg.color} ${splitPct}%)`;
+  };
+
+  const iconColorFor = (seg) =>
+    score >= seg.visMax ? 'rgba(0,0,0,0.22)' : 'rgba(0,0,0,0.44)';
+
+  // ── "I want to reach" helper message ──────────────────────────
+  const showGoalMessage = maxRecommended != null && score > maxRecommended;
+
+  // ── Glow color follows active segment ─────────────────────────
+  const glowColor = activeSeg.color;
 
   return (
-    <div style={S.wrapper}>
+    <div style={S.root}>
+
       {/* ── Header row ── */}
-      <div style={S.header}>
-        <span style={S.labelSmall}>Health Score</span>
-        <span style={{ ...S.labelLarge, color: activeSeg.color }}>
-          {score} &nbsp;·&nbsp; {activeSeg.label}
-        </span>
+      <div style={S.headerRow}>
+        <span style={S.headerLabel}>Health Score</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* "I want to reach" badge — shown when score > maxRecommended */}
+          {showGoalMessage && (
+            <span style={{
+              ...S.goalBadge,
+              animation: 'hss-fadein 0.25s ease',
+            }}>
+              I want to reach&nbsp;<strong style={{ color: '#F2D94E' }}>{score}</strong>
+            </span>
+          )}
+          <span style={{ ...S.activeLabel, color: glowColor }}>
+            {score}&nbsp;·&nbsp;{activeSeg.label}
+          </span>
+        </div>
       </div>
 
       {/* ── Track + Marker ── */}
-      <div
-        style={S.outerWrap}
-        onClick={(e) => commit(e.clientX)}
-      >
+      <div style={S.outerWrap} onClick={(e) => commit(e.clientX)}>
+
         {/* Colored pill track */}
         <div ref={trackRef} style={S.track}>
-          {SEGMENTS.map((seg) => {
-            const segW  = seg.max - seg.min;
-            const pctW  = (segW / TOTAL) * 100;
-            const isDimmed  = score >= seg.max;          // fully behind marker
-            const isPartial = score > seg.min && score < seg.max; // straddles marker
-            const isAhead   = score <= seg.min;          // fully ahead of marker
-
-            let bg;
-            if (isDimmed) {
-              bg = seg.dimColor;
-            } else if (isPartial) {
-              const splitPct = ((score - seg.min) / segW) * 100;
-              bg = `linear-gradient(90deg, ${seg.dimColor} ${splitPct}%, ${seg.color} ${splitPct}%)`;
-            } else {
-              bg = seg.color;
-            }
-
-            const IconComp   = ICON_MAP[seg.icon];
-            const iconColor  = isDimmed
-              ? 'rgba(0,0,0,0.28)'
-              : isAhead
-                ? 'rgba(0,0,0,0.42)'
-                : 'rgba(0,0,0,0.38)';
-
+          {visSegs.map((seg) => {
+            const IconComp = ICON_MAP[seg.icon];
             return (
-              <div key={seg.label} style={{ ...S.segment, width: `${pctW}%`, background: bg }}>
-                <IconComp size={28} color={iconColor} />
+              <div
+                key={seg.label}
+                style={{
+                  ...S.segment,
+                  width: `${seg.widthPct}%`,
+                  background: getSegBg(seg),
+                }}
+              >
+                <IconComp size={28} color={iconColorFor(seg)} />
               </div>
             );
           })}
         </div>
 
-        {/* Floating marker */}
+        {/* Draggable marker */}
         <div
-          onMouseDown={(e) => { e.preventDefault(); dragging.current = true; }}
-          onTouchStart={() => { dragging.current = true; }}
           role="slider"
-          aria-valuemin={minAllowedScore}
-          aria-valuemax={100}
+          aria-valuemin={floorVal}
+          aria-valuemax={max}
           aria-valuenow={score}
-          aria-label="Health score"
+          aria-label={`Health score: ${score}`}
           tabIndex={0}
           onKeyDown={onKeyDown}
+          onMouseDown={(e) => { e.preventDefault(); dragging.current = true; }}
+          onTouchStart={() => { dragging.current = true; }}
           style={{
             ...S.marker,
-            left: `calc(${markerPct * 100}% - 45px)`,
+            left: `calc(${markerPct}% - 45px)`,
             boxShadow: [
-              '0 0 0 5px rgba(255,255,255,0.07)',
-              '0 0 0 10px rgba(255,255,255,0.03)',
-              `0 0 32px 6px ${activeSeg.color}50`,
-              '0 8px 28px rgba(0,0,0,0.6)',
+              '0 0 0 5px rgba(255,255,255,0.06)',
+              '0 0 0 10px rgba(255,255,255,0.025)',
+              `0 0 30px 8px ${glowColor}44`,
+              '0 6px 28px rgba(0,0,0,0.65)',
             ].join(', '),
           }}
         >
-          {/* Outer glow bloom */}
-          <div style={{ ...S.markerGlow, background: `radial-gradient(circle, ${activeSeg.color}2a 0%, transparent 68%)` }} />
-          {/* Inner dark circle */}
-          <div style={S.markerInner}>
-            <LockIcon />
-          </div>
+          <div style={{ ...S.markerGlow, background: `radial-gradient(circle, ${glowColor}20 0%, transparent 68%)` }} />
+          <div style={S.markerInner}><LockIcon /></div>
         </div>
       </div>
 
-      {/* ── Segment labels ── */}
-      <div style={S.labels}>
-        {SEGMENTS.map((seg) => {
-          const isActive = activeSeg.label === seg.label;
-          return (
-            <div
-              key={seg.label}
-              style={{
-                ...S.segLabel,
-                width: `${(seg.max - seg.min) / TOTAL * 100}%`,
-                color:      isActive ? seg.color           : 'rgba(255,255,255,0.20)',
-                fontWeight: isActive ? 700                  : 400,
-                transition: 'color 0.35s ease, font-weight 0.2s ease',
-              }}
-            >
-              {seg.label}
-            </div>
-          );
-        })}
+      {/* ── Tick marks + segment labels row ── */}
+      <div style={S.tickRow}>
+        {ticks.length > 0 ? (
+          /* Explicit ticks from parent */
+          ticks.map(v => {
+            const pct = ((v - min) / span) * 100;
+            const isCurrent = v === score;
+            const isPast    = v < score;
+            const isBeyond  = maxRecommended != null && v > maxRecommended;
+            return (
+              <span
+                key={v}
+                onClick={(e) => { e.stopPropagation(); const next = clamp(v, floorVal, max); setScore(next); onChange?.(next); }}
+                style={{
+                  position: 'absolute',
+                  left: `${pct}%`,
+                  transform: 'translateX(-50%)',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  fontSize: '9px',
+                  fontWeight: isCurrent ? 700 : 400,
+                  color: isCurrent
+                    ? glowColor
+                    : isBeyond
+                      ? 'rgba(228,228,231,0.18)'
+                      : isPast
+                        ? 'rgba(228,228,231,0.22)'
+                        : 'rgba(228,228,231,0.40)',
+                  cursor: 'pointer',
+                  transition: 'color 0.2s',
+                  userSelect: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {v}
+              </span>
+            );
+          })
+        ) : (
+          /* Auto segment labels */
+          visSegs.map((seg) => {
+            const isActive = activeSeg.label === seg.label;
+            return (
+              <div
+                key={seg.label}
+                style={{
+                  width: `${seg.widthPct}%`,
+                  textAlign: 'center',
+                  fontSize: '8px',
+                  letterSpacing: '0.11em',
+                  textTransform: 'uppercase',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  color: isActive ? seg.color : 'rgba(255,255,255,0.20)',
+                  fontWeight: isActive ? 700 : 400,
+                  transition: 'color 0.3s',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {seg.label}
+              </div>
+            );
+          })
+        )}
       </div>
 
       <style>{`
-        @keyframes hss-pulse {
-          0%,100% { opacity: 1; }
-          50%      { opacity: 0.7; }
-        }
+        @keyframes hss-fadein { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
       `}</style>
     </div>
   );
 };
 
-// ── Style objects ─────────────────────────────────────────────────
+// ── Styles ───────────────────────────────────────────────────────
 const S = {
-  wrapper: {
+  root: {
     width: '100%',
-    padding: '22px 28px 18px',
-    background: 'linear-gradient(135deg, rgba(24,24,32,0.98) 0%, rgba(16,16,22,0.98) 100%)',
-    borderRadius: '24px',
+    padding: '20px 24px 16px',
+    background: 'linear-gradient(135deg, rgba(22,22,30,0.97) 0%, rgba(14,14,20,0.97) 100%)',
+    borderRadius: '20px',
     border: '1px solid rgba(255,255,255,0.07)',
-    boxShadow: '0 0 0 1px rgba(255,255,255,0.03), 0 24px 64px rgba(0,0,0,0.55)',
+    boxShadow: '0 0 0 1px rgba(255,255,255,0.03), 0 20px 56px rgba(0,0,0,0.5)',
     userSelect: 'none',
     WebkitUserSelect: 'none',
   },
-  header: {
+  headerRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '16px',
+    marginBottom: '14px',
   },
-  labelSmall: {
+  headerLabel: {
     fontSize: '9px',
     fontWeight: 700,
-    letterSpacing: '0.25em',
+    letterSpacing: '0.24em',
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.30)',
+    color: 'rgba(255,255,255,0.28)',
     fontFamily: 'var(--font-mono, monospace)',
   },
-  labelLarge: {
-    fontSize: '11px',
+  goalBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '4px 12px',
+    borderRadius: '100px',
+    fontSize: '10px',
+    fontWeight: 500,
+    fontFamily: 'var(--font-mono, monospace)',
+    color: 'rgba(255,197,61,0.85)',
+    background: 'rgba(255,197,61,0.10)',
+    border: '1px solid rgba(255,197,61,0.25)',
+    letterSpacing: '0.02em',
+    whiteSpace: 'nowrap',
+  },
+  activeLabel: {
+    fontSize: '10px',
     fontWeight: 700,
-    letterSpacing: '0.12em',
+    letterSpacing: '0.10em',
     textTransform: 'uppercase',
     fontFamily: 'var(--font-mono, monospace)',
     transition: 'color 0.35s ease',
@@ -282,9 +388,8 @@ const S = {
   outerWrap: {
     position: 'relative',
     height: '80px',
-    // Extra vertical room for the 90px marker to overflow without layout shift
-    marginTop: '5px',
-    marginBottom: '5px',
+    marginTop: '4px',
+    marginBottom: '4px',
     cursor: 'pointer',
   },
   track: {
@@ -304,7 +409,7 @@ const S = {
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    transition: 'background 0.25s ease',
+    transition: 'background 0.22s ease',
   },
   marker: {
     position: 'absolute',
@@ -314,22 +419,22 @@ const S = {
     height: '90px',
     borderRadius: '50%',
     background: 'rgba(8,8,14,0.96)',
-    border: '2px solid rgba(255,255,255,0.15)',
+    border: '2px solid rgba(255,255,255,0.13)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'grab',
     zIndex: 10,
-    transition: 'left 0.04s linear, box-shadow 0.4s ease',
+    transition: 'left 0.04s linear, box-shadow 0.38s ease',
     willChange: 'left',
     outline: 'none',
   },
   markerGlow: {
     position: 'absolute',
-    inset: '-24px',
+    inset: '-22px',
     borderRadius: '50%',
     pointerEvents: 'none',
-    transition: 'background 0.4s ease',
+    transition: 'background 0.38s ease',
     zIndex: 0,
   },
   markerInner: {
@@ -338,27 +443,18 @@ const S = {
     width: '60px',
     height: '60px',
     borderRadius: '50%',
-    background: 'linear-gradient(145deg, rgba(22,22,32,0.98) 0%, rgba(12,12,18,0.98) 100%)',
-    border: '1px solid rgba(255,255,255,0.09)',
+    background: 'linear-gradient(145deg, rgba(20,20,30,0.98) 0%, rgba(10,10,18,0.98) 100%)',
+    border: '1px solid rgba(255,255,255,0.08)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.7)',
   },
-  labels: {
+  tickRow: {
+    position: 'relative',
     display: 'flex',
-    marginTop: '10px',
-  },
-  segLabel: {
-    fontSize: '8px',
-    letterSpacing: '0.13em',
-    textTransform: 'uppercase',
-    textAlign: 'center',
-    fontFamily: 'var(--font-mono, monospace)',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    paddingTop: '2px',
+    height: '18px',
+    marginTop: '8px',
   },
 };
 
