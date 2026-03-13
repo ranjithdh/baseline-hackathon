@@ -47,7 +47,7 @@ const CrownHeartIcon = ({ size = 28, color }) => (
   </svg>
 );
 const LockIcon = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
     stroke="rgba(255,255,255,0.85)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
     <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -230,7 +230,7 @@ const HealthScoreSlider = ({
                   background: getSegBg(seg),
                 }}
               >
-                <IconComp size={28} color={iconColorFor(seg)} />
+                <IconComp size={17} color={iconColorFor(seg)} />
               </div>
             );
           })}
@@ -249,7 +249,7 @@ const HealthScoreSlider = ({
           onTouchStart={() => { dragging.current = true; }}
           style={{
             ...S.marker,
-            left: `calc(${markerPct}% - 45px)`,
+            left: `calc(${markerPct}% - 27px)`,
             boxShadow: [
               '0 0 0 5px rgba(255,255,255,0.06)',
               '0 0 0 10px rgba(255,255,255,0.025)',
@@ -387,9 +387,9 @@ const S = {
   },
   outerWrap: {
     position: 'relative',
-    height: '80px',
-    marginTop: '4px',
-    marginBottom: '4px',
+    height: '48px',       // 80 × 0.6
+    marginTop: '2px',     // 4 × 0.6
+    marginBottom: '2px',  // 4 × 0.6
     cursor: 'pointer',
   },
   track: {
@@ -398,9 +398,9 @@ const S = {
     left: 0,
     right: 0,
     transform: 'translateY(-50%)',
-    height: '80px',
+    height: '48px',       // 80 × 0.6
     display: 'flex',
-    borderRadius: '60px',
+    borderRadius: '36px', // 60 × 0.6
     overflow: 'hidden',
   },
   segment: {
@@ -415,8 +415,8 @@ const S = {
     position: 'absolute',
     top: '50%',
     transform: 'translateY(-50%)',
-    width: '90px',
-    height: '90px',
+    width: '54px',        // 90 × 0.6
+    height: '54px',       // 90 × 0.6
     borderRadius: '50%',
     background: 'rgba(8,8,14,0.96)',
     border: '2px solid rgba(255,255,255,0.13)',
@@ -431,7 +431,7 @@ const S = {
   },
   markerGlow: {
     position: 'absolute',
-    inset: '-22px',
+    inset: '-13px',       // 22 × 0.6
     borderRadius: '50%',
     pointerEvents: 'none',
     transition: 'background 0.38s ease',
@@ -440,21 +440,21 @@ const S = {
   markerInner: {
     position: 'relative',
     zIndex: 1,
-    width: '60px',
-    height: '60px',
+    width: '36px',        // 60 × 0.6
+    height: '36px',       // 60 × 0.6
     borderRadius: '50%',
     background: 'linear-gradient(145deg, rgba(20,20,30,0.98) 0%, rgba(10,10,18,0.98) 100%)',
     border: '1px solid rgba(255,255,255,0.08)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.7)',
+    boxShadow: 'inset 0 1px 6px rgba(0,0,0,0.7)', // 10 × 0.6
   },
   tickRow: {
     position: 'relative',
     display: 'flex',
-    height: '18px',
-    marginTop: '8px',
+    height: '11px',       // 18 × 0.6
+    marginTop: '5px',     // 8 × 0.6
   },
 };
 
