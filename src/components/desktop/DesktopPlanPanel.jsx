@@ -241,14 +241,14 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
         alignItems: 'end',
       }}>
         <div>
-          {/* <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: '9px',
+           <div style={{
+            fontFamily: 'var(--font-mono)', fontSize: '14px',
             letterSpacing: '0.3em', textTransform: 'uppercase',
-            color: 'rgba(228,228,231,0.3)', marginBottom: '8px',
+            color: 'rgba(255, 255, 255, 1)', marginBottom: '8px',
           }}>
             Playground
-          </div> */}
-          {/* <div style={{
+          </div> 
+           <div style={{
             display: 'flex', alignItems: 'baseline', gap: '12px',
             marginBottom: '24px', flexWrap: 'wrap',
           }}>
@@ -262,7 +262,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
             }}>
               {goalTarget}
             </div>
-            {/* Status Tag 
+            {/* Status Tag */}
             <div style={{
               display: 'inline-flex', alignItems: 'center',
               padding: '6px 14px', borderRadius: '100px',
@@ -276,7 +276,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
             }}>
               {getScoreStatus(goalTarget).text}
             </div>
-          </div> */}
+          </div> 
 
           {/* ── Health Score Slider ── */}
           <HealthScoreSlider
