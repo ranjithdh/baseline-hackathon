@@ -4,18 +4,23 @@ import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlan
 // The Playground panel uses the new V2 design.
 import HealthScoreSliderV2 from './HealthScoreSliderV2';
 import DashboardCard from './DashboardCard';
-import ExpertGuidanceCard from './ExpertGuidanceCard';
+// ExpertGuidanceCard (V1) is intentionally kept for DesktopDashboard.
+// DesktopPlanPanel uses the redesigned HealthScoreLimitCard instead.
+import HealthScoreLimitCard from './HealthScoreLimitCard';
+import { InferenceBadge } from '../../ui/inference-badge';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
 const GOAL_MIN = BASE_SCORE;
 const GOAL_MAX = 100;
 
+// Aligned with SEGMENTS in HealthScoreSliderV2 — uses chart CSS vars for
+// solid pill background. Text is dark on bright fills, white on dark fills.
 const getScoreStatus = (score) => {
-  if (score >= 86) return { text: 'Elite', color: 'rgb(48, 164, 108)', bg: 'rgba(48, 164, 108, 0.12)', border: 'rgba(48, 164, 108, 0.3)' };
-  if (score >= 71) return { text: 'Strong', color: 'rgb(48, 164, 108)', bg: 'rgba(48, 164, 108, 0.12)', border: 'rgba(48, 164, 108, 0.3)' };
-  if (score >= 66) return { text: 'Stable', color: 'rgb(48, 164, 108)', bg: 'rgba(48, 164, 108, 0.12)', border: 'rgba(48, 164, 108, 0.3)' };
-  if (score >= 51) return { text: 'Constrained', color: 'rgb(255, 197, 61)', bg: 'rgba(255, 197, 61, 0.12)', border: 'rgba(255, 197, 61, 0.3)' };
-  return { text: 'High Alert', color: 'rgb(241, 121, 104)', bg: 'rgba(241, 121, 104, 0.12)', border: 'rgba(241, 121, 104, 0.3)' };
+  if (score >= 85) return { text: 'Elite',       tagBg: 'rgb(var(--chart-6))', tagText: 'rgba(255,255,255,0.92)' };
+  if (score >= 75) return { text: 'Strong',      tagBg: 'rgb(var(--chart-5))', tagText: 'rgba(255,255,255,0.92)' };
+  if (score >= 65) return { text: 'Stable',      tagBg: 'rgb(var(--chart-4))', tagText: 'rgba(0,0,0,0.72)'       };
+  if (score >= 50) return { text: 'Constrained', tagBg: 'rgb(var(--chart-3))', tagText: 'rgba(0,0,0,0.72)'       };
+  return             { text: 'Compromised',  tagBg: 'rgb(var(--chart-2))', tagText: 'rgba(0,0,0,0.72)'       };
 };
 
 // ── Helper: greedy pick of top-gain items to reach pts needed ────
@@ -265,20 +270,32 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
             }}>
               {goalTarget}
             </div>
-            {/* Status Tag */}
-            <div style={{
-              display: 'inline-flex', alignItems: 'center',
-              padding: '6px 14px', borderRadius: '100px',
-              fontSize: '13px', fontWeight: 600,
-              fontFamily: 'var(--font-mono)',
-              background: getScoreStatus(goalTarget).bg,
-              color: getScoreStatus(goalTarget).color,
-              border: `1px solid ${getScoreStatus(goalTarget).border}`,
-              height: 'fit-content', alignSelf: 'center',
-              marginLeft: '4px'
-            }}>
-              {getScoreStatus(goalTarget).text}
-            </div>
+            {/* Status Tag — solid segment-color pill, matches reference design */}
+            {(() => {
+              const status = getScoreStatus(goalTarget);
+              return (
+                <div style={{
+                  display:        'inline-flex',
+                  alignItems:     'center',
+                  padding:        '6px 16px',
+                  borderRadius:   '100px',
+                  fontSize:       '13px',
+                  fontWeight:     600,
+                  fontFamily:     'var(--font-main)',
+                  background:     status.tagBg,
+                  color:          status.tagText,
+                  border:         'none',
+                  height:         'fit-content',
+                  alignSelf:      'center',
+                  marginLeft:     '4px',
+                  letterSpacing:  '0.01em',
+                  transition:     'background 0.3s ease',
+                  userSelect:     'none',
+                }}>
+                  {status.text}
+                </div>
+              );
+            })()}
           </div> 
 
           {/* ── Health Score Slider V2 (new design) ── */}
@@ -330,7 +347,10 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
 
           {goalTarget > MAX_ACHIEVABLE && (
           <div style={{ width:'100%',position: 'relative', top: 0, padding:'0px 0px' }}>
-            <ExpertGuidanceCard targetScore={goalTarget} />
+            <HealthScoreLimitCard
+              score={goalTarget}
+              onConsultClick={() => {/* navigate to consult flow */}}
+            />
           </div>
         )}
       </div>
