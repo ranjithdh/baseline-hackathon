@@ -7,6 +7,15 @@ const HeroScore = ({ onSetGoal }) => {
   const { score_details } = healthData.data;
   const [showDeepDive, setShowDeepDive] = useState(false);
 
+  const score = score_details.normalized_baseline_score;
+  const getStatus = (val) => {
+    if (val < 50) return 'Compromised';
+    if (val < 65) return 'Constrained';
+    if (val < 75) return 'Stable';
+    if (val < 85) return 'Robust';
+    return 'Elite';
+  };
+
   return (
     <div className="hero-section">
       <div className="geometric-container">
@@ -14,9 +23,9 @@ const HeroScore = ({ onSetGoal }) => {
         <div className="square-inner">
           <div className="score-box">
             <p className="score-label">Baseline Score</p>
-            <h1 className="score-value">{score_details.normalized_baseline_score}</h1>
+            <h1 className="score-value">{score}</h1>
             <div className="score-delta">
-              <p className="delta-text">Status: {score_details.inference}</p>
+              <p className="delta-text">Status: {getStatus(score)}</p>
             </div>
 
             {/* Creative Explanation Tag */}
@@ -38,7 +47,7 @@ const HeroScore = ({ onSetGoal }) => {
       <div className="system-description">
         <p className="description-text">{score_details.baseline_score_description}</p>
         <button className="goal-btn group" onClick={onSetGoal}>
-          <span>Set Goal for Stable</span>
+          <span>Set Goal</span>
           <div className="btn-glow"></div>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="ml-2">
             <path d="M12 5v14M5 12h14" />

@@ -5,6 +5,7 @@ import StatusLog from './StatusLog';
 import healthData from '../data.json';
 import TimelineDial from './TimelineDial';
 import { motion, AnimatePresence } from 'framer-motion';
+import consultationCrystal from '../assets/consultation_crystal.png';
 
 const Dashboard = ({ onSetGoal, onDetail, onSettings }) => {
     const [heroView, setHeroView] = useState('score'); // 'score' or 'timeline'
@@ -80,24 +81,25 @@ const Dashboard = ({ onSetGoal, onDetail, onSettings }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full mb-8 mt-4 relative overflow-hidden p-6 sm:p-8 border-y border-white/10 shadow-y-xl rounded-[12px] group"
-                style={{ background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.9) 0%, rgba(2, 6, 23, 0.95) 100%)', backdropFilter: 'blur(20px)' }}
+                className="w-full mb-8 mt-4 relative overflow-hidden p-6 sm:p-8 shadow-y-xl rounded-[20px] group border-none"
+                style={{ background: 'linear-gradient(135deg, rgba(30, 58, 138, 1) 0%, rgba(2, 6, 23, 1) 100%)' }}
             >
-                <div className="relative z-10 w-[70%]">
-                    <h3 className="text-[22px] sm:text-[20px] font-medium text-white mb-2 font-heading tracking-tight leading-tight group-hover:text-blue-200 transition-colors">Upcoming Consultation</h3>
-                    <p className="text-[#A1A1AA] text-[11px] sm:text-[12px] font-medium tracking-wide mb-1">3:00 PM - 7:00 PM (GMT+5:30)</p>
-                    <p className="text-[#A1A1AA] text-[11px] sm:text-[12px] font-medium tracking-wide mb-6">Wednesday, October 20, 2025</p>
-                    <button className="bg-[#f2f2f2] text-zinc-950 font-bold text-[12px] tracking-wider  px-6 py-3 rounded-[14px] hover:bg-white active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] font-heading">
+                <div className="relative z-10 w-[65%]">
+                    <h3 className="text-[22px] sm:text-[24px] font-medium text-white mb-2 font-heading tracking-tight leading-tight group-hover:text-blue-200 transition-colors">Upcoming Consultation</h3>
+                    <p className="text-[#A1A1AA] text-[12px] sm:text-[14px] font-medium tracking-wide mb-1 opacity-80">3:00 PM - 7:00 PM (GMT+5:30)</p>
+                    <p className="text-[#A1A1AA] text-[12px] sm:text-[14px] font-medium tracking-wide mb-8 opacity-80">Wednesday, October 20, 2025</p>
+                    <button className="bg-[#E4E4E7] text-zinc-950 font-bold text-[13px] tracking-tight px-8 py-3.5 rounded-[12px] hover:bg-white active:scale-95 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] font-heading">
                         Add to Calendar
                     </button>
                 </div>
 
-                {/* Decorative crystals abstract representation */}
-                <div className="absolute right-[-40px] top-[-30px] w-56 h-56 pointer-events-none flex items-center justify-center -rotate-[15deg] opacity-70 group-hover:opacity-100 group-hover:rotate-[5deg] transition-all duration-1000 ease-out" style={{ mixBlendMode: 'screen' }}>
-                    <div className="absolute w-[180%] h-[25%] bg-gradient-to-r from-blue-400 to-indigo-600 rotate-[45deg] blur-[8px] rounded-full shadow-[0_0_30px_rgba(59,130,246,0.6)]" />
-                    <div className="absolute w-[180%] h-[25%] bg-gradient-to-r from-cyan-400 to-blue-500 -rotate-[45deg] blur-[8px] rounded-full shadow-[0_0_30px_rgba(34,211,238,0.6)]" />
-                    <div className="absolute w-[25%] h-[180%] bg-gradient-to-b from-indigo-400 to-fuchsia-500 blur-[8px] rounded-full shadow-[0_0_30px_rgba(168,85,247,0.6)]" />
-                    <div className="absolute w-[180%] h-[25%] bg-gradient-to-r from-purple-400 to-zinc-900 rotate-[90deg] blur-[8px] rounded-full shadow-[0_0_30px_rgba(168,85,247,0.6)]" />
+                {/* Crystal Background Image */}
+                <div className="absolute right-4 bottom-4 w-[100px] h-[100px] pointer-events-none flex items-center justify-center opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-1000 ease-out" style={{ mixBlendMode: 'screen' }}>
+                    <img
+                        src={consultationCrystal}
+                        alt="Consultation Crystal"
+                        className="w-full h-full object-contain brightness-125 contrast-125"
+                    />
                 </div>
             </motion.div>
 

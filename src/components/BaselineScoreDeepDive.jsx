@@ -3,7 +3,7 @@ import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from
 
 
 
-const BaselineScoreDeepDive = ({ onClose }) => {
+const BaselineScoreDeepDive = ({ onClose, onSetGoal }) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const springConfig = { damping: 40, stiffness: 200 };
@@ -49,7 +49,7 @@ const BaselineScoreDeepDive = ({ onClose }) => {
 
 
       {/* Main Content Area (Scrollable) */}
-      <div className="relative z-20 w-full flex flex-col items-center pt-24 h-full overflow-y-auto no-scrollbar pointer-events-none">
+      <div className="relative z-20 w-full flex flex-col items-center pt-24 pb-[200px] h-full overflow-y-auto no-scrollbar">
 
         {/* Title Heading */}
         <div className="max-w-[340px] px-6 text-center pointer-events-auto mb-10">
@@ -86,6 +86,21 @@ const BaselineScoreDeepDive = ({ onClose }) => {
             className="absolute inset-[-10px] border-t-2 border-[#4c93ff]/40 rounded-full pointer-events-none"
           />
         </div>
+
+        {/* Potential Score Indicator - Refined */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 pointer-events-auto flex items-center gap-3 bg-white/5 px-5 py-2 rounded-full border border-white/10 backdrop-blur-md shadow-lg"
+        >
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[14px] text-blue-400 font-variation-icon-bold">trending_up</span>
+            <span className="text-zinc-400 text-[10px] font-black uppercase tracking-[0.2em] font-heading">Potential</span>
+          </div>
+          <div className="w-[1px] h-3 bg-white/20" />
+          <span className="text-white text-[12px] font-black font-heading tracking-tight">80</span>
+        </motion.div>
         {/* BIOMETRIC HORIZON (Score Range) */}
         <div className="mt-16 w-full max-w-[340px] px-6 pointer-events-auto">
           <div className="relative pt-6 pb-2">
@@ -102,25 +117,15 @@ const BaselineScoreDeepDive = ({ onClose }) => {
             {/* Proportional Segments */}
             <div className="h-1.5 w-full flex gap-1 items-stretch">
               {/* Compromised (0-50) */}
-              <div className="basis-1/2 bg-[#ef4444]/20 rounded-full overflow-hidden">
-                <div className="h-full w-full bg-[#ef4444] opacity-20" />
-              </div>
+              <div className="basis-1/2 bg-[#ef4444] rounded-l-full shadow-[0_0_10px_#ef444433]" />
               {/* Constrained (50-65) */}
-              <div className="basis-[15%] bg-[#f59e0b]/20">
-                <div className="h-full w-full bg-[#f59e0b] opacity-40 shadow-[0_0_10px_#f59e0b44]" />
-              </div>
+              <div className="basis-[15%] bg-[#f59e0b] shadow-[0_0_10px_#f59e0b44]" />
               {/* Stable (65-75) */}
-              <div className="basis-[10%] bg-[#10b981]">
-                <div className="h-full w-full bg-[#10b981] shadow-[0_0_15px_#10b98188]" />
-              </div>
+              <div className="basis-[10%] bg-[#10b981] shadow-[0_0_15px_#10b98188]" />
               {/* Robust (75-85) */}
-              <div className="basis-[10%] bg-[#2b7fff]/20">
-                <div className="h-full w-full bg-[#2b7fff] opacity-30" />
-              </div>
+              <div className="basis-[10%] bg-[#2b7fff] shadow-[0_0_10px_#2b7fff44]" />
               {/* Elite (85-100) */}
-              <div className="basis-[15%] bg-[#06b6d4]/20 rounded-full overflow-hidden">
-                <div className="h-full w-full bg-[#06b6d4] opacity-20" />
-              </div>
+              <div className="basis-[15%] bg-[#06b6d4] rounded-r-full shadow-[0_0_10px_#06b6d433]" />
             </div>
 
             {/* Ticks & Thresholds */}
@@ -135,25 +140,28 @@ const BaselineScoreDeepDive = ({ onClose }) => {
           {/* Classification Legend */}
           <div className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-3">
             {[
-              { label: 'Compromised', color: '#ef4444', active: false },
-              { label: 'Constrained', color: '#f59e0b', active: false },
-              { label: 'Stable', color: '#10b981', active: true },
-              { label: 'Robust', color: '#2b7fff', active: false },
-              { label: 'Elite', color: '#06b6d4', active: false }
-            ].map((item, idx) => (
-              <div key={idx} className={`flex items-center gap-1.5 transition-all duration-500 ${item.active ? 'opacity-100 scale-105' : 'opacity-30'}`}>
-                <div
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{
-                    backgroundColor: item.color,
-                    boxShadow: item.active ? `0 0 10px ${item.color}` : 'none'
-                  }}
-                />
-                <span className={`text-[8px] font-black uppercase tracking-[0.2em] ${item.active ? 'text-white' : 'text-zinc-500'}`}>
-                  {item.label}
-                </span>
-              </div>
-            ))}
+              { label: 'Compromised', color: '#ef4444', min: 0, max: 50 },
+              { label: 'Constrained', color: '#f59e0b', min: 50, max: 65 },
+              { label: 'Stable', color: '#10b981', min: 65, max: 75 },
+              { label: 'Robust', color: '#2b7fff', min: 75, max: 85 },
+              { label: 'Elite', color: '#06b6d4', min: 85, max: 101 }
+            ].map((item, idx) => {
+              const active = 65 >= item.min && 65 < item.max;
+              return (
+                <div key={idx} className={`flex items-center gap-1.5 transition-all duration-500 ${active ? 'scale-105' : 'opacity-80'}`}>
+                  <div
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{
+                      backgroundColor: item.color,
+                      boxShadow: active ? `0 0 10px ${item.color}` : 'none'
+                    }}
+                  />
+                  <span className={`text-[8px] font-black uppercase tracking-[0.2em] ${active ? 'text-white' : 'text-zinc-400'}`}>
+                    {item.label}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -172,10 +180,20 @@ const BaselineScoreDeepDive = ({ onClose }) => {
           </div>
         </div>
 
+      </div>
 
-
-
-        <div className="mt-12 h-24" />{/* Bottom Spacer */}
+      {/* Floating Set Your Goal CTA - Join Style */}
+      <div className="fixed bottom-10 left-0 right-0 z-[1050] flex justify-center px-6 pointer-events-none">
+        <motion.button
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={onSetGoal}
+          className="bg-white text-[#0A0F29] text-[11px] font-black uppercase tracking-[0.3em] px-12 py-[18px] rounded-full hover:bg-blue-50 transition-all shadow-[0_20px_50px_rgba(255,255,255,0.1)] pointer-events-auto font-heading border border-white/20"
+        >
+          Set Your Goal
+        </motion.button>
       </div>
 
 

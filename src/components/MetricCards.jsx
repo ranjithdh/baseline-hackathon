@@ -46,7 +46,7 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
           border-radius: 20px;
           margin-bottom: 16px;
           background: rgb(var(--card));
-          border: 1px solid rgb(var(--card-border));
+          border: none;
           box-shadow: var(--shadow-sm);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;

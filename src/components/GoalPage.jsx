@@ -175,10 +175,10 @@ const GoalPage = ({ onBack, onNext }) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const getStatus = (val) => {
-    if (val <= 50) return { label: 'Compromised', color: 'var(--rating-rank-2)' };
-    if (val <= 65) return { label: 'Constrained', color: 'var(--rating-rank-3)' };
-    if (val <= 75) return { label: 'Stable', color: 'var(--rating-rank-4)' };
-    if (val <= 85) return { label: 'Robust', color: 'var(--rating-rank-5)' };
+    if (val < 50) return { label: 'Compromised', color: 'var(--rating-rank-2)' };
+    if (val < 65) return { label: 'Constrained', color: 'var(--rating-rank-3)' };
+    if (val < 75) return { label: 'Stable', color: 'var(--rating-rank-4)' };
+    if (val < 85) return { label: 'Robust', color: 'var(--rating-rank-5)' };
     return { label: 'Elite', color: 'var(--rating-rank-6)' };
   };
 
