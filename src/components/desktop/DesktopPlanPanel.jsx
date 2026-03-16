@@ -4,6 +4,7 @@ import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlan
 // The Playground panel uses the new V2 design.
 import HealthScoreSliderV2 from './HealthScoreSliderV2';
 import DashboardCard from './DashboardCard';
+import ExpertGuidanceCard from './ExpertGuidanceCard';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
 const GOAL_MIN = BASE_SCORE;
@@ -325,6 +326,13 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
                 : `+${gained} pts · ${toGoal} more`}
           </div>
         </DashboardCard>
+
+
+          {goalTarget > MAX_ACHIEVABLE && (
+          <div style={{ width:'100%',position: 'relative', top: 0, padding:'0px 0px' }}>
+            <ExpertGuidanceCard targetScore={goalTarget} />
+          </div>
+        )}
       </div>
 
       {/* ── PROGRESS BAR ── */}
