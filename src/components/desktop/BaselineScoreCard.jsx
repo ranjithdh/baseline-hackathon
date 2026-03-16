@@ -182,60 +182,110 @@ const FloatingOrb = ({ style }) => (
   }} />
 );
 
-// ─── MilestoneDots ───────────────────────────────────────────────────────────
-const MilestoneDots = ({ score, status, cfg }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: 0, width: '100%' }}>
-    {LEVELS.map((lvl, i) => {
-      const threshold = LEVEL_THRESHOLDS[i];
-      const reached   = score >= threshold;
-      const isCurrent = lvl === status;
-      const lvlCfg    = STATUS[lvl];
-      return (
-        <React.Fragment key={lvl}>
-          {/* Connecting line */}
-          {i > 0 && (
-            <div style={{
-              flex: 1, height: '2px',
-              background: reached
-                ? `linear-gradient(90deg, ${STATUS[LEVELS[i-1]].color}60, ${lvlCfg.color}60)`
-                : 'rgba(255,255,255,0.07)',
-              transition: 'background 0.4s ease',
-            }} />
-          )}
-          {/* Dot */}
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '5px',
-          }}>
-            <div style={{
-              width:  isCurrent ? '12px' : '8px',
-              height: isCurrent ? '12px' : '8px',
-              borderRadius: '50%',
-              background: reached ? lvlCfg.color : 'rgba(255,255,255,0.12)',
-              boxShadow: isCurrent ? `0 0 14px ${lvlCfg.color}, 0 0 28px ${lvlCfg.color}60` : 'none',
-              border: isCurrent ? `2px solid rgba(255,255,255,0.6)` : 'none',
-              transition: 'all 0.6s cubic-bezier(0.34,1.56,0.64,1)',
-              flexShrink: 0,
-            }} />
-            <span style={{
-              fontSize: '8px',
-              fontWeight: isCurrent ? 700 : 400,
-              color: isCurrent ? lvlCfg.color : 'rgba(255,255,255,0.22)',
-              letterSpacing: '0.06em',
-              whiteSpace: 'nowrap',
-              fontFamily: 'inherit',
+// ─── UnifiedProgress ──────────────────────────────────────────────────────────
+const UnifiedProgress = ({ score, status, revealed }) => {
+  const segments = [
+    { label: 'Alert',       min: 0,  max: 50,  width: 50, color: STATUS['High Alert'].color },
+    { label: 'Constrained', min: 50, max: 65,  width: 15, color: STATUS['Constrained'].color },
+    { label: 'Stable',      min: 65, max: 75,  width: 10, color: STATUS['Stable'].color },
+    { label: 'Strong',      min: 75, max: 85,  width: 10, color: STATUS['Strong'].color },
+    { label: 'Elite',       min: 85, max: 100, width: 15, color: STATUS['Elite'].color },
+  ];
+
+  // Head indicator position
+  const scorePct = revealed ? score : 0;
+  const cfg = STATUS[status] || STATUS['Stable'];
+
+  return (
+    <div style={{ width: '100%', marginTop: 'auto' }}>
+      {/* Labels Row */}
+      <div style={{
+        display: 'flex',
+        width: '100%',
+        marginBottom: '10px',
+        opacity: revealed ? 1 : 0,
+        transition: 'opacity 0.6s ease 1s',
+      }}>
+        {segments.map((s) => {
+          const isActive = status === (s.label === 'Alert' ? 'High Alert' : s.label);
+          return (
+            <div key={s.label} style={{
+              width: `${s.width}%`,
+              textAlign: 'center',
+              fontSize: '9px',
+              fontWeight: isActive ? 800 : 500,
+              color: isActive ? s.color : 'rgba(255,255,255,0.22)',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
               transition: 'color 0.4s',
             }}>
-              {lvl === 'High Alert' ? 'Alert' : lvl}
-            </span>
-          </div>
-        </React.Fragment>
-      );
-    })}
-  </div>
-);
+              {s.label}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Segmented Track */}
+      <div style={{
+        position: 'relative',
+        height: '10px',
+        width: '100%',
+        background: 'rgba(255,255,255,0.06)',
+        borderRadius: '100px',
+        overflow: 'hidden',
+        display: 'flex',
+        gap: '2px', // subtle gap between segments
+        padding: '0 2px',
+        alignItems: 'center',
+      }}>
+        {segments.map((s) => (
+          <div key={s.label} style={{
+            height: '4px',
+            width: `${s.width}%`,
+            background: 'rgba(255,255,255,0.05)',
+            borderRadius: '2px',
+          }} />
+        ))}
+
+        {/* Global Progress Fill */}
+        <div style={{
+          position: 'absolute',
+          top: 0, left: 0, bottom: 0,
+          width: `${scorePct}%`,
+          background: `linear-gradient(90deg, ${STATUS['High Alert'].color}80, ${cfg.color})`,
+          borderRadius: '100px',
+          boxShadow: `0 0 15px ${cfg.color}50`,
+          transition: 'width 2s cubic-bezier(0.16,1,0.3,1) 0.5s',
+          overflow: 'hidden',
+        }}>
+          {/* Inner Shimmer */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+            width: '200%',
+            animation: 'bsc-shimmer 3s linear infinite',
+          }} />
+        </div>
+
+        {/* Score Indicator Head */}
+        <div style={{
+          position: 'absolute',
+          left: `${scorePct}%`,
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '16px',
+          height: '16px',
+          borderRadius: '50%',
+          background: '#fff',
+          border: `3px solid ${cfg.color}`,
+          boxShadow: `0 0 10px ${cfg.color}, 0 0 20px ${cfg.color}40`,
+          transition: 'left 2s cubic-bezier(0.16,1,0.3,1) 0.5s',
+          zIndex: 5,
+        }} />
+      </div>
+    </div>
+  );
+};
 
 // ─── InsightChip ─────────────────────────────────────────────────────────────
 const InsightChip = ({ icon, label, value, color, delay }) => {
@@ -577,70 +627,40 @@ const BaselineScoreCard = ({
             </div>
           </div>
 
-          {/* ── Level milestones ── */}
+          {/* ── Unified Progress indicator ── */}
           <div style={{
-            marginBottom: '20px',
+            marginBottom: '24px',
             opacity: revealed ? 1 : 0,
-            transition: 'opacity 0.5s ease 1.8s',
+            transition: 'opacity 0.5s ease 1.6s',
           }}>
-            <MilestoneDots score={score} status={status} cfg={cfg} />
+            <UnifiedProgress score={score} status={status} revealed={revealed} />
+
+            {/* Motivational subtext */}
+            {nextLabel && (
+              <div style={{
+                marginTop: '12px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                opacity: revealed ? 1 : 0,
+                transition: 'opacity 0.5s ease 2.2s',
+              }}>
+                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
+                  Next Level: <strong style={{ color: STATUS[nextLabel].color, fontStyle: 'normal' }}>{nextLabel}</strong>
+                </div>
+                <div style={{
+                  fontSize: '11px', fontWeight: 700,
+                  color: '#4ade80',
+                  background: 'rgba(74,222,128,0.1)',
+                  padding: '4px 10px', borderRadius: '100px',
+                  border: '1px solid rgba(74,222,128,0.2)',
+                }}>
+                  ⚡ Needs {pointsLeft} points
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* ── Progress to next level ── */}
-          {nextLabel && (
-            <div style={{
-              marginBottom: '20px',
-              opacity: revealed ? 1 : 0,
-              transition: 'opacity 0.5s ease 2s',
-            }}>
-              {/* Progress header */}
-              <div style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-                marginBottom: '10px',
-              }}>
-                <div>
-                  <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', fontWeight: 500 }}>
-                    Next level:&nbsp;
-                  </span>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: STATUS[nextLabel].color }}>
-                    {nextLabel}
-                  </span>
-                </div>
-                <span style={{
-                  fontSize: '11px', fontWeight: 600,
-                  color: cfg.color,
-                  background: `rgba(${cfg.rgb},0.09)`,
-                  padding: '3px 9px', borderRadius: '100px',
-                  border: `1px solid rgba(${cfg.rgb},0.2)`,
-                }}>
-                  ⚡ {pointsLeft} pts
-                </span>
-              </div>
-
-              {/* Progress track */}
-              <div style={{
-                height: '6px',
-                background: 'rgba(255,255,255,0.06)',
-                borderRadius: '100px',
-                overflow: 'hidden',
-                position: 'relative',
-              }}>
-                <div className={`${uniqueId}-bar-fill`}>
-                  <div className={`${uniqueId}-bar-shine`} />
-                </div>
-              </div>
-
-              {/* Motivational line */}
-              <div style={{
-                marginTop: '8px',
-                fontSize: '11px',
-                color: 'rgba(255,255,255,0.28)',
-                fontStyle: 'italic',
-              }}>
-                Push to <strong style={{ color: STATUS[nextLabel].color, fontStyle: 'normal' }}>{nextLabel}</strong> — only <strong style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'normal' }}>{pointsLeft} points</strong> separate you.
-              </div>
-            </div>
-          )}
 
           {/* ── Divider ── */}
           <div style={{
