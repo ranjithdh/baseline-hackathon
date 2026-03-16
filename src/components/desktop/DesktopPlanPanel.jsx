@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
-import HealthScoreSlider from '../HealthScoreSlider';
+import HealthScoreSlider from './HealthScoreSlider';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
 const GOAL_MIN = BASE_SCORE;
