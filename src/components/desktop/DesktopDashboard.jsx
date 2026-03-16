@@ -40,7 +40,7 @@ const DesktopDashboard = () => {
       }}>
          {/* ── Expert Guidance sticky banner (only when goal exceeds achievable) ── */}
         {goalTarget > MAX_ACHIEVABLE && (
-          <div style={{ width:'calc(100% - 260px)',position: 'fixed', top: 0, zIndex: 100, padding:'0px 48px' }}>
+          <div style={{ width:'calc(100% - 260px)',position: 'fixed', top: 10, zIndex: 100, padding:'0px 48px' }}>
             <ExpertGuidanceCard targetScore={goalTarget} />
           </div>
         )}
