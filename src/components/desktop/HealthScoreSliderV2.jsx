@@ -6,7 +6,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 // ─────────────────────────────────────────────────────────────────────────────
 const SLIDER_UI_CONFIG = {
   sliderHeight:  10,   // px — colored track height
-  thumbSize:     20,   // base unit; rendered thumb = 3× this (60 px)
+  thumbSize:     25,   // base unit; rendered thumb = 3× this (60 px)
   trackRadius:   999,  // px — pill-shaped segment ends
   labelFontSize: 9,    // px — tick / label text (matches V1)
   segmentGap:    3,    // px — space between adjacent segment pills
@@ -15,7 +15,7 @@ const SLIDER_UI_CONFIG = {
 };
 
 // Derived constants — computed once from config, never hard-coded in JSX
-const D  = SLIDER_UI_CONFIG.thumbSize * 3;          // thumb diameter  = 60 px
+const D  = SLIDER_UI_CONFIG.thumbSize;          // thumb diameter  = 60 px
 const R  = D / 2;                                    // thumb radius    = 30 px
 const WH = D + Math.round(D * 0.8);                 // wrapper height  = 108 px (glow room)
 
@@ -231,10 +231,10 @@ const HealthScoreSliderV2 = ({
                 }}
               >
                 {/* Subtle icon — clipped by the track height naturally */}
-                <IconComp
+                {/* <IconComp
                   size={SLIDER_UI_CONFIG.iconSize}
                   color="rgba(0,0,0,0.22)"
-                />
+                /> */}
               </div>
             );
           })}
