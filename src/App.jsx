@@ -14,7 +14,7 @@ import BottomNav from './components/BottomNav';
 function App() {
   const [view, setView] = useState('home');
   const [detailTab, setDetailTab] = useState('positive');
-  const [actionPlanData, setActionPlanData] = useState(null);
+  const [showConsultation, setShowConsultation] = useState(true);
   const [theme, setTheme] = React.useState(() => {
     return localStorage.getItem('theme') || 'dark';
   });
@@ -49,6 +49,7 @@ function App() {
               onDetail={onHandleDetail}
               onSetGoal={() => setView('goal')}
               onScoreClick={() => setView('baseline-deep-dive')}
+              showConsultation={showConsultation}
             />
           </motion.div>
         )}
@@ -58,19 +59,35 @@ function App() {
               onSetGoal={() => setView('goal')}
               onDetail={onHandleDetail}
               onSettings={() => setView('settings')}
+              isEmpty={true}
             />
           </motion.div>
         )}
         {view === 'settings' && (
           <motion.div key="settings" variants={pageVariants} initial="initial" animate="enter" exit="exit">
             <Settings
-              onBack={() => setView('dashboard')}
+              onBack={() => setView('home')}
               currentTheme={theme}
               onToggleTheme={toggleTheme}
+              showConsultation={showConsultation}
+              onToggleConsultation={() => setShowConsultation(prev => !prev)}
             />
           </motion.div>
         )}
 
+        {view === 'action-plan' && (
+          <motion.div key="action-plan" variants={pageVariants} initial="initial" animate="enter" exit="exit">
+            <GoalActionCombined
+              onBack={() => setView('home')}
+              onAnalyze={() => setView('book-consultation')}
+              onViewDetailed={(data) => {
+                setActionPlanData(data);
+                setView('detailed-action-plan');
+              }}
+              isEmpty={true}
+            />
+          </motion.div>
+        )}
         {view === 'goal' && (
           <motion.div key="goal" variants={pageVariants} initial="initial" animate="enter" exit="exit">
             <GoalActionCombined

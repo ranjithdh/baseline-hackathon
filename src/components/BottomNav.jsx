@@ -5,7 +5,8 @@ const BottomNav = ({ activeView, onNavigate }) => {
     const navItems = [
         { id: 'home', label: 'Home', icon: 'home' },
         { id: 'dashboard', label: 'Data', icon: 'monitoring' },
-        { id: 'action-plan', label: 'Action Plan', icon: 'event_note' }
+        { id: 'action-plan', label: 'Action Plan', icon: 'event_note' },
+        { id: 'settings', label: 'Settings', icon: 'settings' }
     ];
 
     return (
@@ -17,7 +18,7 @@ const BottomNav = ({ activeView, onNavigate }) => {
             >
                 {navItems.map((item) => {
                     const isActive = activeView === item.id;
-                    
+
                     return (
                         <button
                             key={item.id}
@@ -32,17 +33,15 @@ const BottomNav = ({ activeView, onNavigate }) => {
                                 />
                             )}
                             <div className="flex flex-col items-center gap-1.5 relative z-10">
-                                <span 
-                                    className={`material-symbols-outlined text-[20px] transition-colors ${
-                                        isActive ? 'text-blue-400 font-variation-icon-fill' : 'text-white/40 group-hover:text-white/60'
-                                    }`}
+                                <span
+                                    className={`material-symbols-outlined text-[20px] transition-colors ${isActive ? 'text-blue-400 font-variation-icon-fill' : 'text-white/40 group-hover:text-white/60'
+                                        }`}
                                 >
                                     {item.icon}
                                 </span>
-                                <span 
-                                    className={`text-[9px] font-bold uppercase tracking-[0.15em] transition-colors ${
-                                        isActive ? 'text-blue-400' : 'text-white/30 group-hover:text-white/50'
-                                    }`}
+                                <span
+                                    className={`text-[9px] font-bold tracking-[0.15em] transition-colors ${isActive ? 'text-blue-400' : 'text-white/30 group-hover:text-white/50'
+                                        }`}
                                 >
                                     {item.label}
                                 </span>

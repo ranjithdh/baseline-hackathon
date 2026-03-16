@@ -5,7 +5,7 @@ import consultationCrystal from '../assets/consultation_crystal.png';
 import baselineSilhouette from '../assets/baseline-silhouette.png';
 import baselineBg from '../assets/baseline_background_image.png';
 
-const Home = ({ onDetail, onSetGoal, onScoreClick }) => {
+const Home = ({ onDetail, onSetGoal, onScoreClick, showConsultation }) => {
     const { score_details, contributors } = healthData.data;
 
     const score = score_details.normalized_baseline_score;
@@ -92,7 +92,7 @@ const Home = ({ onDetail, onSetGoal, onScoreClick }) => {
     };
 
     return (
-        <div className="dashboard-container relative pb-20 overflow-x-hidden">
+        <div className="dashboard-container relative overflow-y-auto overflow-x-hidden min-h-screen" style={{ paddingBottom: '200px' }}>
             {/* Header */}
             <header className="w-full pt-8 mb-6 px-1 flex items-center justify-between">
                 <div>
@@ -104,27 +104,29 @@ const Home = ({ onDetail, onSetGoal, onScoreClick }) => {
             </header>
 
             {/* Final Floating Consultation Pill */}
-            <div className="fixed bottom-28 left-0 right-0 z-[45] flex justify-center px-6 pointer-events-none">
-                <motion.div 
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    whileHover={{ scale: 1.01 }}
-                    className="w-full max-w-sm bg-[#0A0F29]/85 backdrop-blur-3xl border border-white/10 rounded-full p-1.5 pl-2 flex items-center justify-between shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] pointer-events-auto"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-400/20 flex-shrink-0">
-                            <span className="material-symbols-outlined text-blue-400 text-[20px] animate-pulse">videocam</span>
+            {showConsultation && (
+                <div className="fixed bottom-32 left-0 right-0 z-[45] flex justify-center px-6 pointer-events-none">
+                    <motion.div
+                        initial={{ y: 50, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        whileHover={{ scale: 1.01 }}
+                        className="w-full max-w-sm bg-[#0A0F29]/85 backdrop-blur-3xl border border-white/10 rounded-full p-1.5 pl-2 flex items-center justify-between shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] pointer-events-auto"
+                    >
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-400/20 flex-shrink-0">
+                                <span className="material-symbols-outlined text-blue-400 text-[20px] animate-pulse">videocam</span>
+                            </div>
+                            <div className="flex flex-col justify-center">
+                                <h4 className="text-white text-[11px] font-black uppercase tracking-wider font-heading leading-tight">Dr. Sarah Johnson</h4>
+                                <p className="text-blue-300/40 text-[8px] font-bold uppercase tracking-widest mt-0.5">Session • Today 3:00 PM</p>
+                            </div>
                         </div>
-                        <div className="flex flex-col justify-center">
-                            <h4 className="text-white text-[11px] font-black uppercase tracking-wider font-heading leading-tight">Dr. Sarah Johnson</h4>
-                            <p className="text-blue-300/40 text-[8px] font-bold uppercase tracking-widest mt-0.5">Session • Today 3:00 PM</p>
-                        </div>
-                    </div>
-                    <button className="bg-white text-[#0A0F29] text-[10px] font-black uppercase tracking-widest px-6 py-2.5 rounded-full hover:bg-blue-50 transition-all active:scale-90 shadow-lg font-heading ml-4">
-                        Join
-                    </button>
-                </motion.div>
-            </div>
+                        <button className="bg-white text-[#0A0F29] text-[10px] font-black uppercase tracking-widest px-6 py-2.5 rounded-full hover:bg-blue-50 transition-all active:scale-90 shadow-lg font-heading ml-4">
+                            Join
+                        </button>
+                    </motion.div>
+                </div>
+            )}
             {/* Baseline Score Card - Blue Style */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
