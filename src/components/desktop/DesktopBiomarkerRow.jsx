@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DashboardCard from './DashboardCard';
 
 const SUMMARY_CARDS = [
   {
@@ -101,14 +102,9 @@ const DesktopBiomarkerRow = () => {
           const hiddenCount = card.markers.length - VISIBLE_LIMIT;
 
           return (
-            <div
+            <DashboardCard
               key={card.id}
-              style={{
-                background: 'var(--card-bg)',
-                borderRadius: '18px',
-                border: '1px solid var(--border-color)',
-                padding: '20px 24px',
-              }}
+              style={{ padding: '20px 24px' }}
             >
               {/* Header */}
               <div style={{
@@ -174,7 +170,7 @@ const DesktopBiomarkerRow = () => {
                   {isExpanded ? 'View Less' : `View More (${hiddenCount})`}
                 </button>
               )}
-            </div>
+            </DashboardCard>
           );
         })}
       </div>

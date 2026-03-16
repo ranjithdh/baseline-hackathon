@@ -1,7 +1,13 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const ExpertGuidanceCard = ({ targetScore }) => {
   return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    >
     <div style={{
       width: '100%',
       marginBottom: '0',
@@ -63,6 +69,7 @@ const ExpertGuidanceCard = ({ targetScore }) => {
         </button>
       </div>
     </div>
+    </motion.div>
   );
 };
 

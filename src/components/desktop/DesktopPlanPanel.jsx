@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
 import HealthScoreSlider from './HealthScoreSlider';
+import DashboardCard from './DashboardCard';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
 const GOAL_MIN = BASE_SCORE;
@@ -214,13 +215,12 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
   return (
     <>
       {/* ── PLAYGROUND / GOAL SETTER CONTAINER ── */}
-      <div
+      <DashboardCard
         ref={planPanelRef}
         style={{
           margin: '32px 48px 0',
-          background: 'rgb(var(--zinc-950))',
-          borderRadius: '28px',
           position: 'relative',
+          padding: 0,
         }}
       >
         {/* Background gradient */}
@@ -291,11 +291,9 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
         </div>
 
         {/* Projected score card */}
-        <div style={{
+        <DashboardCard style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.09)',
-          borderRadius: '20px', padding: '28px 36px',
+          padding: '28px 36px',
           minWidth: '180px', textAlign: 'center', gap: '6px',
         }}>
           <div style={{
@@ -324,7 +322,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
               : projScore >= goalTarget ? `+${gained} pts · Goal ✓`
                 : `+${gained} pts · ${toGoal} more`}
           </div>
-        </div>
+        </DashboardCard>
       </div>
 
       {/* ── PROGRESS BAR ── */}
@@ -366,13 +364,12 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
         </div>
       </div> */}
 
-      </div>
+      </DashboardCard>
       {/* ── ACTION PLAN: separate section ── */}
-      <div style={{
+      <DashboardCard style={{
         margin: '20px 48px 0',
-        background: 'rgb(var(--zinc-950))',
-        borderRadius: '28px',
         position: 'relative',
+        padding: 0,
       }}>
       <div style={{ padding: '28px 44px 40px', position: 'relative', zIndex: 1 }}>
 
@@ -503,7 +500,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
           </div>
         )}
       </div>
-      </div>
+      </DashboardCard>
     </>
   );
 };
