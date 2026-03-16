@@ -1,12 +1,14 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 
 // ── Global segment palette (full 0–100 range) ────────────────────
+// `color`   → CSS variable string, usable directly in inline styles
+// `glowRgb` → raw "r,g,b" triplet matching the token, used in JS rgba() calls
 const SEGMENTS = [
-  { min: 0,  max: 50,  label: 'High Alert',  color: '#B45A5A', dimColor: '#5C2E2E', icon: 'heartbeat'   },
-  { min: 50, max: 65,  label: 'Constrained', color: '#C79A45', dimColor: '#6B5020', icon: 'restriction' },
-  { min: 65, max: 75,  label: 'Stable',      color: '#F2D94E', dimColor: '#7A6C24', icon: 'heart'       },
-  { min: 75, max: 85,  label: 'Strong',      color: '#8ED081', dimColor: '#3E6637', icon: 'shield'      },
-  { min: 85, max: 100, label: 'Elite',       color: '#2FA36B', dimColor: '#165432', icon: 'crown'       },
+  { min: 0,  max: 50,  label: 'Compromised', color: 'rgb(var(--chart-2))', glowRgb: '241,121,104', icon: 'heartbeat'   },
+  { min: 50, max: 65,  label: 'Constrained', color: 'rgb(var(--chart-3))', glowRgb: '244,199,100', icon: 'restriction' },
+  { min: 65, max: 75,  label: 'Stable',      color: 'rgb(var(--chart-4))', glowRgb: '141,226,141', icon: 'heart'       },
+  { min: 75, max: 85,  label: 'Strong',      color: 'rgb(var(--chart-5))', glowRgb: '31,120,76',   icon: 'shield'      },
+  { min: 85, max: 100, label: 'Elite',       color: 'rgb(var(--chart-6))', glowRgb: '0,158,148',   icon: 'crown'       },
 ];
 
 // ── SVG Icon library ─────────────────────────────────────────────
@@ -177,24 +179,27 @@ const HealthScoreSlider = ({
     onChange?.(next);
   };
 
-  // ── Dimming logic per visible segment ─────────────────────────
-  const getSegBg = (seg) => {
-    if (score <= seg.visMin) return seg.color;         // fully ahead  → lit
-    if (score >= seg.visMax) return seg.dimColor;      // fully behind → dim
-
-    // Marker straddles this segment → gradient split
-    const splitPct = ((score - seg.visMin) / (seg.visMax - seg.visMin)) * 100;
-    return `linear-gradient(90deg, ${seg.dimColor} ${splitPct}%, ${seg.color} ${splitPct}%)`;
+  // ── Dimming logic: returns 0 (fully lit) → 1 (fully dim) per segment ──
+  // Used to drive a GPU-accelerated scaleX overlay instead of a CSS gradient.
+  const getDimFraction = (seg) => {
+    if (score <= seg.visMin) return 0;   // segment is entirely ahead → fully lit
+    if (score >= seg.visMax) return 1;   // segment is entirely behind → fully dim
+    return (score - seg.visMin) / (seg.visMax - seg.visMin);
   };
 
+  // Icons are dark on lit segments, subtle-white on dimmed ones
   const iconColorFor = (seg) =>
-    score >= seg.visMax ? 'rgba(0,0,0,0.22)' : 'rgba(0,0,0,0.44)';
+    score >= seg.visMax ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.44)';
 
   // ── "I want to reach" helper message ──────────────────────────
   const showGoalMessage = maxRecommended != null && score > maxRecommended;
 
-  // ── Glow color follows active segment ─────────────────────────
+  // ── Glow helpers ──────────────────────────────────────────────
+  // glowColor: CSS variable string for direct inline `color` use (e.g. tick marks)
+  // glowRgba:  rgba() builder using the raw triplet — needed for JS template literals
+  //            (CSS variable strings can't be appended with hex alpha like `${var}44`)
   const glowColor = activeSeg.color;
+  const glowRgba  = (alpha) => `rgba(${activeSeg.glowRgb},${alpha})`;
 
   return (
     <div style={S.root}>
@@ -206,16 +211,30 @@ const HealthScoreSlider = ({
         <div ref={trackRef} style={S.track}>
           {visSegs.map((seg) => {
             const IconComp = ICON_MAP[seg.icon];
+            const dimFraction = getDimFraction(seg);
             return (
               <div
                 key={seg.label}
-                style={{
-                  ...S.segment,
-                  width: `${seg.widthPct}%`,
-                  background: getSegBg(seg),
-                }}
+                style={{ ...S.segment, width: `${seg.widthPct}%`, position: 'relative', overflow: 'hidden' }}
               >
-                <IconComp size={17} color={iconColorFor(seg)} />
+                {/* Lit base — always the full segment color */}
+                <div style={{ position: 'absolute', inset: 0, background: seg.color }} />
+
+                {/* GPU-accelerated dim overlay — scaleX from left, no gradient repaints */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'rgba(0,0,0,0.70)',
+                  transformOrigin: 'left center',
+                  transform: `scaleX(${dimFraction})`,
+                  transition: 'transform 0.22s ease',
+                  willChange: 'transform',
+                }} />
+
+                {/* Icon sits above both layers */}
+                <div style={{ position: 'relative', zIndex: 2 }}>
+                  <IconComp size={17} color={iconColorFor(seg)} />
+                </div>
               </div>
             );
           })}
@@ -238,12 +257,12 @@ const HealthScoreSlider = ({
             boxShadow: [
               '0 0 0 5px rgba(255,255,255,0.06)',
               '0 0 0 10px rgba(255,255,255,0.025)',
-              `0 0 30px 8px ${glowColor}44`,
+              `0 0 30px 8px ${glowRgba(0.267)}`,
               '0 6px 28px rgba(0,0,0,0.65)',
             ].join(', '),
           }}
         >
-          <div style={{ ...S.markerGlow, background: `radial-gradient(circle, ${glowColor}20 0%, transparent 68%)` }} />
+          <div style={{ ...S.markerGlow, background: `radial-gradient(circle, ${glowRgba(0.125)} 0%, transparent 68%)` }} />
           <div style={S.markerInner}><DragHandleIcon /></div>
         </div>
       </div>
@@ -389,7 +408,7 @@ const S = {
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    transition: 'background 0.22s ease',
+    // no background transition — the scaleX dim overlay handles all animation
   },
   marker: {
     position: 'absolute',

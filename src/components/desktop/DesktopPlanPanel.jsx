@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
-import HealthScoreSlider from './HealthScoreSlider';
+// HealthScoreSlider (V1) is intentionally kept untouched for other screens.
+// The Playground panel uses the new V2 design.
+import HealthScoreSliderV2 from './HealthScoreSliderV2';
 import DashboardCard from './DashboardCard';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
@@ -233,14 +235,14 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
       {/* ── GOAL SETTER ── */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr auto',
+        gridTemplateColumns: '1fr 220px',
         gap: '32px',
         padding: '40px 44px 32px',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
         position: 'relative', zIndex: 1,
         alignItems: 'center',
       }}>
-        <div>
+        <div style={{ minWidth: 0 }}>
            <div style={{
             fontFamily: 'var(--font-mono)', fontSize: '14px',
             letterSpacing: '0.3em', textTransform: 'uppercase',
@@ -257,7 +259,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
             </div>
             <div style={{
               fontFamily: 'var(--font-heading)', fontSize: '56px',
-              color: 'rgb(255,197,61)', lineHeight: 1,
+              color: 'rgb(var(--zinc-100))', lineHeight: 1,
               transition: 'all 0.25s cubic-bezier(0.16,1,0.3,1)',
             }}>
               {goalTarget}
@@ -278,8 +280,8 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
             </div>
           </div> 
 
-          {/* ── Health Score Slider ── */}
-          <HealthScoreSlider
+          {/* ── Health Score Slider V2 (new design) ── */}
+          <HealthScoreSliderV2
             min={GOAL_MIN}
             max={GOAL_MAX}
             score={goalTarget}
@@ -293,8 +295,8 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
         {/* Projected score card */}
         <DashboardCard style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          padding: '28px 36px',
-          minWidth: '180px', textAlign: 'center', gap: '6px',
+          padding: '28px 24px',
+          textAlign: 'center', gap: '6px',
         }}>
           <div style={{
             fontFamily: 'var(--font-mono)', fontSize: '9px',
