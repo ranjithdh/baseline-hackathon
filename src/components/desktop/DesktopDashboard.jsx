@@ -9,7 +9,7 @@ import ExpertGuidanceCard    from './ExpertGuidanceCard';
 import { MAX_ACHIEVABLE }    from './desktopPlanData';
 
 
-const DesktopDashboard = () => {
+const DesktopDashboard = ({ onSwitchView }) => {
   const [activeNav, setActiveNav]  = useState('dashboard');
   const [goalTarget, setGoalTarget] = useState(70);
   const planPanelRef               = useRef(null);
@@ -30,6 +30,7 @@ const DesktopDashboard = () => {
       <DesktopSidebar
         activeNav={activeNav}
         onNavigate={setActiveNav}
+        onSwitchView={onSwitchView}
       />
 
       {/* ── Main content ── */}
@@ -39,14 +40,14 @@ const DesktopDashboard = () => {
         overflowY: 'auto',
       }}>
          {/* ── Expert Guidance sticky banner (only when goal exceeds achievable) ── */}
-        {goalTarget > MAX_ACHIEVABLE && (
-          <div style={{ width:'calc(100% - 260px)',position: 'fixed', top: 0, zIndex: 100, padding:'0px 48px' }}>
+        {/* {goalTarget > MAX_ACHIEVABLE && (
+          <div style={{ width:'calc(100% - 260px)',position: 'fixed', top: 10, zIndex: 100, padding:'0px 48px' }}>
             <ExpertGuidanceCard targetScore={goalTarget} />
           </div>
-        )}
+        )} */}
 
         {/* Top bar */}
-        <DesktopTopBar onBookConsult={() => setActiveNav('consult')} />
+        <DesktopTopBar />
 
         {/* ── Row 1: Score Card + Consult Banner (side-by-side) ── */}
         <>
@@ -78,6 +79,7 @@ const DesktopDashboard = () => {
           planPanelRef={planPanelRef}
           goalTarget={goalTarget}
           onGoalChange={setGoalTarget}
+          onBookConsult={() => setActiveNav('consult')}
         />
 
       </main>

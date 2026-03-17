@@ -6,6 +6,7 @@
   --text-primary: rgb(var(--foreground));
   --text-secondary: rgb(var(--muted-foreground));
   --accent-color: rgb(var(--primary));
+  --secondary-color: rgb(var(--secondary));
   --accent-secondary: rgb(var(--primary));
   --border-color: rgb(var(--border));
   --card-bg-rgb: var(--card);
@@ -16,6 +17,24 @@
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.2);
   --shadow-lg: var(--shadow-lg-token, 0 20px 60px rgba(0, 0, 0, 0.5));
+
+
+  /* Chart colors */
+  --chart-0: 141 210 226;
+  --chart-0-foreground: var(--zinc-700);
+  --chart-1: 188 21 21;
+  --chart-1-foreground: 255 255 255;
+  --chart-2: 241 121 104;
+  --chart-2-foreground: 9 9 11;
+  --chart-3: 244 199 100;
+  --chart-3-foreground: 9 9 11;
+  --chart-4: 141 226 141;
+  --chart-4-foreground: 9 9 11;
+  --chart-5: 31 120 76;
+  --chart-5-foreground: 255 255 255;
+  --chart-6: 0 158 148;
+  --chart-6-foreground: 0 158 148;
+
 }
 
 * {
@@ -57,7 +76,6 @@ h1,
 h2,
 h3 {
   font-family: var(--font-heading);
-  text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 

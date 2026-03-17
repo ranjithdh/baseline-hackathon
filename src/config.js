@@ -1,7 +1,10 @@
 // ─── Layout Configuration ──────────────────────────────────────────
-//  📱 IS_DESKTOP = false  →  launches Mobile design  (default)
-//  🖥️ IS_DESKTOP = true   →  launches Desktop design
 //
-//  This is the ONLY place you need to change to switch layouts.
-// ───────────────────────────────────────────────────────────────────
-export const IS_DESKTOP = true;
+//  The IS_DESKTOP flag has been replaced with a dynamic runtime selector.
+//  On first launch the user chooses Mobile or Desktop via ViewSelectorScreen.
+//  The choice is persisted to localStorage under the key "IS_DESKTOP".
+//
+//  To reset the selection (show the selector again) clear localStorage:
+//    localStorage.removeItem('IS_DESKTOP')
+//
+// ──────────────────────────────────────────────────────────────────

@@ -1,12 +1,18 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const ExpertGuidanceCard = ({ targetScore }) => {
   return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+    >
     <div style={{
       width: '100%',
       marginBottom: '0',
       borderRadius: '10px',
-      background: 'linear-gradient(135deg, rgba(60,60,90,0.95) 0%, rgba(90,60,130,0.95) 100%)',
+      background:  'linear-gradient(to right, #253282 0%, 21.09704613685608%, #374DAE 42.19409227371216%, 71.09704613685608%, #537DD3 100%)',
       backdropFilter: 'blur(2px)',
       boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6)',
       display: 'flex',
@@ -63,6 +69,7 @@ const ExpertGuidanceCard = ({ targetScore }) => {
         </button>
       </div>
     </div>
+    </motion.div>
   );
 };
 

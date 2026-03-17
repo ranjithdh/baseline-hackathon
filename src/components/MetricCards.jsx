@@ -3,11 +3,12 @@ import healthData from '../data.json';
 
 const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
   const isCaution = variant === 'caution';
-  const statusColor = isCaution ? 'var(--red-9)' : 'var(--green-9)';
-  
+  const isWatch = variant === 'watch';
+  const statusColor = isCaution ? 'var(--red-9)' : isWatch ? '245, 158, 11' : 'var(--green-9)';
+
   return (
-    <div 
-      className={`card-white ${variant}`} 
+    <div
+      className={`card-white ${variant}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -15,11 +16,11 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
       <div className="card-header">
         <div className="card-title-group">
           <div className="status-icon-container">
-            <span 
+            <span
               className="material-symbols-outlined text-[18px]"
               style={{ color: `rgb(${statusColor})` }}
             >
-              {isCaution ? 'warning' : 'check_circle'}
+              {isCaution ? 'warning' : isWatch ? 'visibility' : 'check_circle'}
             </span>
             <div className="icon-glow" style={{ '--glow-color': `rgb(${statusColor})` }} />
           </div>
@@ -45,7 +46,7 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
           border-radius: 20px;
           margin-bottom: 16px;
           background: rgb(var(--card));
-          border: 1px solid rgb(var(--card-border));
+          border: none;
           box-shadow: var(--shadow-sm);
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
@@ -63,27 +64,42 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
         }
 
         .status-icon-container {
-          width: 40px;
-          height: 40px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
-          background: #1c1c1f;
+          background: #121214;
           display: flex;
           align-items: center;
           justify-content: center;
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
-          box-shadow: 
-            0 4px 12px rgba(0, 0, 0, 0.5), 
-            inset 0 1px 1px rgba(255, 255, 255, 0.05),
-            inset 0 -2px 4px rgba(0, 0, 0, 0.4);
           position: relative;
+          
+          /* Deep inner shadow for the "recessed" feel */
+          box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.8);
+          transition: all 0.3s ease;
+        }
+
+        /* Razor-sharp top-rim highlight using mask-composite */
+        .status-icon-container::after {
+          content: "";
+          position: absolute;
+          inset: -0.5px;
+          border-radius: 50%;
+          padding: 1px;
+          background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 45%);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
         }
 
         .icon-glow {
           position: absolute;
-          inset: 0;
+          inset: -2px;
           border-radius: 50%;
-          box-shadow: 0 0 15px var(--glow-color);
-          opacity: 0.15;
+          background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
+          opacity: 0.1;
+          filter: blur(8px);
           pointer-events: none;
         }
 
@@ -146,12 +162,19 @@ const MetricCards = ({ onDetail }) => {
   const { contributors } = healthData.data;
 
   return (
-    <div className="metrics-group" style={{ width: '100%', padding: '0 10px' }}>
+    <div className="metrics-group" style={{ width: '100%', padding: '0 1px' }}>
       <MetricCard
         title="What's Working Well"
         mainValue={contributors.positive_count}
         label="POSITIVE FACTORS"
         onClick={() => onDetail('positive')}
+      />
+      <MetricCard
+        title="Watch Closely"
+        mainValue={3}
+        label="MONITORING REQUIRED"
+        variant="watch"
+        onClick={() => onDetail('watch')}
       />
       <MetricCard
         title="Needs Attention"

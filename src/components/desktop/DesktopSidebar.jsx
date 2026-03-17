@@ -98,7 +98,9 @@ const styles = {
   },
 };
 
-const DesktopSidebar = ({ activeNav = 'dashboard', onNavigate }) => {
+const DesktopSidebar = ({ activeNav = 'dashboard', onNavigate, onSwitchView }) => {
+  const [switchHovered, setSwitchHovered] = React.useState(false);
+
   return (
     <aside style={styles.sidebar}>
       {/* Logo */}
@@ -129,6 +131,48 @@ const DesktopSidebar = ({ activeNav = 'dashboard', onNavigate }) => {
           );
         })}
       </nav>
+
+      {/* Switch View */}
+      <button
+        onClick={onSwitchView}
+        onMouseEnter={() => setSwitchHovered(true)}
+        onMouseLeave={() => setSwitchHovered(false)}
+        title="Go back to view selector"
+        style={{
+          display:        'flex',
+          alignItems:     'center',
+          gap:            '10px',
+          width:          '100%',
+          padding:        '10px 14px',
+          borderRadius:   '8px',
+          background:     switchHovered ? 'rgba(255,255,255,0.06)' : 'transparent',
+          border:         '1px solid rgba(255,255,255,0.08)',
+          color:          switchHovered ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.30)',
+          fontSize:       '12px',
+          fontFamily:     'var(--font-main)',
+          fontWeight:     500,
+          cursor:         'pointer',
+          letterSpacing:  '0.01em',
+          transition:     'background 0.2s ease, color 0.2s ease',
+          outline:        'none',
+        }}
+      >
+        {/* Phone icon */}
+        <svg
+          width="14" height="14" viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+          style={{ flexShrink: 0 }}
+        >
+          <rect x="5" y="2" width="14" height="20" rx="2.5" />
+          <line x1="9.5" y1="18.5" x2="14.5" y2="18.5" />
+        </svg>
+        Switch View
+      </button>
 
       {/* User */}
       <div style={styles.userSection}>

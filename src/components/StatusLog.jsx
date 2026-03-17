@@ -95,9 +95,11 @@ const LogItem = ({ icon, title, subtitle, xp, variant }) => {
 };
 
 const StatusLog = () => {
-  const { contributors } = healthData.data;
+  // const { contributors } = healthData.data;
 
   return (
+    null
+    /*
     <div className="status-log-section" style={{ width: '100%', paddingBottom: '40px' }}>
       <p className="section-label" style={{
         marginBottom: '20px',
@@ -121,6 +123,7 @@ const StatusLog = () => {
         />
       ))}
     </div>
+    */
   );
 };
 

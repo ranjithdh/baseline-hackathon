@@ -42,9 +42,14 @@
         },
         "contributors": {
             "positive": [
-                {"display_name": "HbA1c", "current_value": 5.4, "unit": "%", "inference": "Optimal"},
-                {"display_name": "Fasting Insulin", "current_value": 7.6, "unit": "µU/mL", "inference": "Optimal"},
-                {"display_name": "VO2 Max", "current_value": 41, "unit": "mL/kg/min", "inference": "Good"}
+                {"display_name": "HbA1c", "current_value": 5.4, "unit": "%", "inference": "Optimal", "category": "Metabolic"},
+                {"display_name": "Fasting Insulin", "current_value": 7.6, "unit": "µU/mL", "inference": "Optimal", "category": "Metabolic"},
+                {"display_name": "VO2 Max", "current_value": 41, "unit": "mL/kg/min", "inference": "Good", "category": "Cardiovascular"},
+                {"display_name": "Vitamin B12", "current_value": 650, "unit": "pg/mL", "inference": "Optimal", "category": "Nutrients"},
+                {"display_name": "Magnesium", "current_value": 2.2, "unit": "mg/dL", "inference": "Optimal", "category": "Nutrients"},
+                {"display_name": "Ferritin", "current_value": 120, "unit": "ng/mL", "inference": "Good", "category": "Blood"},
+                {"display_name": "HDL Cholesterol", "current_value": 65, "unit": "mg/dL", "inference": "Optimal", "category": "Heart"},
+                {"display_name": "Triglycerides", "current_value": 85, "unit": "mg/dL", "inference": "Optimal", "category": "Metabolic"}
             ],
             "negative": [
                 {"display_name": "Vitamin D", "current_value": 19.69, "unit": "ng/mL", "inference": "Very Low"},
