@@ -98,11 +98,10 @@ function describeArc(cx, cy, r, startDeg, endDeg) {
 }
 
 // ─── WarmArc ──────────────────────────────────────────────────────────────────
-// The large warm gold→red arc matching the screenshot aesthetic
 const WarmArc = ({ score, cfg, revealed, uid }) => {
-  const SIZE = 190;
-  const CX = SIZE / 2, CY = SIZE / 2 + 8;
-  const R = 76;
+  const SIZE = 150;
+  const CX = SIZE / 2, CY = SIZE / 2 + 5;
+  const R = 62;
 
   const fillFrac = revealed ? score / 100 : 0;
   const fillEnd = START_DEG + SWEEP_DEG * fillFrac;
@@ -112,46 +111,39 @@ const WarmArc = ({ score, cfg, revealed, uid }) => {
     <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}
       style={{ overflow: 'visible', display: 'block', flexShrink: 0 }}>
       <defs>
-        {/* Warm gradient: gold → orange → deep-red */}
         <linearGradient id={`${uid}-arc-grad`} x1="0%" y1="100%" x2="80%" y2="0%">
           <stop offset="0%" stopColor="#d4a012" />
           <stop offset="50%" stopColor="#c86420" />
           <stop offset="100%" stopColor={cfg.arcRed} />
         </linearGradient>
-        {/* Softer glow filter */}
         <filter id={`${uid}-arc-glow`} x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="9" result="blur" />
+          <feGaussianBlur stdDeviation="7" result="blur" />
           <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
-        {/* Inner ambient */}
         <radialGradient id={`${uid}-center-glow`} cx="50%" cy="62%" r="48%">
-          <stop offset="0%" stopColor="rgba(210,140,30,0.18)" />
+          <stop offset="0%" stopColor="rgba(210,140,30,0.15)" />
           <stop offset="100%" stopColor="transparent" />
         </radialGradient>
       </defs>
 
-      {/* Ambient center glow */}
-      <circle cx={CX} cy={CY} r={R - 8} fill={`url(#${uid}-center-glow)`} />
+      <circle cx={CX} cy={CY} r={R - 6} fill={`url(#${uid}-center-glow)`} />
 
-      {/* Track (very faint warm) */}
       <path d={describeArc(CX, CY, R, START_DEG, arcEnd)}
-        fill="none" stroke="rgba(220,160,60,0.09)" strokeWidth="16" strokeLinecap="round" />
+        fill="none" stroke="rgba(220,160,60,0.07)" strokeWidth="12" strokeLinecap="round" />
 
-      {/* Glow halo behind arc */}
       {revealed && score > 2 && (
         <path d={describeArc(CX, CY, R, START_DEG, fillEnd)}
           fill="none"
-          stroke="rgba(200,110,20,0.38)"
-          strokeWidth="24" strokeLinecap="round"
+          stroke="rgba(200,110,20,0.3)"
+          strokeWidth="18" strokeLinecap="round"
           filter={`url(#${uid}-arc-glow)`} />
       )}
 
-      {/* Main filled arc */}
       {revealed && score > 2 && (
         <path d={describeArc(CX, CY, R, START_DEG, fillEnd)}
           fill="none"
           stroke={`url(#${uid}-arc-grad)`}
-          strokeWidth="16" strokeLinecap="round" />
+          strokeWidth="12" strokeLinecap="round" />
       )}
     </svg>
   );
@@ -429,25 +421,24 @@ const BaselineScoreCard = ({
           display: flex;
           flex-direction: column;
 
-          /* Warm dark-brown background matching the screenshot */
+          /* Rich Blue Brand Background */
           background:
-            radial-gradient(ellipse at 30% 25%, rgba(80,30,10,0.90) 0%, transparent 65%),
-            radial-gradient(ellipse at 75% 70%, rgba(50,15,5,0.70) 0%, transparent 60%),
-            radial-gradient(ellipse at 50% 50%, #1e0c04 0%, #130804 50%, #0c0502 100%);
+            radial-gradient(ellipse at 30% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 60%),
+            linear-gradient(270deg, rgb(151, 159, 254) 0%, rgb(141, 136, 248) 24.22%, rgb(0, 36, 145) 57.3%, rgb(0, 10, 41) 80.88%);
 
-          border: 1px solid rgba(200,140,60,0.12);
+          border: 1px solid rgba(var(--zinc-400), 0.15);
           box-shadow:
-            0 0 60px rgba(180,80,20,0.12),
+            0 0 60px rgba(0,0,0,0.5),
             0 32px 80px rgba(0,0,0,0.7),
-            inset 0 1px 0 rgba(220,160,80,0.08);
+            inset 0 1px 0 rgba(var(--zinc-200), 0.05);
           transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease;
         }
         .${uid}-card:hover {
           transform: translateY(-4px) scale(1.005);
           box-shadow:
-            0 0 80px rgba(200,110,30,0.20),
-            0 40px 100px rgba(0,0,0,0.75),
-            inset 0 1px 0 rgba(220,160,80,0.12);
+            0 0 80px rgba(var(--brand-color), 0.1),
+            0 40px 100px rgba(0,0,0,0.8),
+            inset 0 1px 0 rgba(var(--zinc-200), 0.1);
         }
 
         /* Grain texture overlay */
@@ -510,59 +501,70 @@ const BaselineScoreCard = ({
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             marginBottom: '14px',
           }}>
-            {/* Left: dash + label */}
+            {/* Left: dash + label + BETA */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <div style={{
-                width: '18px', height: '1px',
-                background: 'rgba(200,150,70,0.45)',
+                width: '18px', height: '1.5px',
+                background: 'rgba(255,255,255,0.25)',
               }} />
-              <span style={{
-                fontSize: '9.5px', fontWeight: 600, letterSpacing: '0.20em',
-                textTransform: 'uppercase', color: 'rgba(210,170,100,0.55)',
-              }}>
-                Your Baseline Score
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  fontSize: '9.5px', fontWeight: 700, letterSpacing: '0.20em',
+                  textTransform: 'uppercase', color: 'rgba(255,255,255,0.65)',
+                }}>
+                  Your Baseline Score
+                </span>
+                <span style={{
+                  fontSize: '7.5px', fontWeight: 800, padding: '2px 9px',
+                  borderRadius: '100px', background: 'rgba(255,255,255,0.12)',
+                  color: '#fff', border: '1px solid rgba(255,255,255,0.25)',
+                  letterSpacing: '0.12em',
+                }}>BETA</span>
+              </div>
             </div>
-            {/* Right: BETA + ⓘ */}
+            {/* Right: ⓘ */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-              <span style={{
-                fontSize: '7.5px', fontWeight: 700, padding: '2px 8px',
-                borderRadius: '100px', background: 'rgba(99,102,241,0.12)',
-                color: 'rgba(165,180,252,0.75)', border: '1px solid rgba(99,102,241,0.22)',
-                letterSpacing: '0.12em',
-              }}>BETA</span>
               <button
                 className={`${uid}-info-btn`}
                 onClick={(e) => { e.stopPropagation(); setShowInfo(true); }}
+                style={{
+                  width: '20px', height: '20px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.1)', border: '1,5px solid rgba(255,255,255,0.3)',
+                  color: '#fff', fontSize: '11px', fontWeight: 800,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', transition: 'all 0.2s', fontStyle: 'italic', fontFamily: 'serif'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
                 title="What is Baseline Score?"
               >i</button>
             </div>
           </div>
 
-          {/* ── Thin divider ── */}
+          {/* ── Divider ── */}
           <div style={{
-            height: '1px', marginBottom: '18px',
-            background: 'linear-gradient(90deg, rgba(200,150,60,0.18), rgba(200,150,60,0.06) 60%, transparent)',
+            height: '1px', marginBottom: '16px',
+            background: 'linear-gradient(90deg, transparent, rgba(var(--zinc-400), 0.12) 30%, rgba(var(--zinc-400), 0.12) 70%, transparent)',
           }} />
 
           {/* ── Main hero row: Arc left + Content right ── */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '18px', flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '22px', flex: 1 }}>
 
             {/* Arc + score center */}
-            <div style={{ position: 'relative', flexShrink: 0 }}>
+            <div style={{ position: 'relative', flexShrink: 0, marginLeft: '10px' }}>
               <WarmArc score={score} cfg={cfg} revealed={revealed} uid={uid} />
               {/* Score overlaid in arc center */}
               <div style={{
                 position: 'absolute', inset: 0,
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
-                paddingTop: '16px',
+                paddingTop: '10px',
               }}>
                 <div style={{
-                  fontSize: '52px', fontWeight: 900, lineHeight: 1,
-                  color: '#f0e4cc',
-                  letterSpacing: '-3px',
-                  textShadow: '0 0 30px rgba(210,140,40,0.45), 0 2px 4px rgba(0,0,0,0.5)',
+                  fontSize: '44px', fontWeight: 900, lineHeight: 1,
+                  color: '#fff',
+                  letterSpacing: '-2px',
+                  textShadow: `0 0 25px rgba(255,255,255,0.2), 0 2px 10px rgba(0,0,0,0.4)`,
                   opacity: revealed ? 1 : 0,
                   transform: revealed ? 'scale(1)' : 'scale(0.85)',
                   transition: 'opacity 0.6s ease 0.5s, transform 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.5s',
@@ -571,8 +573,8 @@ const BaselineScoreCard = ({
                   {displayScore}
                 </div>
                 <div style={{
-                  fontSize: '10px', fontWeight: 500,
-                  color: 'rgba(210,175,120,0.38)', letterSpacing: '0.04em',
+                  fontSize: '10px', fontWeight: 600,
+                  color: 'rgba(255,255,255,0.45)', letterSpacing: '0.04em',
                   marginTop: '1px',
                   opacity: revealed ? 1 : 0,
                   transition: 'opacity 0.4s ease 1.2s',
@@ -583,16 +585,16 @@ const BaselineScoreCard = ({
             {/* Right content */}
             <div style={{
               flex: 1, display: 'flex', flexDirection: 'column',
-              gap: '10px', paddingTop: '10px', minWidth: 0,
+              gap: '8px', minWidth: 0,
             }}>
 
               {/* Status badge */}
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: '7px',
-                background: cfg.badgeBg,
-                border: `1px solid ${cfg.badgeBorder}`,
+                background: `rgba(${cfg.rgb}, 0.08)`,
+                border: `1px solid rgba(${cfg.rgb}, 0.25)`,
                 borderRadius: '100px',
-                padding: '5px 13px',
+                padding: '4px 12px',
                 width: 'fit-content',
                 opacity: revealed ? 1 : 0,
                 transform: revealed ? 'translateY(0)' : 'translateY(8px)',
@@ -600,15 +602,15 @@ const BaselineScoreCard = ({
               }}>
                 <div style={{
                   width: '6px', height: '6px', borderRadius: '50%',
-                  background: cfg.badgeColor,
-                  animation: `${uid}-dot-pulse 2.5s infinite`,
+                  background: cfg.color,
+                  boxShadow: `0 0 8px ${cfg.color}`,
                 }} />
-                <span style={{ fontSize: '11px', fontWeight: 800, color: cfg.badgeColor, letterSpacing: '0.10em' }}>
+                <span style={{ fontSize: '10px', fontWeight: 800, color: cfg.color, letterSpacing: '0.08em' }}>
                   {cfg.badge} {status.toUpperCase()}
                 </span>
               </div>
 
-              {/* Bold tagline – matches "Good foundations. Real room to grow." style */}
+              {/* Tagline */}
               <div style={{
                 opacity: revealed ? 1 : 0,
                 transform: revealed ? 'translateY(0)' : 'translateY(10px)',
@@ -616,18 +618,18 @@ const BaselineScoreCard = ({
               }}>
                 {cfg.tagTitle.split('\n').map((line, i) => (
                   <div key={i} style={{
-                    fontSize: '17px', fontWeight: 800,
-                    color: '#f0e0c4',
-                    lineHeight: 1.25,
+                    fontSize: '18px', fontWeight: 800,
+                    color: '#fff',
+                    lineHeight: 1.2,
                     letterSpacing: '-0.3px',
-                    textShadow: '0 1px 8px rgba(0,0,0,0.5)',
+                    textShadow: '0 2px 10px rgba(0,0,0,0.3)'
                   }}>{line}</div>
                 ))}
               </div>
 
               {/* Subtitle */}
               <div style={{
-                fontSize: '11.5px', color: 'rgba(210,170,110,0.50)',
+                fontSize: '12px', color: 'rgba(255,255,255,0.8)', // Adjusted for better contrast
                 lineHeight: 1.5, fontWeight: 400,
                 opacity: revealed ? 1 : 0,
                 transition: 'opacity 0.5s ease 1.5s',
@@ -639,72 +641,75 @@ const BaselineScoreCard = ({
 
           {/* ── Divider ── */}
           <div style={{
-            height: '1px', margin: '16px 0',
-            background: 'linear-gradient(90deg, transparent, rgba(200,150,60,0.12) 30%, rgba(200,150,60,0.12) 70%, transparent)',
+            height: '1px', margin: '12px 0',
+            background: 'linear-gradient(90deg, transparent, rgba(var(--zinc-400), 0.08) 30%, rgba(var(--zinc-400), 0.08) 70%, transparent)',
           }} />
 
 
-          {/* ── Bottom info panel (frosted row – like screenshot) ── */}
+          {/* ── Bottom info panel (frosted row) ── */}
           <div style={{
-            background: 'rgba(255,220,150,0.04)',
-            border: '1px solid rgba(200,150,60,0.12)',
-            borderRadius: '14px',
-            padding: '12px 14px',
+            background: 'rgba(var(--zinc-400), 0.03)',
+            border: '1px solid rgba(var(--zinc-400), 0.12)',
+            borderRadius: '16px',
+            padding: '16px 14px',
             display: 'grid',
-            gridTemplateColumns: '1fr 1px 1fr',
+            gridTemplateColumns: 'minmax(0, 1fr) 1px minmax(0, 1fr)',
             gap: '12px',
             alignItems: 'center',
             opacity: revealed ? 1 : 0,
             transform: revealed ? 'translateY(0)' : 'translateY(8px)',
             transition: 'opacity 0.5s ease 2.2s, transform 0.5s ease 2.2s',
           }}>
-            {/* Left: potential + simulate */}
-
-
-            {/* Right: top % + biggest boost */}
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '11px', color: 'rgba(210,175,110,0.42)', marginBottom: '3px' }}>
+            {/* Left side: Age Group Rank (Centered) */}
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
                 🏆 Age Group Rank
               </div>
-              <div style={{ fontSize: '17px', fontWeight: 800, color: '#f0e0c4' }}>
-                Top <span style={{ color: '#c084fc' }}>{topPercentage}%</span>
+              <div style={{ fontSize: '20px', fontWeight: 900, color: '#fff' }}>
+                Top <span style={{ color: '#ffb340' }}>{topPercentage}%</span>
               </div>
-              <div style={{ fontSize: '10px', color: 'rgba(210,170,100,0.38)', marginTop: '2px' }}>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', marginTop: '2px', fontWeight: 500 }}>
                 in your age group
               </div>
             </div>
 
             {/* Center divider */}
-            <div style={{ width: '1px', height: '44px', background: 'rgba(200,150,60,0.15)', justifySelf: 'center' }} />
+            <div style={{ width: '1px', height: '44px', background: 'rgba(255,255,255,0.15)', justifySelf: 'center' }} />
 
-
-            <div>
-              <div style={{ fontSize: '11px', color: 'rgba(210,175,110,0.55)', marginBottom: '3px' }}>
-                Your potential:{' '}
-                <span style={{ fontWeight: 800, color: potCfg.color }}>{potLabel}</span>
+            {/* Right side: Potential (Centered) */}
+            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.5)', marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 700 }}>
+                Potential: <span style={{ fontWeight: 900, color: '#3de88c' }}>{potLabel}</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '13px', fontWeight: 800, color: potCfg.color }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+                <span style={{ fontSize: '15px', fontWeight: 900, color: '#3de88c' }}>
                   {gap} pts
                 </span>
-                <span style={{ fontSize: '11px', color: 'rgba(210,175,100,0.45)', fontWeight: 500 }}>
-                  to reach your potential
+                <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.45)', fontWeight: 500 }}>
+                  to reach gap
                 </span>
               </div>
               {/* Simulate button – inline text style */}
               <button
                 onClick={(e) => { e.stopPropagation(); onSimulate?.(); }}
                 style={{
-                  marginTop: '7px',
+                  marginTop: '8px',
                   background: 'none', border: 'none', padding: 0,
                   display: 'flex', alignItems: 'center', gap: '5px',
-                  color: potCfg.color, fontSize: '11px', fontWeight: 700,
+                  color: '#fff', fontSize: '11px', fontWeight: 800,
                   cursor: 'pointer', letterSpacing: '0.04em',
-                  opacity: 0.85, transition: 'opacity 0.2s',
+                  opacity: 0.9, transition: 'all 0.2s',
                   position: 'relative', overflow: 'hidden',
+                  textDecoration: 'underline', textUnderlineOffset: '3px',
                 }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '0.85'}
+                onMouseEnter={e => {
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.color = '#3ae8ff';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.opacity = '0.85';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
               >
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -717,9 +722,6 @@ const BaselineScoreCard = ({
                 </svg>
               </button>
             </div>
-
-
-
           </div>
 
           {/* ── Biggest Boost chip ── */}
@@ -746,12 +748,12 @@ const BaselineScoreCard = ({
 
           {/* ── Motivational footer line ── */}
           <div style={{
-            marginTop: '12px', paddingTop: '10px',
-            borderTop: '1px solid rgba(200,150,60,0.07)',
+            marginTop: '16px', paddingTop: '12px',
+            borderTop: '1px solid rgba(255,255,255,0.1)',
             textAlign: 'center',
-            fontSize: '10px', color: 'rgba(210,170,100,0.32)',
-            fontWeight: 400, letterSpacing: '0.04em',
-            opacity: revealed ? 1 : 0,
+            fontSize: '10px', color: 'rgba(255,255,255,0.4)',
+            fontWeight: 500, letterSpacing: '0.04em',
+            opacity: revealed ? 0.9 : 0,
             transition: 'opacity 0.5s ease 2.8s',
           }}>
             {cfg.motiveLine}
