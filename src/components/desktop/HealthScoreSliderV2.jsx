@@ -7,7 +7,7 @@ import sliderMarker from '../../assets/slider_marker.png';
 // ─────────────────────────────────────────────────────────────────────────────
 const SLIDER_UI_CONFIG = {
   sliderHeight:  10,   // px — colored track height
-  thumbSize:     30,   // base unit; rendered thumb = 3× this (60 px)
+  thumbSize:     30,   // thumb diameter in px
   trackRadius:   999,  // px — pill-shaped segment ends
   labelFontSize: 10,    // px — tick / label text (matches V1)
   segmentGap:    3,    // px — space between adjacent segment pills
@@ -16,9 +16,9 @@ const SLIDER_UI_CONFIG = {
 };
 
 // Derived constants — computed once from config, never hard-coded in JSX
-const D  = SLIDER_UI_CONFIG.thumbSize;          // thumb diameter  = 60 px
-const R  = D / 2;                                    // thumb radius    = 30 px
-const WH = D + Math.round(D * 0.4);                 // wrapper height  — reduced extra space to 50%
+const D  = SLIDER_UI_CONFIG.thumbSize;          // thumb diameter  (60 px)
+const R  = D / 2;                               // thumb radius    (30 px)
+const WH = D + Math.round(D * 0.5);            // wrapper height  = thumb + 50% breathing room for glow
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SEGMENTS — single source of truth
@@ -338,7 +338,7 @@ const S = {
     cursor:       'grab',
     zIndex:       10,
     outline:      'none',
-    overflow:     'hidden',
+    // overflow: visible — intentionally not set so marker image renders unclipped
     // `left` is injected inline (score-dependent)
     transition:   'left 0.04s linear',
     willChange:   'left',
