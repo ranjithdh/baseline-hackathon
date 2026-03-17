@@ -51,9 +51,9 @@ const S = {
 
   title: {
     color:       '#FFFFFF',
-    fontSize:    '15px',
-    fontWeight:  '700',
-    lineHeight:  '1.3',
+    fontSize:    '14px',
+    fontWeight:  '500',
+    lineHeight:  '1',
     letterSpacing: '0.01em',
   },
 
@@ -72,7 +72,7 @@ const S = {
   arrow: {
     color:       'rgba(255,255,255,0.90)',
     fontSize:    '20px',
-    fontWeight:  '400',
+    fontWeight:  '500',
     lineHeight:  '1',
     flexShrink:  0,
     marginLeft:  '12px',
