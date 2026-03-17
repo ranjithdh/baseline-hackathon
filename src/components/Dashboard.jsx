@@ -6,14 +6,26 @@ import healthData from '../data.json';
 import TimelineDial from './TimelineDial';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Dashboard = ({ onSetGoal, onDetail, onSettings }) => {
+const Dashboard = ({ onSetGoal, onDetail, onSettings, onSwitchView }) => {
     const [heroView, setHeroView] = useState('score'); // 'score' or 'timeline'
 
     return (
         <div className="dashboard-container relative">
             {/* Top Controls */}
             <div className="absolute top-4 right-6 z-30 flex gap-2">
-                <motion.button 
+                {/* Switch View — returns to the ViewSelectorScreen */}
+                <motion.button
+                    whileTap={{ scale: 0.9 }}
+                    onClick={onSwitchView}
+                    title="Switch to Desktop View"
+                    className="w-10 h-10 rounded-full bg-card/10 backdrop-blur-md shadow-lg border border-white/10 flex items-center justify-center text-white/40 hover:text-primary transition-all"
+                >
+                    <span className="material-symbols-outlined text-[20px]">
+                        devices
+                    </span>
+                </motion.button>
+
+                <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={onSettings}
                     className="w-10 h-10 rounded-full bg-card/10 backdrop-blur-md shadow-lg border border-white/10 flex items-center justify-center text-white/40 hover:text-primary transition-all"
@@ -22,8 +34,8 @@ const Dashboard = ({ onSetGoal, onDetail, onSettings }) => {
                         settings
                     </span>
                 </motion.button>
- 
-                <motion.button 
+
+                <motion.button
                     whileTap={{ scale: 0.9 }}
                     onClick={() => setHeroView(prev => prev === 'score' ? 'timeline' : 'score')}
                     className="w-10 h-10 rounded-full bg-card/10 backdrop-blur-md shadow-lg border border-white/10 flex items-center justify-center text-white/40 hover:text-primary transition-all"

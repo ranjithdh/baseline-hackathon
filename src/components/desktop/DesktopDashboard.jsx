@@ -9,7 +9,7 @@ import ExpertGuidanceCard    from './ExpertGuidanceCard';
 import { MAX_ACHIEVABLE }    from './desktopPlanData';
 
 
-const DesktopDashboard = () => {
+const DesktopDashboard = ({ onSwitchView }) => {
   const [activeNav, setActiveNav]  = useState('dashboard');
   const [goalTarget, setGoalTarget] = useState(70);
   const planPanelRef               = useRef(null);
@@ -30,6 +30,7 @@ const DesktopDashboard = () => {
       <DesktopSidebar
         activeNav={activeNav}
         onNavigate={setActiveNav}
+        onSwitchView={onSwitchView}
       />
 
       {/* ── Main content ── */}

@@ -41,6 +41,14 @@ function App() {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
+  // ── Reset view selection → show ViewSelectorScreen again ────────
+  // Clears both the in-memory state and localStorage so the selector
+  // is shown immediately and the decision isn't re-applied on reload.
+  const handleSwitchView = () => {
+    localStorage.removeItem('IS_DESKTOP');
+    document.body.classList.remove('desktop');
+    setIsDesktop(null);
+  };
 
   const onHandleDetail = (tab) => {
     setDetailTab(tab);
@@ -60,7 +68,7 @@ function App() {
 
   // ── Desktop mode → full desktop layout ──────────────────────────
   if (isDesktop === true) {
-    return <DesktopDashboard />;
+    return <DesktopDashboard onSwitchView={handleSwitchView} />;
   }
 
   return (
@@ -72,6 +80,7 @@ function App() {
               onSetGoal={() => setView('goal')}
               onDetail={onHandleDetail}
               onSettings={() => setView('settings')}
+              onSwitchView={handleSwitchView}
             />
           </motion.div>
         )}
