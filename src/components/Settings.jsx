@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const Settings = ({ onBack, currentTheme, onToggleTheme }) => {
+const Settings = ({ onBack, currentTheme, onToggleTheme, showConsultation, onToggleConsultation }) => {
   return (
     <div className="dashboard-container" style={{ paddingBottom: '40px' }}>
       <header style={{ 
@@ -88,6 +88,59 @@ const Settings = ({ onBack, currentTheme, onToggleTheme }) => {
           <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-main)' }}>
             Authenticated as <strong>Guest_Sigma_72</strong>
           </p>
+        </div>
+
+        <div style={{ 
+          height: '1px', 
+          background: 'var(--border-color)', 
+          width: '100%' 
+        }}></div>
+
+        {/* Consultation Toggle */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center' 
+        }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-heading)' }}>Consultation Banner</h3>
+            <p style={{ 
+              fontSize: '0.75rem', 
+              color: 'var(--text-secondary)',
+              marginTop: '4px',
+              fontFamily: 'var(--font-main)'
+            }}>
+              Show upcoming session reminders on dashboard
+            </p>
+          </div>
+          
+          <div 
+            onClick={onToggleConsultation}
+            style={{
+              width: '44px',
+              height: '24px',
+              background: showConsultation ? 'var(--accent-color, #3b82f6)' : 'rgba(255,255,255,0.05)',
+              borderRadius: '20px',
+              position: 'relative',
+              cursor: 'pointer',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              border: showConsultation ? '1px solid transparent' : '1px solid rgba(255,255,255,0.1)'
+            }}
+          >
+            <motion.div
+              animate={{ x: showConsultation ? 22 : 2 }}
+              initial={false}
+              style={{
+                width: '18px',
+                height: '18px',
+                background: 'white',
+                borderRadius: '50%',
+                position: 'absolute',
+                top: '2px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}
+            />
+          </div>
         </div>
       </section>
 

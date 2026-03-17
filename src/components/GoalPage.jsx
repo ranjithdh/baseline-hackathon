@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CircularGauge = ({ value, status }) => {
   const radius = 90;
@@ -29,14 +30,14 @@ const CircularGauge = ({ value, status }) => {
           strokeLinecap="round"
           style={{
             transition: 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-            filter: 'drop-shadow(0 0 8px rgba(var(--brand-color), 0.3))'
+            filter: 'drop-shadow(0 0 4px rgba(var(--brand-color), 0.2))',
+            willChange: 'stroke-dashoffset'
           }}
           transform="rotate(-90 120 120)"
         />
       </svg>
       <div className="gauge-text">
         <h2 className="text-primary-text">{value}</h2>
-        <span className="label text-muted-foreground">TARGET_SCORE</span>
       </div>
       <style jsx>{`
         .gauge-container {
@@ -174,11 +175,11 @@ const GoalPage = ({ onBack, onNext }) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const getStatus = (val) => {
-    if (val <= 50) return { label: 'Compromised', color: 'var(--text-secondary)' };
-    if (val <= 65) return { label: 'Constrained', color: 'var(--text-secondary)' };
-    if (val <= 75) return { label: 'Stable', color: 'var(--accent-color)' };
-    if (val <= 85) return { label: 'Robust', color: 'var(--accent-color)' };
-    return { label: 'Elite', color: 'var(--accent-color)' };
+    if (val < 50) return { label: 'Compromised', color: 'var(--rating-rank-2)' };
+    if (val < 65) return { label: 'Constrained', color: 'var(--rating-rank-3)' };
+    if (val < 75) return { label: 'Stable', color: 'var(--rating-rank-4)' };
+    if (val < 85) return { label: 'Robust', color: 'var(--rating-rank-5)' };
+    return { label: 'Elite', color: 'var(--rating-rank-6)' };
   };
 
   const currentStatus = getStatus(goalScore);
@@ -191,77 +192,123 @@ const GoalPage = ({ onBack, onNext }) => {
   };
 
   return (
-    <div className="minimal-goal-page">
+    <div className="minimal-goal-page bg-background text-foreground font-main flex justify-center overflow-hidden">
       {isGenerating && <GeneratingOverlay />}
-      <div className="bg-effects">
-        <div className="grid"></div>
-        <div className="glow-orb" style={{ backgroundColor: 'var(--accent-color)' }}></div>
-      </div>
+      <main className="w-full max-w-[430px] h-full bg-background flex flex-col relative shadow-2xl overflow-hidden text-[#f2f2f2]">
+        <div className="bg-effects z-0">
+          <div className="grid"></div>
+          <div className="glow-orb" style={{ backgroundColor: 'var(--accent-color)' }}></div>
+        </div>
 
-      <div className="content">
-        <header className="page-header">
-          <button onClick={onBack} className="close-btn">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
+        <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10">
+          <header className="px-6 sm:px-8 pt-8 pb-4 mb-4">
+            <nav className="flex justify-between items-center mb-10">
+              <button
+                onClick={onBack}
+                className="flex items-center gap-2 text-[10px] font-extrabold tracking-[0.2em] text-muted-foreground uppercase hover:text-primary transition-all group"
+              >
+                <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back_ios</span>
+                DASHBOARD
+              </button>
+            </nav>
+          </header>
 
-        </header>
+          <main className="main-setter px-8 pb-48">
+            <motion.div
+              animate={{
+                borderColor: `rgb(${currentStatus.color})`,
+                boxShadow: `0 0 20px rgb(${currentStatus.color} / 0.15)`
+              }}
+              transition={{ duration: 0.4 }}
+              className="status-badge shadow-sm mb-12 bg-zinc-900/60 backdrop-blur-md"
+              style={{
+                border: `1px solid rgb(${currentStatus.color})`,
+                boxShadow: `0 0 15px rgb(${currentStatus.color} / 0.15)`
+              }}
+            >
+              <motion.span
+                className="dot"
+                animate={{ backgroundColor: `rgb(${currentStatus.color})` }}
+                transition={{ duration: 0.4 }}
+              />
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={currentStatus.label}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-primary-text"
+                >
+                  {currentStatus.label}
+                </motion.span>
+              </AnimatePresence>
+            </motion.div>
 
-        <main className="main-setter">
-          <div className="status-badge shadow-sm">
-            <span className="dot" style={{ backgroundColor: currentStatus.color }}></span>
-            <span className="text-primary-text">{currentStatus.label}</span>
-          </div>
-
-          <div className="visualization">
-            <CircularGauge value={goalScore} status={currentStatus} />
-          </div>
-
-          <div className="control-center">
-            <div className="slider-header">
-              <span>ADJUST_BASELINE_PARAMETER</span>
+            <div className="visualization mb-14 scale-[1.05]">
+              <CircularGauge value={goalScore} status={currentStatus} />
             </div>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={goalScore}
-              onChange={(e) => setGoalScore(parseInt(e.target.value))}
-              className="minimal-slider"
-            />
-            <div className="slider-hints">
-              <span>0</span>
-              <span>25</span>
-              <span>50</span>
-              <span>75</span>
-              <span>100</span>
-            </div>
-          </div>
-        </main>
 
-        <footer className="page-footer">
-          <button className="next-btn" onClick={handleNext}>
-            NEXT
+            <div className="control-center">
+              <div className="slider-header mb-6">
+                <span className="text-[9px] font-black tracking-[0.2em] text-muted-foreground uppercase opacity-50">Adjust Target Score</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={goalScore}
+                onChange={(e) => setGoalScore(parseInt(e.target.value))}
+                className="minimal-slider"
+                style={{
+                  background: `linear-gradient(to right, var(--secondary-color) 0%, var(--secondary-color) ${goalScore}%, rgb(var(--zinc-800)) ${goalScore}%, rgb(var(--zinc-800)) 100%)`
+                }}
+              />
+              <div className="slider-hints mt-4">
+                <span>0</span>
+                <span>25</span>
+                <span>50</span>
+                <span>75</span>
+                <span>100</span>
+              </div>
+            </div>
+          </main>
+        </div>
+
+        {/* Static Glass Bottom Action Area - Absolute positioned for stability */}
+        <div
+          className="absolute bottom-0 left-0 right-0 z-40 bg-zinc-950/80 backdrop-blur-md border-t border-zinc-800/20 px-8 pt-6 flex flex-col items-center gap-5 touch-none"
+          style={{
+            paddingBottom: 'calc(24px + env(safe-area-inset-bottom))',
+            // Mask for dynamic address bar gaps
+            boxShadow: '0 50px 0 0 rgb(9, 9, 11)',
+            willChange: 'transform'
+          }}
+        >
+
+
+          <button
+            onClick={handleNext}
+            className="w-full bg-primary text-zinc-950 font-black text-[12px] tracking-[0.25em] uppercase py-5 rounded-full shadow-2xl shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all font-heading"
+          >
+            Next
           </button>
-        </footer>
-      </div>
+        </div>
+      </main>
 
       <style jsx>{`
         .minimal-goal-page {
           position: relative;
-          background: var(--bg-color);
+          width: 100vw;
           height: 100vh;
-          width: 100%;
-          max-width: 390px;
-          margin: 0 auto;
-          color: var(--text-primary);
-          font-family: var(--font-main);
+          height: 100dvh;
           overflow: hidden;
+          background-color: #09090b;
+          will-change: transform;
         }
 
         .bg-effects {
-          position: absolute;
+          position: fixed;
           inset: 0;
           z-index: 0;
           pointer-events: none;
@@ -270,9 +317,9 @@ const GoalPage = ({ onBack, onNext }) => {
         .grid {
           position: absolute;
           inset: 0;
-          background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+          background-image: radial-gradient(var(--zinc-800) 1px, transparent 1px);
           background-size: 40px 40px;
-          opacity: 0.1;
+          opacity: 0.15;
         }
 
         .glow-orb {
@@ -283,47 +330,17 @@ const GoalPage = ({ onBack, onNext }) => {
           width: 400px;
           height: 400px;
           border-radius: 50%;
-          filter: blur(100px);
-          opacity: 0.15;
+          filter: blur(80px);
+          opacity: 0.08;
           transition: transform 0.8s ease;
-        }
-
-        .content {
-          position: relative;
-          z-index: 1;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          padding: 40px 30px;
-        }
-
-        .page-header {
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
-          margin-bottom: 40px;
-        }
-
-        .close-btn {
-          background: none;
-          border: none;
-          color: var(--text-primary);
-          cursor: pointer;
-          padding: 0;
-          opacity: 0.3;
-          transition: all 0.3s;
-        }
-        .close-btn:hover { 
-          opacity: 1; 
-          transform: rotate(90deg);
+          will-change: transform, opacity;
+          pointer-events: none;
         }
 
         .main-setter {
-          flex: 1;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 60px;
         }
 
         .status-badge {
@@ -331,16 +348,15 @@ const GoalPage = ({ onBack, onNext }) => {
           align-items: center;
           gap: 12px;
           padding: 8px 20px;
-          border: 1px solid var(--border-color);
           border-radius: 40px;
           font-family: var(--font-mono);
           font-size: 0.75rem;
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 1.5px;
-          background: var(--card-bg-translucent);
-          backdrop-filter: blur(var(--glass-blur));
-          box-shadow: var(--shadow-sm);
+          background: rgba(24, 24, 27, 0.4);
+          backdrop-filter: blur(32px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .dot {
@@ -350,29 +366,32 @@ const GoalPage = ({ onBack, onNext }) => {
           box-shadow: 0 0 10px currentColor;
         }
 
+        .visualization {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+        }
+
         .control-center {
           width: 100%;
           display: flex;
           flex-direction: column;
-          gap: 25px;
-        }
-
-        .slider-header {
-          font-family: var(--font-mono);
-          font-size: 0.6rem;
-          color: var(--text-secondary);
-          text-align: center;
-          letter-spacing: 2.5px;
-          font-weight: 700;
         }
 
         .minimal-slider {
           -webkit-appearance: none;
           width: 100%;
-          height: 4px;
-          background: var(--border-color);
-          border-radius: 4px;
+          height: 6px;
+          border-radius: 6px;
           outline: none;
+        }
+
+        .minimal-slider::-webkit-slider-runnable-track {
+          background: transparent;
+        }
+
+        .minimal-slider::-moz-range-track {
+          background: transparent;
         }
 
         .minimal-slider::-webkit-slider-thumb {
@@ -380,10 +399,10 @@ const GoalPage = ({ onBack, onNext }) => {
           width: 24px;
           height: 24px;
           background: #FFF;
-          border: 2px solid var(--accent-color);
+          border: 2px solid var(--primary);
           border-radius: 50%;
           cursor: pointer;
-          box-shadow: var(--shadow-md);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
           transition: transform 0.2s;
         }
 
@@ -396,33 +415,8 @@ const GoalPage = ({ onBack, onNext }) => {
           justify-content: space-between;
           font-family: var(--font-mono);
           font-size: 0.6rem;
-          color: var(--text-secondary);
+          color: var(--muted-foreground);
           font-weight: 700;
-        }
-
-        .page-footer {
-          text-align: center;
-          padding-bottom: 20px;
-        }
-
-        .next-btn {
-          width: 100%;
-          background: var(--accent-color);
-          border: none;
-          color: #FFF;
-          padding: 18px;
-          border-radius: 16px;
-          font-weight: 800;
-          font-size: 0.9rem;
-          letter-spacing: 2px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 10px 20px rgba(var(--brand-color), 0.2);
-        }
-
-        .next-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 15px 30px rgba(var(--brand-color), 0.3);
         }
       `}</style>
     </div>

@@ -6,6 +6,7 @@
   --text-primary: rgb(var(--foreground));
   --text-secondary: rgb(var(--muted-foreground));
   --accent-color: rgb(var(--primary));
+  --secondary-color: rgb(var(--secondary));
   --accent-secondary: rgb(var(--primary));
   --border-color: rgb(var(--border));
   --card-bg-rgb: var(--card);
@@ -75,7 +76,6 @@ h1,
 h2,
 h3 {
   font-family: var(--font-heading);
-  text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
