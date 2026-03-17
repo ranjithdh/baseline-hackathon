@@ -7,7 +7,7 @@ import sliderMarker from '../../assets/slider_marker.png';
 // ─────────────────────────────────────────────────────────────────────────────
 const SLIDER_UI_CONFIG = {
   sliderHeight:  10,   // px — colored track height
-  thumbSize:     25,   // base unit; rendered thumb = 3× this (60 px)
+  thumbSize:     30,   // base unit; rendered thumb = 3× this (60 px)
   trackRadius:   999,  // px — pill-shaped segment ends
   labelFontSize: 9,    // px — tick / label text (matches V1)
   segmentGap:    3,    // px — space between adjacent segment pills
@@ -33,56 +33,6 @@ const SEGMENTS = [
   { min: 75, max: 85,  label: 'Strong',      color: 'rgb(var(--chart-5))', glowRgb: '31,120,76',   icon: 'shield'      },
   { min: 85, max: 100, label: 'Elite',       color: 'rgb(var(--chart-6))', glowRgb: '0,158,148',   icon: 'crown'       },
 ];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SVG ICONS  (lightweight inline SVGs, one per segment concept)
-// ─────────────────────────────────────────────────────────────────────────────
-const HeartbeatIcon = ({ size, color }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-    stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-  </svg>
-);
-
-const RestrictionIcon = ({ size, color }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-    stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="9" width="20" height="12" rx="2" />
-    <path d="M8 9V6a4 4 0 0 1 8 0v3" />
-    <line x1="12" y1="14" x2="12" y2="16" />
-  </svg>
-);
-
-const HeartIcon = ({ size, color }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-    stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-  </svg>
-);
-
-const ShieldIcon = ({ size, color }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-    stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-  </svg>
-);
-
-const CrownIcon = ({ size, color }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-    stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2 19h20" />
-    <path d="M2 7l4 5 6-7 6 7 4-5v12H2z" />
-    <path d="M9 15c0-1.7 1.3-3 3-3s3 1.3 3 3" />
-  </svg>
-);
-
-const ICON_MAP = {
-  heartbeat:   HeartbeatIcon,
-  restriction: RestrictionIcon,
-  heart:       HeartIcon,
-  shield:      ShieldIcon,
-  crown:       CrownIcon,
-};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PURE HELPERS
@@ -220,7 +170,6 @@ const HealthScoreSliderV2 = ({
         {/* ── Segmented pill track ── */}
         <div ref={trackRef} style={S.track}>
           {visSegs.map((seg) => {
-            const IconComp = ICON_MAP[seg.icon];
             return (
               <div
                 key={seg.label}
@@ -231,11 +180,6 @@ const HealthScoreSliderV2 = ({
                   background: seg.color,
                 }}
               >
-                {/* Subtle icon — clipped by the track height naturally */}
-                {/* <IconComp
-                  size={SLIDER_UI_CONFIG.iconSize}
-                  color="rgba(0,0,0,0.22)"
-                /> */}
               </div>
             );
           })}
@@ -291,9 +235,9 @@ const HealthScoreSliderV2 = ({
                   fontWeight: isCurrent ? 700 : 400,
                   color: isCurrent
                     ? glowColor
-                    : isBeyond  ? 'rgba(228,228,231,0.18)'
-                    : isPast    ? 'rgba(228,228,231,0.22)'
-                    :             'rgba(228,228,231,0.40)',
+                    : isBeyond  ? 'rgb(var(--foreground))'
+                    : isPast    ? 'rgb(var(--foreground))'
+                    :             'rgb(var(--foreground))',
                   cursor:     'pointer',
                   transition: 'color 0.2s',
                   userSelect: 'none',

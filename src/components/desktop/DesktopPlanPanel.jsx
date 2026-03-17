@@ -330,27 +330,6 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
 
         {/* ── Right column: Build CTA + Projected Score card ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignSelf: 'center' }}>
-
-          {/* "Build your Action Plan" — appears when slider differs from baseline */}
-          <AnimatePresence>
-            {showActionPlanButton && (
-              <motion.div
-                key="build-action-plan-btn"
-                initial={{ opacity: 0, y: -6, scale: 0.97 }}
-                animate={{ opacity: 1, y: 0,  scale: 1    }}
-                exit={{    opacity: 0, y: -6, scale: 0.97 }}
-                transition={{ duration: 0.22, ease: 'easeOut' }}
-              >
-                <PrimaryButton
-                  onClick={handleBuildActionPlan}
-                  style={{ width: '100%' }}
-                >
-                  Build your Action Plan
-                </PrimaryButton>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* Projected score card */}
           <DashboardCard style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center',
