@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IS_DESKTOP } from './config';
-import Dashboard        from './components/Dashboard';
-import DesktopDashboard from './components/desktop/DesktopDashboard';
+import Dashboard            from './components/Dashboard';
+import DesktopDashboard     from './components/desktop/DesktopDashboard';
+import ViewSelectorScreen   from './components/ViewSelectorScreen';
 import GoalPage from './components/GoalPage';
 import ActionPlan from './components/ActionPlan';
 import ContributorDetail from './components/ContributorDetail';
@@ -17,15 +17,25 @@ function App() {
     return localStorage.getItem('theme') || 'dark';
   });
 
+  // ── Layout mode — null means "not yet chosen" (show selector) ──────────────
+  // Reads from localStorage on mount so returning users skip the selector.
+  const [isDesktop, setIsDesktop] = useState(() => {
+    const saved = localStorage.getItem('IS_DESKTOP');
+    if (saved === null) return null;   // first visit → show ViewSelectorScreen
+    return saved === 'true';
+  });
+
   React.useLayoutEffect(() => {
     document.documentElement.className = theme;
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // Apply layout mode once on launch based on IS_DESKTOP in config.js
+  // Sync body class whenever the layout mode is committed.
   React.useLayoutEffect(() => {
-    document.body.classList.toggle('desktop', IS_DESKTOP);
-  }, []);
+    if (isDesktop !== null) {
+      document.body.classList.toggle('desktop', isDesktop);
+    }
+  }, [isDesktop]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
@@ -43,8 +53,13 @@ function App() {
     exit: { opacity: 0, x: -20, transition: { duration: 0.2, ease: "easeIn" } }
   };
 
-  // ── If desktop mode, render the full desktop layout directly ──
-  if (IS_DESKTOP) {
+  // ── No selection yet → show the launch screen ──────────────────
+  if (isDesktop === null) {
+    return <ViewSelectorScreen onSelect={setIsDesktop} />;
+  }
+
+  // ── Desktop mode → full desktop layout ──────────────────────────
+  if (isDesktop === true) {
     return <DesktopDashboard />;
   }
 
