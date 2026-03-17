@@ -9,7 +9,7 @@ const SLIDER_UI_CONFIG = {
   sliderHeight:  10,   // px — colored track height
   thumbSize:     30,   // base unit; rendered thumb = 3× this (60 px)
   trackRadius:   999,  // px — pill-shaped segment ends
-  labelFontSize: 9,    // px — tick / label text (matches V1)
+  labelFontSize: 10,    // px — tick / label text (matches V1)
   segmentGap:    3,    // px — space between adjacent segment pills
   iconSize:      10,   // px — SVG icons inside each segment
   scoreFontSize: 18,   // px — reserved for future score-inside-thumb use
@@ -18,7 +18,7 @@ const SLIDER_UI_CONFIG = {
 // Derived constants — computed once from config, never hard-coded in JSX
 const D  = SLIDER_UI_CONFIG.thumbSize;          // thumb diameter  = 60 px
 const R  = D / 2;                                    // thumb radius    = 30 px
-const WH = D + Math.round(D * 0.8);                 // wrapper height  = 108 px (glow room)
+const WH = D + Math.round(D * 0.4);                 // wrapper height  — reduced extra space to 50%
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SEGMENTS — single source of truth
@@ -296,7 +296,7 @@ const S = {
     position:     'relative',
     height:       `${WH}px`,
     marginTop:    '4px',
-    marginBottom: '4px',
+    marginBottom: '0px',
     cursor:       'pointer',
   },
 
@@ -364,7 +364,7 @@ const S = {
     position:   'relative',
     display:    'flex',
     height:     `${Math.max(LF + 2, 11)}px`,
-    marginTop:  '5px',
+    marginTop:  '0px',
   },
 };
 

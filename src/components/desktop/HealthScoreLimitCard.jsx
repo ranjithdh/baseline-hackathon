@@ -46,7 +46,7 @@ const HealthScoreLimitCard = React.memo(({ score, onConsultClick }) => {
         border:         '1px solid rgb(var(--border))',
         // ── Typography baseline ────────────────────────────────────────────
         fontFamily:     'var(--font-main)',
-        fontSize:       '13px',
+        fontSize:       '12px',
         lineHeight:     '1.6',
         color:          'rgb(var(--foreground))',
       }}
