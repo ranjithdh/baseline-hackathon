@@ -202,16 +202,18 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
   const showActionPlanButton = goalTarget !== baselineScore;
 
   const handleBuildActionPlan = useCallback(() => {
-    // Confirm the current slider position as the new baseline.
+    // Commit the current slider position as the new baseline and regenerate the plan.
     setBaselineScore(goalTarget);
-    // TODO: wire up to action plan generation flow via prop callback.
+    setSelectedIds(new Set(computeNeeded(goalTarget)));
   }, [goalTarget]);
 
-  const neededIds = useMemo(() => computeNeeded(goalTarget), [goalTarget]);
-  const ptsNeeded = Math.min(goalTarget, MAX_ACHIEVABLE) - BASE_SCORE;
+  // Action plan computed values are driven by baselineScore (committed goal),
+  // NOT goalTarget (live slider) — so the card never re-renders during drag.
+  const neededIds = useMemo(() => computeNeeded(baselineScore), [baselineScore]);
+  const ptsNeeded = Math.min(baselineScore, MAX_ACHIEVABLE) - BASE_SCORE;
   const gained = ALL_ITEMS.filter(i => selectedIds.has(i.id)).reduce((s, i) => s + i.gain, 0);
   const projScore = Math.min(100, BASE_SCORE + gained);
-  const toGoal = goalTarget - projScore;
+  const toGoal = baselineScore - projScore;
   const progressPct = ptsNeeded > 0 ? Math.min(100, (gained / ptsNeeded) * 100) : 100;
 
   const badge = ptsNeeded <= 7
@@ -225,19 +227,27 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
   // Total selected across ALL categories (for header summary)
   const totalSelected = ALL_ITEMS.filter(i => selectedIds.has(i.id)).length;
 
+  // Only update the live slider value — do NOT touch selectedIds or baselineScore
+  // during drag. The Action Plan Card stays tied to baselineScore until the user
+  // explicitly clicks "Build your Action Plan".
   const handleGoalChange = (val) => {
-    const g = parseInt(val);
-    onGoalChange(g);
-    setSelectedIds(new Set(computeNeeded(g)));
+    onGoalChange(parseInt(val));
   };
 
-  const handleToggleItem = (id) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
+  // Clicking an item toggles selection, then commits the resulting projected
+  // score as both the slider position and the new baseline — keeping everything
+  // in sync exactly like choosing a new committed score.
+  const handleToggleItem = useCallback((id) => {
+    const next = new Set(selectedIds);
+    next.has(id) ? next.delete(id) : next.add(id);
+
+    const newGained = ALL_ITEMS.filter(i => next.has(i.id)).reduce((s, i) => s + i.gain, 0);
+    const newProjScore = Math.min(GOAL_MAX, Math.max(GOAL_MIN, BASE_SCORE + newGained));
+
+    setSelectedIds(next);
+    setBaselineScore(newProjScore);
+    onGoalChange(newProjScore);
+  }, [selectedIds, onGoalChange]);
 
   return (
     <>
@@ -310,28 +320,22 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
 
 
             <div style={{ marginLeft: 'auto', alignSelf: 'center' }}>
-
-                {/* <button
-
-          style={{
-            background: '#ffffff',
-            color: '#0d1b4b',
-            border: 'none',
-            borderRadius: '12px',
-            padding: '12px 28px',
-            fontSize: '14px',
-            fontWeight: 600,
-            fontFamily: 'var(--font-main)',
-            cursor: 'pointer',
-            transition: 'opacity 0.15s',
-          }}
-          onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
-          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-        >
-          Build your Action Plan
-        </button> */}
-
-         <BuildActionPlanBanner targetScore={goalTarget} />
+              <AnimatePresence>
+                {showActionPlanButton && (
+                  <motion.div
+                    key="build-action-plan-btn"
+                    initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                  >
+                    <BuildActionPlanBanner
+                      targetScore={goalTarget}
+                      onClick={handleBuildActionPlan}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
           </div> 
@@ -374,12 +378,12 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
               fontSize: '12px', fontWeight: 600, minHeight: '20px',
               fontFamily: 'var(--font-mono)',
               color: gained === 0 ? 'rgba(228,228,231,0.25)'
-                : projScore >= goalTarget ? 'rgb(48,164,108)'
+                : projScore >= baselineScore ? 'rgb(48,164,108)'
                   : 'rgb(255,197,61)',
               transition: 'color 0.3s',
             }}>
               {gained === 0 ? 'Select actions below'
-                : projScore >= goalTarget ? `+${gained} pts · Goal ✓`
+                : projScore >= baselineScore ? `+${gained} pts · Goal ✓`
                   : `+${gained} pts · ${toGoal} more`}
             </div>
           </DashboardCard>
@@ -438,10 +442,14 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
 
       </DashboardCard>
       {/* ── ACTION PLAN: separate section ── */}
+      {/* Fades out when slider drifts from baseline; restores on commit. */}
       <DashboardCard style={{
         margin: '20px 48px 0',
         position: 'relative',
         padding: 0,
+        opacity: showActionPlanButton ? 0.4 : 1,
+        pointerEvents: showActionPlanButton ? 'none' : 'auto',
+        transition: 'opacity 0.3s ease',
       }}>
       <div style={{ padding: '28px 44px 40px', position: 'relative', zIndex: 1 }}>
 
