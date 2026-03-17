@@ -9,6 +9,7 @@ import PrimaryButton from './PrimaryButton';
 // ExpertGuidanceCard (V1) is intentionally kept for DesktopDashboard.
 // DesktopPlanPanel uses the redesigned HealthScoreLimitCard instead.
 import HealthScoreLimitCard from './HealthScoreLimitCard';
+import BuildActionPlanBanner from './BuildActionPlanBanner';
 import { InferenceBadge } from '../../ui/inference-badge';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
@@ -306,6 +307,33 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
                 </div>
               );
             })()}
+
+
+            <div style={{ marginLeft: 'auto', alignSelf: 'center' }}>
+
+                {/* <button
+
+          style={{
+            background: '#ffffff',
+            color: '#0d1b4b',
+            border: 'none',
+            borderRadius: '12px',
+            padding: '12px 28px',
+            fontSize: '14px',
+            fontWeight: 600,
+            fontFamily: 'var(--font-main)',
+            cursor: 'pointer',
+            transition: 'opacity 0.15s',
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+        >
+          Build your Action Plan
+        </button> */}
+
+         <BuildActionPlanBanner targetScore={goalTarget} />
+            </div>
+
           </div> 
 
           {/* ── Health Score Slider V2 (new design) ── */}
@@ -357,7 +385,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
           </DashboardCard>
 
         </div>{/* end right column */}
-
+          
 
           {goalTarget > MAX_ACHIEVABLE && (
           <div style={{ width:'100%',position: 'relative', top: 0, padding:'0px 0px' }}>
