@@ -1,18 +1,67 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-// ─── Status config ────────────────────────────────────────────────────────────
+// ─── Status config ─────────────────────────────────────────────────────────────
 const STATUS = {
-  'High Alert':  { color: '#ff4d4d', colorDim: '#7f1d1d', rgb: '255,77,77',   arcA: '#ff4d4d', arcB: '#ff9966', next: 'Constrained', nextAt: 50  },
-  'Constrained': { color: '#ff8c42', colorDim: '#7c2d12', rgb: '255,140,66',  arcA: '#ff8c42', arcB: '#ffcc66', next: 'Stable',      nextAt: 65  },
-  'Stable':      { color: '#f5c842', colorDim: '#78450a', rgb: '245,200,66',  arcA: '#f5c842', arcB: '#ffe066', next: 'Strong',      nextAt: 75  },
-  'Strong':      { color: '#3de88c', colorDim: '#14532d', rgb: '61,232,140',  arcA: '#3de88c', arcB: '#a3ffcb', next: 'Elite',       nextAt: 85  },
-  'Elite':       { color: '#c084fc', colorDim: '#3b0764', rgb: '192,132,252', arcA: '#c084fc', arcB: '#e8baff', next: null,          nextAt: 100 },
+  'High Alert': {
+    color: '#ff6060', rgb: '255,96,96',
+    arcGold: '#e05010', arcRed: '#7a1010',
+    badge: '⚡', badgeBg: 'rgba(180,40,20,0.18)', badgeBorder: 'rgba(200,60,30,0.45)', badgeColor: '#ff8060',
+    tagTitle: 'Your body needs\nattention now.',
+    tagSub: 'Early action creates the biggest impact.',
+    motiveLine: 'Small steps today build a healthier tomorrow.',
+    next: 'Constrained', nextAt: 50,
+  },
+  'Constrained': {
+    color: '#e8c030', rgb: '232,192,48',
+    arcGold: '#d4a012', arcRed: '#8b4008',
+    badge: '▲', badgeBg: 'rgba(180,140,20,0.15)', badgeBorder: 'rgba(210,160,30,0.4)', badgeColor: '#e8c030',
+    tagTitle: 'Building back.\nKeep going.',
+    tagSub: 'Progress is happening beneath the surface.',
+    motiveLine: 'Consistency is the bridge between goals and results.',
+    next: 'Stable', nextAt: 65,
+  },
+  'Stable': {
+    color: '#a0c840', rgb: '160,200,64',
+    arcGold: '#d4a012', arcRed: '#8b2808',
+    badge: '★', badgeBg: 'rgba(160,160,30,0.14)', badgeBorder: 'rgba(185,160,40,0.42)', badgeColor: '#c8b840',
+    tagTitle: 'Good foundations.\nReal room to grow.',
+    tagSub: "You're on track for something great.",
+    motiveLine: 'Keep pursuing your health goals to reach peak wellness.',
+    next: 'Strong', nextAt: 75,
+  },
+  'Strong': {
+    color: '#3a9050', rgb: '58,144,80',
+    arcGold: '#c8a010', arcRed: '#1e6030',
+    badge: '◆', badgeBg: 'rgba(40,140,60,0.14)', badgeBorder: 'rgba(60,160,80,0.38)', badgeColor: '#50b868',
+    tagTitle: "You're thriving.\nKeep it up.",
+    tagSub: 'Your body is performing at a high level.',
+    motiveLine: 'Elite health is within your reach.',
+    next: 'Elite', nextAt: 85,
+  },
+  'Elite': {
+    color: '#20b8c8', rgb: '32,184,200',
+    arcGold: '#20a0c0', arcRed: '#1050a0',
+    badge: '✦', badgeBg: 'rgba(20,150,180,0.14)', badgeBorder: 'rgba(30,170,200,0.38)', badgeColor: '#40c8d8',
+    tagTitle: 'Peak performance.\nExceptional health.',
+    tagSub: "You've reached the top tier.",
+    motiveLine: "You're an inspiration. Maintain your excellence.",
+    next: null, nextAt: 100,
+  },
 };
 
 const LEVELS = ['High Alert', 'Constrained', 'Stable', 'Strong', 'Elite'];
 const LEVEL_THRESHOLDS = [0, 50, 65, 75, 85, 100];
 
-// ─── useCountUp ──────────────────────────────────────────────────────────────
+// ─── Segments for the progress track ──────────────────────────────────────────
+const PROGRESS_SEGMENTS = [
+  { label: 'Alert', min: 0, max: 50, width: 28, color: '#ff6060' },
+  { label: 'Constrained', min: 50, max: 65, width: 16, color: '#e8c030' },
+  { label: 'Stable', min: 65, max: 75, width: 14, color: '#a0c840' },
+  { label: 'Strong', min: 75, max: 85, width: 14, color: '#3a9050' },
+  { label: 'Elite', min: 85, max: 100, width: 28, color: '#20b8c8' },
+];
+
+// ─── useCountUp ───────────────────────────────────────────────────────────────
 function useCountUp(target, { delay = 600, duration = 1800 } = {}) {
   const [val, setVal] = useState(0);
   useEffect(() => {
@@ -21,7 +70,7 @@ function useCountUp(target, { delay = 600, duration = 1800 } = {}) {
       const tick = (ts) => {
         if (!started) { startTime = ts; started = true; }
         const p = Math.min((ts - startTime) / duration, 1);
-        const ease = 1 - Math.pow(1 - p, 4); // ease-out-quart — snappier start
+        const ease = 1 - Math.pow(1 - p, 4);
         setVal(Math.round(target * ease));
         if (p < 1) frame = requestAnimationFrame(tick);
       };
@@ -32,10 +81,10 @@ function useCountUp(target, { delay = 600, duration = 1800 } = {}) {
   return val;
 }
 
-// ─── Arc math helpers ────────────────────────────────────────────────────────
-const SWEEP_DEG = 260;   // how many degrees the arc spans
-const GAP_DEG   = 100;   // remaining gap at the bottom
-const START_DEG = 90 + GAP_DEG / 2; // starts at bottom-left
+// ─── Arc math ─────────────────────────────────────────────────────────────────
+const SWEEP_DEG = 270;
+const GAP_DEG = 90;
+const START_DEG = 90 + GAP_DEG / 2;
 
 function polarToXY(cx, cy, r, angleDeg) {
   const rad = ((angleDeg - 90) * Math.PI) / 180;
@@ -48,665 +97,665 @@ function describeArc(cx, cy, r, startDeg, endDeg) {
   return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
 }
 
-// ─── PremiumArc ──────────────────────────────────────────────────────────────
-const PremiumArc = ({ score, cfg, revealed }) => {
-  const SIZE = 260;
-  const CX = SIZE / 2, CY = SIZE / 2;
-  const R_OUTER = 108, R_MID = 96, R_INNER = 84;
+// ─── WarmArc ──────────────────────────────────────────────────────────────────
+// The large warm gold→red arc matching the screenshot aesthetic
+const WarmArc = ({ score, cfg, revealed, uid }) => {
+  const SIZE = 190;
+  const CX = SIZE / 2, CY = SIZE / 2 + 8;
+  const R = 76;
 
-  // Calculate fill end angle
-  const fillFrac   = revealed ? score / 100 : 0;
-  const fillEndDeg = START_DEG + SWEEP_DEG * fillFrac;
-  const arcEndDeg  = START_DEG + SWEEP_DEG;
-
-  // Tip dot position
-  const tipPt = polarToXY(CX, CY, R_MID, fillEndDeg);
-
-  const gradId   = 'arc-grad';
-  const glowId   = 'arc-glow';
-  const tipGlowId = 'tip-glow';
+  const fillFrac = revealed ? score / 100 : 0;
+  const fillEnd = START_DEG + SWEEP_DEG * fillFrac;
+  const arcEnd = START_DEG + SWEEP_DEG;
 
   return (
-    <svg
-      width={SIZE} height={SIZE}
-      viewBox={`0 0 ${SIZE} ${SIZE}`}
-      style={{ overflow: 'visible', display: 'block' }}
-    >
+    <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}
+      style={{ overflow: 'visible', display: 'block', flexShrink: 0 }}>
       <defs>
-        {/* Arc gradient */}
-        <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%"   stopColor={cfg.arcA} stopOpacity="0.55" />
-          <stop offset="100%" stopColor={cfg.arcB} stopOpacity="1" />
+        {/* Warm gradient: gold → orange → deep-red */}
+        <linearGradient id={`${uid}-arc-grad`} x1="0%" y1="100%" x2="80%" y2="0%">
+          <stop offset="0%" stopColor="#d4a012" />
+          <stop offset="50%" stopColor="#c86420" />
+          <stop offset="100%" stopColor={cfg.arcRed} />
         </linearGradient>
-
-        {/* Outer glow filter */}
-        <filter id={glowId} x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="6" result="blur" />
+        {/* Softer glow filter */}
+        <filter id={`${uid}-arc-glow`} x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="9" result="blur" />
           <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
-
-        {/* Tip glow filter */}
-        <filter id={tipGlowId} x="-200%" y="-200%" width="500%" height="500%">
-          <feGaussianBlur stdDeviation="5" result="blur" />
-          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-
-        {/* Radial gradient for center fill */}
-        <radialGradient id="center-radial" cx="50%" cy="50%" r="50%">
-          <stop offset="0%"   stopColor={`rgba(${cfg.rgb},0.08)`} />
+        {/* Inner ambient */}
+        <radialGradient id={`${uid}-center-glow`} cx="50%" cy="62%" r="48%">
+          <stop offset="0%" stopColor="rgba(210,140,30,0.18)" />
           <stop offset="100%" stopColor="transparent" />
         </radialGradient>
       </defs>
 
-      {/* ── Outer decorative ring (faintest) ── */}
-      <path
-        d={describeArc(CX, CY, R_OUTER, START_DEG, arcEndDeg)}
-        fill="none"
-        stroke="rgba(255,255,255,0.04)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
+      {/* Ambient center glow */}
+      <circle cx={CX} cy={CY} r={R - 8} fill={`url(#${uid}-center-glow)`} />
 
-      {/* ── Track  ── */}
-      <path
-        d={describeArc(CX, CY, R_MID, START_DEG, arcEndDeg)}
-        fill="none"
-        stroke="rgba(255,255,255,0.06)"
-        strokeWidth="14"
-        strokeLinecap="round"
-      />
+      {/* Track (very faint warm) */}
+      <path d={describeArc(CX, CY, R, START_DEG, arcEnd)}
+        fill="none" stroke="rgba(220,160,60,0.09)" strokeWidth="16" strokeLinecap="round" />
 
-      {/* ── Inner decorative ring ── */}
-      <path
-        d={describeArc(CX, CY, R_INNER, START_DEG, arcEndDeg)}
-        fill="none"
-        stroke="rgba(255,255,255,0.03)"
-        strokeWidth="1"
-        strokeLinecap="round"
-      />
-
-      {/* ── Filled arc (glow layer — blurred duplicate) ── */}
-      {revealed && (
-        <path
-          d={describeArc(CX, CY, R_MID, START_DEG, fillEndDeg)}
-          fill="none"
-          stroke={`rgba(${cfg.rgb},0.45)`}
-          strokeWidth="18"
-          strokeLinecap="round"
-          filter={`url(#${glowId})`}
-          style={{ transition: 'stroke-dashoffset 0.1s' }}
-        />
-      )}
-
-      {/* ── Filled arc (sharp layer) ── */}
-      {revealed && (
-        <path
-          d={describeArc(CX, CY, R_MID, START_DEG, fillEndDeg)}
-          fill="none"
-          stroke={`url(#${gradId})`}
-          strokeWidth="14"
-          strokeLinecap="round"
-        />
-      )}
-
-      {/* ── Center radial ambient ── */}
-      <circle cx={CX} cy={CY} r={R_INNER - 10} fill="url(#center-radial)" />
-
-      {/* ── Tip glow dot ── */}
+      {/* Glow halo behind arc */}
       {revealed && score > 2 && (
-        <>
-          <circle
-            cx={tipPt.x} cy={tipPt.y} r="14"
-            fill={`rgba(${cfg.rgb},0.18)`}
-            filter={`url(#${tipGlowId})`}
-          />
-          <circle
-            cx={tipPt.x} cy={tipPt.y} r="7"
-            fill={cfg.arcB}
-            filter={`url(#${tipGlowId})`}
-          />
-          <circle cx={tipPt.x} cy={tipPt.y} r="3.5" fill="#fff" />
-        </>
+        <path d={describeArc(CX, CY, R, START_DEG, fillEnd)}
+          fill="none"
+          stroke="rgba(200,110,20,0.38)"
+          strokeWidth="24" strokeLinecap="round"
+          filter={`url(#${uid}-arc-glow)`} />
+      )}
+
+      {/* Main filled arc */}
+      {revealed && score > 2 && (
+        <path d={describeArc(CX, CY, R, START_DEG, fillEnd)}
+          fill="none"
+          stroke={`url(#${uid}-arc-grad)`}
+          strokeWidth="16" strokeLinecap="round" />
       )}
     </svg>
   );
 };
 
-// ─── FloatingOrb ─────────────────────────────────────────────────────────────
-const FloatingOrb = ({ style }) => (
-  <div style={{
-    position: 'absolute',
-    borderRadius: '50%',
-    pointerEvents: 'none',
-    ...style,
-  }} />
-);
-
-// ─── UnifiedProgress ──────────────────────────────────────────────────────────
-const UnifiedProgress = ({ score, status, revealed }) => {
-  const segments = [
-    { label: 'Alert',       min: 0,  max: 50,  width: 50, color: STATUS['High Alert'].color },
-    { label: 'Constrained', min: 50, max: 65,  width: 15, color: STATUS['Constrained'].color },
-    { label: 'Stable',      min: 65, max: 75,  width: 10, color: STATUS['Stable'].color },
-    { label: 'Strong',      min: 75, max: 85,  width: 10, color: STATUS['Strong'].color },
-    { label: 'Elite',       min: 85, max: 100, width: 15, color: STATUS['Elite'].color },
-  ];
-
-  // Head indicator position
+// ─── SegmentedProgress ────────────────────────────────────────────────────────
+const SegmentedProgress = ({ score, status, revealed }) => {
   const scorePct = revealed ? score : 0;
-  const cfg = STATUS[status] || STATUS['Stable'];
+  const activeSeg = PROGRESS_SEGMENTS.find(
+    (s) => status === (s.label === 'Alert' ? 'High Alert' : s.label)
+  ) || PROGRESS_SEGMENTS[2];
 
   return (
-    <div style={{ width: '100%', marginTop: 'auto' }}>
-      {/* Labels Row */}
+    <div style={{ width: '100%' }}>
+      {/* Label row */}
       <div style={{
-        display: 'flex',
-        width: '100%',
-        marginBottom: '10px',
-        opacity: revealed ? 1 : 0,
-        transition: 'opacity 0.6s ease 1s',
+        display: 'flex', width: '100%', marginBottom: '8px',
+        opacity: revealed ? 1 : 0, transition: 'opacity 0.6s ease 1.2s',
       }}>
-        {segments.map((s) => {
+        {PROGRESS_SEGMENTS.map((s) => {
           const isActive = status === (s.label === 'Alert' ? 'High Alert' : s.label);
           return (
             <div key={s.label} style={{
-              width: `${s.width}%`,
+              flex: s.width,
               textAlign: 'center',
-              fontSize: '9px',
+              fontSize: '7.5px',
               fontWeight: isActive ? 800 : 500,
-              color: isActive ? s.color : 'rgba(255,255,255,0.22)',
-              letterSpacing: '0.04em',
+              color: isActive ? s.color : 'rgba(220,180,120,0.22)',
+              letterSpacing: isActive ? '0.10em' : '0.06em',
               textTransform: 'uppercase',
               transition: 'color 0.4s',
+              position: 'relative',
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {s.label}
+              {isActive && (
+                <div style={{
+                  position: 'absolute', bottom: '-5px', left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '3px', height: '3px', borderRadius: '50%',
+                  background: s.color, boxShadow: `0 0 5px ${s.color}`,
+                }} />
+              )}
             </div>
           );
         })}
       </div>
 
-      {/* Segmented Track */}
+      {/* Pill track */}
       <div style={{
-        position: 'relative',
-        height: '10px',
-        width: '100%',
-        background: 'rgba(255,255,255,0.06)',
-        borderRadius: '100px',
-        overflow: 'hidden',
-        display: 'flex',
-        gap: '2px', // subtle gap between segments
-        padding: '0 2px',
-        alignItems: 'center',
+        position: 'relative', height: '12px', width: '100%',
+        display: 'flex', gap: '3px', alignItems: 'center',
       }}>
-        {segments.map((s) => (
-          <div key={s.label} style={{
-            height: '4px',
-            width: `${s.width}%`,
-            background: 'rgba(255,255,255,0.05)',
-            borderRadius: '2px',
-          }} />
-        ))}
+        {PROGRESS_SEGMENTS.map((s, i) => {
+          const fillAmt = Math.min(Math.max((scorePct - s.min) / (s.max - s.min), 0), 1);
+          const isEmpty = scorePct <= s.min;
+          const isActive = status === (s.label === 'Alert' ? 'High Alert' : s.label);
+          const isFull = scorePct >= s.max;
 
-        {/* Global Progress Fill */}
-        <div style={{
-          position: 'absolute',
-          top: 0, left: 0, bottom: 0,
-          width: `${scorePct}%`,
-          background: `linear-gradient(90deg, ${STATUS['High Alert'].color}80, ${cfg.color})`,
-          borderRadius: '100px',
-          boxShadow: `0 0 15px ${cfg.color}50`,
-          transition: 'width 2s cubic-bezier(0.16,1,0.3,1) 0.5s',
-          overflow: 'hidden',
-        }}>
-          {/* Inner Shimmer */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
-            width: '200%',
-            animation: 'bsc-shimmer 3s linear infinite',
-          }} />
-        </div>
+          return (
+            <div key={s.label} style={{
+              flex: s.width,
+              height: isActive ? '12px' : '7px',
+              borderRadius: i === 0 ? '100px 3px 3px 100px'
+                : i === PROGRESS_SEGMENTS.length - 1 ? '3px 100px 100px 3px'
+                  : '3px',
+              background: `${s.color}18`,
+              position: 'relative', overflow: 'hidden',
+              transition: 'height 0.3s ease',
+              flexShrink: 0,
+            }}>
+              {!isEmpty && (
+                <div style={{
+                  position: 'absolute', top: 0, left: 0, bottom: 0,
+                  width: revealed ? `${fillAmt * 100}%` : '0%',
+                  background: isFull ? s.color : `linear-gradient(90deg, ${s.color}88, ${s.color})`,
+                  transition: 'width 2s cubic-bezier(0.16,1,0.3,1) 0.6s',
+                  boxShadow: isActive ? `0 0 10px ${s.color}90` : 'none',
+                }}>
+                  {isActive && (
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.28) 50%, transparent 100%)',
+                      animation: 'bsc-shimmer 2.5s ease-in-out infinite',
+                    }} />
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
 
-        {/* Score Indicator Head */}
+        {/* Score dot indicator */}
         <div style={{
           position: 'absolute',
           left: `${scorePct}%`,
           top: '50%',
           transform: 'translate(-50%, -50%)',
-          width: '16px',
-          height: '16px',
+          width: '17px', height: '17px',
           borderRadius: '50%',
           background: '#fff',
-          border: `3px solid ${cfg.color}`,
-          boxShadow: `0 0 10px ${cfg.color}, 0 0 20px ${cfg.color}40`,
-          transition: 'left 2s cubic-bezier(0.16,1,0.3,1) 0.5s',
-          zIndex: 5,
+          border: `2.5px solid ${activeSeg.color}`,
+          boxShadow: `0 0 10px ${activeSeg.color}, 0 0 24px ${activeSeg.color}60`,
+          transition: 'left 2s cubic-bezier(0.16,1,0.3,1) 0.6s',
+          zIndex: 10,
         }} />
       </div>
     </div>
   );
 };
 
-// ─── InsightChip ─────────────────────────────────────────────────────────────
-const InsightChip = ({ icon, label, value, color, delay }) => {
-  const [show, setShow] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setShow(true), delay); return () => clearTimeout(t); }, [delay]);
+// ─── InfoModal – "What is Baseline Score" ────────────────────────────────────
+const InfoModal = ({ onClose }) => {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setVisible(true), 10); return () => clearTimeout(t); }, []);
+  const handleClose = () => { setVisible(false); setTimeout(onClose, 350); };
+
   return (
-    <div style={{
-      flex: 1,
-      display: 'flex',
-      alignItems: 'center',
-      gap: '10px',
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(255,255,255,0.07)',
-      borderRadius: '14px',
-      padding: '12px 14px',
-      opacity: show ? 1 : 0,
-      transform: show ? 'translateY(0)' : 'translateY(8px)',
-      transition: 'opacity 0.5s ease, transform 0.5s ease',
-      backdropFilter: 'blur(8px)',
+    <div onClick={handleClose} style={{
+      position: 'fixed', inset: 0, zIndex: 1000,
+      background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(14px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px',
+      opacity: visible ? 1 : 0, transition: 'opacity 0.35s ease',
     }}>
-      <div style={{
-        width: '34px', height: '34px', borderRadius: '10px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: `${color}12`,
-        border: `1px solid ${color}25`,
-        fontSize: '16px', flexShrink: 0,
+      <div onClick={(e) => e.stopPropagation()} style={{
+        width: '100%', maxWidth: '480px', borderRadius: '24px', overflow: 'hidden',
+        boxShadow: '0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.08)',
+        transform: visible ? 'translateY(0) scale(1)' : 'translateY(24px) scale(0.97)',
+        transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", sans-serif',
       }}>
-        {icon}
-      </div>
-      <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.38)', marginBottom: '2px', whiteSpace: 'nowrap' }}>
-          {label}
+        {/* Hero banner */}
+        <div style={{
+          height: '180px', position: 'relative',
+          background: 'linear-gradient(135deg, #3d1a0a 0%, #6b2a1a 40%, #8c3a20 70%, #4a1206 100%)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+        }}>
+          <h2 style={{
+            position: 'relative', zIndex: 1,
+            fontSize: '22px', fontWeight: 800, color: '#fff',
+            textAlign: 'center', textShadow: '0 2px 20px rgba(0,0,0,0.5)', padding: '0 24px',
+          }}>
+            What is Baseline Score?
+          </h2>
+          <button onClick={handleClose} style={{
+            position: 'absolute', top: '14px', right: '14px',
+            width: '30px', height: '30px', borderRadius: '50%',
+            background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
+            color: 'rgba(255,255,255,0.8)', fontSize: '15px', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2,
+          }}>✕</button>
         </div>
-        <div style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.88)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {value}
+        {/* Body */}
+        <div style={{ background: '#111318', padding: '28px 28px 32px' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            background: 'rgba(245,200,66,0.10)', border: '1px solid rgba(245,200,66,0.28)',
+            borderRadius: '100px', padding: '6px 14px', marginBottom: '20px',
+          }}>
+            <span style={{ fontSize: '14px' }}>💳</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#f5c842', letterSpacing: '0.05em' }}>
+              Like CIBIL Score — but for your body health
+            </span>
+          </div>
+          {[
+            { icon: '🧬', text: "The Baseline Score is Deep Holistics' proprietary health score, developed through clinical research, systems-based analysis, and years of preventive health insight." },
+            { icon: '🔗', text: 'Instead of looking at individual markers in isolation, it brings together data across key body systems to reflect how your body is actually functioning today.' },
+            { icon: '🎯', text: 'This allows you to move beyond "normal" ranges and focus on what needs attention now.' },
+          ].map((item, i) => (
+            <div key={i} style={{ display: 'flex', gap: '14px', marginBottom: i < 2 ? '18px' : 0 }}>
+              <div style={{
+                width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
+                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px',
+              }}>{item.icon}</div>
+              <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.65, color: 'rgba(255,255,255,0.62)', fontWeight: 400 }}>{item.text}</p>
+            </div>
+          ))}
+          <div style={{
+            marginTop: '24px', background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '16px',
+            display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '12px', alignItems: 'center',
+          }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.38)', marginBottom: '4px' }}>CIBIL Score</div>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: '#3de88c' }}>Finance</div>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>Credit health</div>
+            </div>
+            <div style={{
+              width: '32px', height: '32px', borderRadius: '50%',
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '12px', color: 'rgba(255,255,255,0.4)',
+            }}>≈</div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.38)', marginBottom: '4px' }}>Baseline Score</div>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: '#f5c842' }}>Body</div>
+              <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>Body health</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// ─── Main Card ───────────────────────────────────────────────────────────────
+// ─── Main Card ────────────────────────────────────────────────────────────────
 const BaselineScoreCard = ({
-  score          = 65,
-  status         = 'Stable',
-  weeklyGain     = 4,
-  biggestBoost   = 'Vitamin D3 + K2',
+  score = 65,
+  status = 'Stable',
+  weeklyGain = 4,
+  biggestBoost = 'Vitamin D3 + K2',
   biggestBoostGain = 7,
-  topPercentage  = 35,
+  topPercentage = 35,
+  potentialScore = 80,
+  onSimulate,
   onDeepDive,
 }) => {
   const [revealed, setRevealed] = useState(false);
-  const [hovered,  setHovered]  = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const displayScore = useCountUp(score, { delay: 500, duration: 2000 });
 
   useEffect(() => { const t = setTimeout(() => setRevealed(true), 150); return () => clearTimeout(t); }, []);
 
   const cfg = STATUS[status] || STATUS['Stable'];
-  const nextLabel  = cfg.next;
-  const nextAt     = cfg.nextAt;
-  const pointsLeft = nextLabel ? Math.max(nextAt - score, 0) : 0;
-  const prevAt     = LEVEL_THRESHOLDS[LEVELS.indexOf(status)];
-  const barPct     = Math.min(Math.max(((score - prevAt) / (nextAt - prevAt)) * 100, 3), 100);
+  const nextLabel = cfg.next;
+  const gap = Math.max(potentialScore - score, 0);
+  const potLabel = nextLabel || 'Elite';
+  const potCfg = STATUS[potLabel] || STATUS['Strong'];
+  const uid = useRef(`bsc-${Math.random().toString(36).slice(2)}`).current;
 
-  const uniqueId = useRef(`bsc-${Math.random().toString(36).slice(2)}`).current;
+  // Derive active segment color for dot indicator
+  const activeSeg = PROGRESS_SEGMENTS.find(
+    (s) => status === (s.label === 'Alert' ? 'High Alert' : s.label)
+  ) || PROGRESS_SEGMENTS[2];
 
   return (
     <>
       <style>{`
-        /* ─ Keyframes ─────────────────────────────────────────── */
-        @keyframes ${uniqueId}-orb1 {
-          0%,100% { transform: translate(0,0) scale(1); opacity:0.35; }
-          33%     { transform: translate(18px,-24px) scale(1.15); opacity:0.6; }
-          66%     { transform: translate(-10px,14px) scale(0.88); opacity:0.28; }
+        @keyframes bsc-shimmer { from { transform: translateX(-100%); } to { transform: translateX(200%); } }
+        @keyframes ${uid}-float {
+          0%,100% { transform: translateY(0px); }
+          50%      { transform: translateY(-3px); }
         }
-        @keyframes ${uniqueId}-orb2 {
-          0%,100% { transform: translate(0,0) scale(1); opacity:0.25; }
-          50%     { transform: translate(-22px,18px) scale(1.2); opacity:0.5; }
-        }
-        @keyframes ${uniqueId}-pulse-ring {
-          0%   { transform: scale(0.92); opacity:0.5; }
-          50%  { transform: scale(1.04); opacity:0.2; }
-          100% { transform: scale(0.92); opacity:0.5; }
-        }
-        @keyframes ${uniqueId}-shimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position:  200% center; }
-        }
-        @keyframes ${uniqueId}-dot-pulse {
-          0%,100% { box-shadow: 0 0 0 0 rgba(${cfg.rgb},0.7); }
-          50%     { box-shadow: 0 0 0 6px rgba(${cfg.rgb},0); }
-        }
-        @keyframes ${uniqueId}-bar-shine {
-          0%   { transform: translateX(-100%); }
-          100% { transform: translateX(350%); }
-        }
-        @keyframes ${uniqueId}-scanline {
+        @keyframes ${uid}-scanline {
           0%   { transform: translateY(-100%); }
-          100% { transform: translateY(400%); }
+          100% { transform: translateY(500%); }
+        }
+        @keyframes ${uid}-topbar {
+          0%   { background-position: 0% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes ${uid}-info-pulse {
+          0%,100% { box-shadow: 0 0 0 0 ${cfg.badgeBorder}; }
+          50%     { box-shadow: 0 0 0 4px transparent; }
+        }
+        @keyframes ${uid}-sim-shine {
+          0%   { transform: translateX(-120%) skewX(-15deg); }
+          100% { transform: translateX(350%) skewX(-15deg); }
+        }
+        @keyframes ${uid}-dot-pulse {
+          0%,100% { box-shadow: 0 0 0 0 ${cfg.badgeBorder}; }
+          50%     { box-shadow: 0 0 0 5px transparent; }
         }
 
-        /* ─ Card root ─────────────────────────────────────────── */
-        .${uniqueId}-root {
+        /* ── Card shell ── */
+        .${uid}-card {
           position: relative;
-          background: linear-gradient(155deg, #090e1c 0%, #0c1424 45%, #07101e 100%);
-          border-radius: 26px;
-          border: 1px solid rgba(255,255,255,0.08);
-          box-shadow:
-            0 0 0 1px rgba(${cfg.rgb},0.0),
-            0 0 60px rgba(${cfg.rgb},0.12),
-            0 32px 80px rgba(0,0,0,0.6),
-            inset 0 1px 0 rgba(255,255,255,0.06);
+          font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', sans-serif;
+          border-radius: 24px;
           overflow: hidden;
           cursor: pointer;
           height: 100%;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'SF Pro Display', sans-serif;
-          transition:
-            transform 0.4s cubic-bezier(0.16,1,0.3,1),
-            box-shadow 0.4s ease;
-        }
-        .${uniqueId}-root:hover {
-          transform: translateY(-4px) scale(1.008);
+
+          /* Warm dark-brown background matching the screenshot */
+          background:
+            radial-gradient(ellipse at 30% 25%, rgba(80,30,10,0.90) 0%, transparent 65%),
+            radial-gradient(ellipse at 75% 70%, rgba(50,15,5,0.70) 0%, transparent 60%),
+            radial-gradient(ellipse at 50% 50%, #1e0c04 0%, #130804 50%, #0c0502 100%);
+
+          border: 1px solid rgba(200,140,60,0.12);
           box-shadow:
-            0 0 0 1px rgba(${cfg.rgb},0.28),
-            0 0 100px rgba(${cfg.rgb},0.2),
-            0 40px 100px rgba(0,0,0,0.7),
-            inset 0 1px 0 rgba(255,255,255,0.1);
+            0 0 60px rgba(180,80,20,0.12),
+            0 32px 80px rgba(0,0,0,0.7),
+            inset 0 1px 0 rgba(220,160,80,0.08);
+          transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease;
+        }
+        .${uid}-card:hover {
+          transform: translateY(-4px) scale(1.005);
+          box-shadow:
+            0 0 80px rgba(200,110,30,0.20),
+            0 40px 100px rgba(0,0,0,0.75),
+            inset 0 1px 0 rgba(220,160,80,0.12);
         }
 
-        /* ─ Top accent bar ─────────────────────────────────────── */
-        .${uniqueId}-accent {
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          height: 3px;
-          background: linear-gradient(90deg, ${cfg.arcA}, ${cfg.arcB}, ${cfg.arcA});
+        /* Grain texture overlay */
+        .${uid}-grain {
+          position: absolute; inset: 0; pointer-events: none;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+          background-size: 160px 160px;
+          mix-blend-mode: overlay; opacity: 0.9; z-index: 0;
+        }
+
+        /* Warm amber scanline */
+        .${uid}-scanline {
+          position: absolute; left: 0; right: 0; height: 60px;
+          background: linear-gradient(180deg, transparent, rgba(210,140,40,0.03), transparent);
+          pointer-events: none; z-index: 1;
+          animation: ${uid}-scanline 10s linear infinite;
+        }
+
+        /* Top shimmer bar */
+        .${uid}-topbar {
+          position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
+          background: linear-gradient(90deg, #c87020, #d4a012, #c8600c, #d4a012);
           background-size: 200% 100%;
-          animation: ${uniqueId}-shimmer 3s linear infinite;
-          opacity: 0.9;
+          animation: ${uid}-topbar 4s linear infinite;
+          opacity: 0.8; z-index: 3;
         }
 
-        /* ─ Noise grain overlay ────────────────────────────────── */
-        .${uniqueId}-grain {
-          position: absolute; inset: 0;
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-          background-repeat: repeat;
-          background-size: 128px 128px;
-          pointer-events: none;
-          opacity: 0.6;
-          mix-blend-mode: overlay;
+        /* Info button */
+        .${uid}-info-btn {
+          width: 20px; height: 20px; border-radius: 50%;
+          background: ${cfg.badgeBg};
+          border: 1.5px solid ${cfg.badgeBorder};
+          color: ${cfg.badgeColor};
+          font-size: 11px; font-weight: 800;
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; flex-shrink: 0;
+          transition: background 0.2s, transform 0.2s;
+          animation: ${uid}-info-pulse 3s ease-in-out infinite;
+          font-style: italic; font-family: Georgia, serif;
         }
+        .${uid}-info-btn:hover { background: ${cfg.badgeBg}; transform: scale(1.15); }
 
-        /* ─ Scanline sweep ─────────────────────────────────────── */
-        .${uniqueId}-scanline {
-          position: absolute; left:0; right:0;
-          height: 80px;
-          background: linear-gradient(180deg, transparent, rgba(${cfg.rgb},0.04), transparent);
-          pointer-events: none;
-          animation: ${uniqueId}-scanline 6s linear infinite;
-        }
-
-        /* ─ Inner content ─────────────────────────────────────── */
-        .${uniqueId}-inner {
-          position: relative;
-          z-index: 2;
-          padding: 26px 28px 24px;
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-        }
-
-        /* ─ Progress bar fill animation ───────────────────────── */
-        .${uniqueId}-bar-fill {
-          height: 100%;
-          border-radius: 100px;
-          background: linear-gradient(90deg, ${cfg.arcA}90, ${cfg.arcB});
-          box-shadow: 0 0 16px rgba(${cfg.rgb},0.6), 0 0 4px rgba(${cfg.rgb},0.4);
-          width: 0%;
-          transition: width 1.8s cubic-bezier(0.16,1,0.3,1) 1s;
-          position: relative;
-          overflow: hidden;
-        }
-        .${uniqueId}-root.revealed .${uniqueId}-bar-fill {
-          width: ${barPct}%;
-        }
-        .${uniqueId}-bar-shine {
-          position: absolute; top:0; bottom:0; width:30%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-          animation: ${uniqueId}-bar-shine 2.2s ease 2.2s infinite;
-        }
-
-        /* ─ Score text glow ───────────────────────────────────── */
-        .${uniqueId}-score-num {
-          font-size: 84px;
-          font-weight: 900;
-          line-height: 1;
-          color: #fff;
-          letter-spacing: -4px;
-          font-variant-numeric: tabular-nums;
-          text-shadow:
-            0 0 40px rgba(${cfg.rgb},0.6),
-            0 0 80px rgba(${cfg.rgb},0.25);
-          opacity: ${revealed ? 1 : 0};
-          transform: ${revealed ? 'scale(1)' : 'scale(0.88)'};
-          transition: opacity 0.6s ease 0.5s, transform 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.5s;
+        /* Inner content wrapper */
+        .${uid}-inner {
+          position: relative; z-index: 2;
+          padding: 20px 22px 18px;
+          display: flex; flex-direction: column; flex: 1;
         }
       `}</style>
 
-      <div
-        className={`${uniqueId}-root${revealed ? ' revealed' : ''}`}
-        onClick={onDeepDive}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        {/* Grain texture */}
-        <div className={`${uniqueId}-grain`} />
-        {/* Scanline sweep */}
-        <div className={`${uniqueId}-scanline`} />
-        {/* Top shimmer accent */}
-        <div className={`${uniqueId}-accent`} />
+      <div className={`${uid}-card`} onClick={onDeepDive}>
+        <div className={`${uid}-grain`} />
+        <div className={`${uid}-scanline`} />
+        <div className={`${uid}-topbar`} />
 
-        {/* ── Floating ambient orbs ── */}
-        <FloatingOrb style={{
-          width: 260, height: 260,
-          top: -60, right: -60,
-          background: `radial-gradient(circle, rgba(${cfg.rgb},0.14) 0%, transparent 70%)`,
-          animation: `${uniqueId}-orb1 9s ease-in-out infinite`,
-        }} />
-        <FloatingOrb style={{
-          width: 200, height: 200,
-          bottom: -80, left: -40,
-          background: `radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 70%)`,
-          animation: `${uniqueId}-orb2 12s ease-in-out infinite 2s`,
-        }} />
+        <div className={`${uid}-inner`}>
 
-        <div className={`${uniqueId}-inner`}>
-
-          {/* ── Header ── */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+          {/* ── Top header: label + BETA + ⓘ ── */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            marginBottom: '14px',
+          }}>
+            {/* Left: dash + label */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{
+                width: '18px', height: '1px',
+                background: 'rgba(200,150,70,0.45)',
+              }} />
               <span style={{
-                fontSize: '10px', fontWeight: 700, letterSpacing: '0.24em',
-                textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)',
+                fontSize: '9.5px', fontWeight: 600, letterSpacing: '0.20em',
+                textTransform: 'uppercase', color: 'rgba(210,170,100,0.55)',
               }}>
-                Baseline Score
+                Your Baseline Score
               </span>
-              <span style={{
-                fontSize: '9px', fontWeight: 700, padding: '2px 8px',
-                borderRadius: '100px', background: 'rgba(99,102,241,0.14)',
-                color: 'rgba(165,180,252,0.8)', border: '1px solid rgba(99,102,241,0.28)',
-                letterSpacing: '0.1em',
-              }}>BETA</span>
             </div>
-
-            {/* Weekly gain */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '5px',
-              background: 'rgba(61,232,140,0.08)', border: '1px solid rgba(61,232,140,0.2)',
-              borderRadius: '100px', padding: '4px 10px',
-              opacity: revealed ? 1 : 0,
-              transition: 'opacity 0.5s ease 2.8s',
-            }}>
-              <span style={{ fontSize: '10px', color: '#3de88c' }}>▲</span>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#3de88c', letterSpacing: '0.02em' }}>
-                +{weeklyGain} this week
-              </span>
+            {/* Right: BETA + ⓘ */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+              <span style={{
+                fontSize: '7.5px', fontWeight: 700, padding: '2px 8px',
+                borderRadius: '100px', background: 'rgba(99,102,241,0.12)',
+                color: 'rgba(165,180,252,0.75)', border: '1px solid rgba(99,102,241,0.22)',
+                letterSpacing: '0.12em',
+              }}>BETA</span>
+              <button
+                className={`${uid}-info-btn`}
+                onClick={(e) => { e.stopPropagation(); setShowInfo(true); }}
+                title="What is Baseline Score?"
+              >i</button>
             </div>
           </div>
 
-          {/* ── Arc + Score center ── */}
-          <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', marginBottom: '4px' }}>
-            {/* Arc SVG */}
-            <PremiumArc score={score} cfg={cfg} revealed={revealed} />
+          {/* ── Thin divider ── */}
+          <div style={{
+            height: '1px', marginBottom: '18px',
+            background: 'linear-gradient(90deg, rgba(200,150,60,0.18), rgba(200,150,60,0.06) 60%, transparent)',
+          }} />
 
-            {/* Pulse ring behind arc */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              pointerEvents: 'none',
-            }}>
+          {/* ── Main hero row: Arc left + Content right ── */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '18px', flex: 1 }}>
+
+            {/* Arc + score center */}
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              <WarmArc score={score} cfg={cfg} revealed={revealed} uid={uid} />
+              {/* Score overlaid in arc center */}
               <div style={{
-                width: '170px', height: '170px', borderRadius: '50%',
-                border: `1px solid rgba(${cfg.rgb},0.2)`,
-                animation: `${uniqueId}-pulse-ring 4s ease-in-out infinite`,
-              }} />
+                position: 'absolute', inset: 0,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                paddingTop: '16px',
+              }}>
+                <div style={{
+                  fontSize: '52px', fontWeight: 900, lineHeight: 1,
+                  color: '#f0e4cc',
+                  letterSpacing: '-3px',
+                  textShadow: '0 0 30px rgba(210,140,40,0.45), 0 2px 4px rgba(0,0,0,0.5)',
+                  opacity: revealed ? 1 : 0,
+                  transform: revealed ? 'scale(1)' : 'scale(0.85)',
+                  transition: 'opacity 0.6s ease 0.5s, transform 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.5s',
+                  fontVariantNumeric: 'tabular-nums',
+                }}>
+                  {displayScore}
+                </div>
+                <div style={{
+                  fontSize: '10px', fontWeight: 500,
+                  color: 'rgba(210,175,120,0.38)', letterSpacing: '0.04em',
+                  marginTop: '1px',
+                  opacity: revealed ? 1 : 0,
+                  transition: 'opacity 0.4s ease 1.2s',
+                }}>/ 100</div>
+              </div>
             </div>
 
-            {/* Center score block */}
+            {/* Right content */}
             <div style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              gap: '2px',
+              flex: 1, display: 'flex', flexDirection: 'column',
+              gap: '10px', paddingTop: '10px', minWidth: 0,
             }}>
-              {/* Score number */}
-              <div className={`${uniqueId}-score-num`}>
-                {displayScore}
-              </div>
 
-              {/* / 100 */}
+              {/* Status badge */}
               <div style={{
-                fontSize: '13px', fontWeight: 500,
-                color: 'rgba(255,255,255,0.25)',
-                letterSpacing: '0.06em',
-                opacity: revealed ? 1 : 0,
-                transition: 'opacity 0.4s ease 1.2s',
-              }}>
-                / 100
-              </div>
-
-              {/* Status badge — inside arc center */}
-              <div style={{
-                marginTop: '6px',
-                display: 'flex', alignItems: 'center', gap: '7px',
-                background: `rgba(${cfg.rgb},0.1)`,
-                border: `1px solid rgba(${cfg.rgb},0.3)`,
+                display: 'inline-flex', alignItems: 'center', gap: '7px',
+                background: cfg.badgeBg,
+                border: `1px solid ${cfg.badgeBorder}`,
                 borderRadius: '100px',
                 padding: '5px 13px',
+                width: 'fit-content',
                 opacity: revealed ? 1 : 0,
-                transform: revealed ? 'translateY(0)' : 'translateY(6px)',
-                transition: 'opacity 0.5s ease 1.4s, transform 0.5s ease 1.4s',
+                transform: revealed ? 'translateY(0)' : 'translateY(8px)',
+                transition: 'opacity 0.5s ease 1s, transform 0.5s ease 1s',
               }}>
                 <div style={{
-                  width: '7px', height: '7px', borderRadius: '50%',
-                  background: cfg.color,
-                  animation: `${uniqueId}-dot-pulse 2s infinite`,
+                  width: '6px', height: '6px', borderRadius: '50%',
+                  background: cfg.badgeColor,
+                  animation: `${uid}-dot-pulse 2.5s infinite`,
                 }} />
-                <span style={{
-                  fontSize: '12px', fontWeight: 700,
-                  color: cfg.color, letterSpacing: '0.06em',
-                }}>
-                  {status}
+                <span style={{ fontSize: '11px', fontWeight: 800, color: cfg.badgeColor, letterSpacing: '0.10em' }}>
+                  {cfg.badge} {status.toUpperCase()}
                 </span>
+              </div>
+
+              {/* Bold tagline – matches "Good foundations. Real room to grow." style */}
+              <div style={{
+                opacity: revealed ? 1 : 0,
+                transform: revealed ? 'translateY(0)' : 'translateY(10px)',
+                transition: 'opacity 0.6s ease 1.2s, transform 0.6s ease 1.2s',
+              }}>
+                {cfg.tagTitle.split('\n').map((line, i) => (
+                  <div key={i} style={{
+                    fontSize: '17px', fontWeight: 800,
+                    color: '#f0e0c4',
+                    lineHeight: 1.25,
+                    letterSpacing: '-0.3px',
+                    textShadow: '0 1px 8px rgba(0,0,0,0.5)',
+                  }}>{line}</div>
+                ))}
+              </div>
+
+              {/* Subtitle */}
+              <div style={{
+                fontSize: '11.5px', color: 'rgba(210,170,110,0.50)',
+                lineHeight: 1.5, fontWeight: 400,
+                opacity: revealed ? 1 : 0,
+                transition: 'opacity 0.5s ease 1.5s',
+              }}>
+                {cfg.tagSub}
               </div>
             </div>
           </div>
-
-          {/* ── Unified Progress indicator ── */}
-          <div style={{
-            marginBottom: '24px',
-            opacity: revealed ? 1 : 0,
-            transition: 'opacity 0.5s ease 1.6s',
-          }}>
-            <UnifiedProgress score={score} status={status} revealed={revealed} />
-
-            {/* Motivational subtext */}
-            {nextLabel && (
-              <div style={{
-                marginTop: '12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                opacity: revealed ? 1 : 0,
-                transition: 'opacity 0.5s ease 2.2s',
-              }}>
-                <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
-                  Next Level: <strong style={{ color: STATUS[nextLabel].color, fontStyle: 'normal' }}>{nextLabel}</strong>
-                </div>
-                <div style={{
-                  fontSize: '11px', fontWeight: 700,
-                  color: '#4ade80',
-                  background: 'rgba(74,222,128,0.1)',
-                  padding: '4px 10px', borderRadius: '100px',
-                  border: '1px solid rgba(74,222,128,0.2)',
-                }}>
-                  ⚡ Needs {pointsLeft} points
-                </div>
-              </div>
-            )}
-          </div>
-
 
           {/* ── Divider ── */}
           <div style={{
-            height: '1px',
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07) 30%, rgba(255,255,255,0.07) 70%, transparent)',
-            marginBottom: '16px',
+            height: '1px', margin: '16px 0',
+            background: 'linear-gradient(90deg, transparent, rgba(200,150,60,0.12) 30%, rgba(200,150,60,0.12) 70%, transparent)',
           }} />
 
-          {/* ── Insight chips row ── */}
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
-            <InsightChip
-              icon="🌟" label="Biggest Boost"
-              value={`${biggestBoost}  +${biggestBoostGain}`}
-              color="#3de88c"
-              delay={2400}
-            />
-            <InsightChip
-              icon="🏆" label="Age Group Rank"
-              value={`Top ${topPercentage}%`}
-              color="#c084fc"
-              delay={2600}
-            />
+
+          {/* ── Bottom info panel (frosted row – like screenshot) ── */}
+          <div style={{
+            background: 'rgba(255,220,150,0.04)',
+            border: '1px solid rgba(200,150,60,0.12)',
+            borderRadius: '14px',
+            padding: '12px 14px',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1px 1fr',
+            gap: '12px',
+            alignItems: 'center',
+            opacity: revealed ? 1 : 0,
+            transform: revealed ? 'translateY(0)' : 'translateY(8px)',
+            transition: 'opacity 0.5s ease 2.2s, transform 0.5s ease 2.2s',
+          }}>
+            {/* Left: potential + simulate */}
+            <div>
+              <div style={{ fontSize: '11px', color: 'rgba(210,175,110,0.55)', marginBottom: '3px' }}>
+                Your potential:{' '}
+                <span style={{ fontWeight: 800, color: potCfg.color }}>{potLabel}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '13px', fontWeight: 800, color: potCfg.color }}>
+                  {gap} pts
+                </span>
+                <span style={{ fontSize: '11px', color: 'rgba(210,175,100,0.45)', fontWeight: 500 }}>
+                  to reach your potential
+                </span>
+              </div>
+              {/* Simulate button – inline text style */}
+              <button
+                onClick={(e) => { e.stopPropagation(); onSimulate?.(); }}
+                style={{
+                  marginTop: '7px',
+                  background: 'none', border: 'none', padding: 0,
+                  display: 'flex', alignItems: 'center', gap: '5px',
+                  color: potCfg.color, fontSize: '11px', fontWeight: 700,
+                  cursor: 'pointer', letterSpacing: '0.04em',
+                  opacity: 0.85, transition: 'opacity 0.2s',
+                  position: 'relative', overflow: 'hidden',
+                }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '0.85'}
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+                Simulate it
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Center divider */}
+            <div style={{ width: '1px', height: '44px', background: 'rgba(200,150,60,0.15)', justifySelf: 'center' }} />
+
+            {/* Right: top % + biggest boost */}
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '11px', color: 'rgba(210,175,110,0.42)', marginBottom: '3px' }}>
+                🏆 Age Group Rank
+              </div>
+              <div style={{ fontSize: '17px', fontWeight: 800, color: '#f0e0c4' }}>
+                Top <span style={{ color: '#c084fc' }}>{topPercentage}%</span>
+              </div>
+              <div style={{ fontSize: '10px', color: 'rgba(210,170,100,0.38)', marginTop: '2px' }}>
+                in your age group
+              </div>
+            </div>
           </div>
 
-          {/* ── CTA Footer ── */}
+          {/* ── Biggest Boost chip ── */}
           <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-            padding: '10px 0 2px',
+            marginTop: '10px',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             opacity: revealed ? 1 : 0,
-            transition: 'opacity 0.5s ease 3s',
+            transition: 'opacity 0.5s ease 2.5s',
           }}>
-            <span style={{
-              fontSize: '11px', fontWeight: 500,
-              color: `rgba(${cfg.rgb},0.55)`,
-              letterSpacing: '0.10em', textTransform: 'uppercase',
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              background: 'rgba(255,220,100,0.05)',
+              border: '1px solid rgba(200,160,50,0.12)',
+              borderRadius: '100px', padding: '5px 11px',
             }}>
-              Tap to explore your full breakdown
-            </span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-              stroke={`rgba(${cfg.rgb},0.55)`} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
+              <span style={{ fontSize: '9px' }}>🌟</span>
+              <span style={{ fontSize: '9.5px', color: 'rgba(210,175,100,0.55)', fontWeight: 500 }}>Biggest Boost</span>
+              <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'rgba(240,220,160,0.75)' }}>
+                {biggestBoost}
+              </span>
+              <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#6abf70' }}>+{biggestBoostGain}</span>
+            </div>
+          </div>
+
+          {/* ── Motivational footer line ── */}
+          <div style={{
+            marginTop: '12px', paddingTop: '10px',
+            borderTop: '1px solid rgba(200,150,60,0.07)',
+            textAlign: 'center',
+            fontSize: '10px', color: 'rgba(210,170,100,0.32)',
+            fontWeight: 400, letterSpacing: '0.04em',
+            opacity: revealed ? 1 : 0,
+            transition: 'opacity 0.5s ease 2.8s',
+          }}>
+            {cfg.motiveLine}
           </div>
 
         </div>
       </div>
+
+      {/* ── Info Modal ── */}
+      {showInfo && <InfoModal onClose={() => setShowInfo(false)} />}
     </>
   );
 };
