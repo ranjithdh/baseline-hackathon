@@ -659,6 +659,25 @@ const BaselineScoreCard = ({
             transition: 'opacity 0.5s ease 2.2s, transform 0.5s ease 2.2s',
           }}>
             {/* Left: potential + simulate */}
+
+
+            {/* Right: top % + biggest boost */}
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '11px', color: 'rgba(210,175,110,0.42)', marginBottom: '3px' }}>
+                🏆 Age Group Rank
+              </div>
+              <div style={{ fontSize: '17px', fontWeight: 800, color: '#f0e0c4' }}>
+                Top <span style={{ color: '#c084fc' }}>{topPercentage}%</span>
+              </div>
+              <div style={{ fontSize: '10px', color: 'rgba(210,170,100,0.38)', marginTop: '2px' }}>
+                in your age group
+              </div>
+            </div>
+
+            {/* Center divider */}
+            <div style={{ width: '1px', height: '44px', background: 'rgba(200,150,60,0.15)', justifySelf: 'center' }} />
+
+
             <div>
               <div style={{ fontSize: '11px', color: 'rgba(210,175,110,0.55)', marginBottom: '3px' }}>
                 Your potential:{' '}
@@ -699,25 +718,12 @@ const BaselineScoreCard = ({
               </button>
             </div>
 
-            {/* Center divider */}
-            <div style={{ width: '1px', height: '44px', background: 'rgba(200,150,60,0.15)', justifySelf: 'center' }} />
 
-            {/* Right: top % + biggest boost */}
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ fontSize: '11px', color: 'rgba(210,175,110,0.42)', marginBottom: '3px' }}>
-                🏆 Age Group Rank
-              </div>
-              <div style={{ fontSize: '17px', fontWeight: 800, color: '#f0e0c4' }}>
-                Top <span style={{ color: '#c084fc' }}>{topPercentage}%</span>
-              </div>
-              <div style={{ fontSize: '10px', color: 'rgba(210,170,100,0.38)', marginTop: '2px' }}>
-                in your age group
-              </div>
-            </div>
+
           </div>
 
           {/* ── Biggest Boost chip ── */}
-          <div style={{
+          {/* <div style={{
             marginTop: '10px',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             opacity: revealed ? 1 : 0,
@@ -736,7 +742,7 @@ const BaselineScoreCard = ({
               </span>
               <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#6abf70' }}>+{biggestBoostGain}</span>
             </div>
-          </div>
+          </div> */}
 
           {/* ── Motivational footer line ── */}
           <div style={{
