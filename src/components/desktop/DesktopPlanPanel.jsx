@@ -249,20 +249,12 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
           padding: 0,
         }}
       >
-        {/* Background gradient */}
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
-          background: `radial-gradient(ellipse at 5% 0%, rgba(241,121,104,0.10) 0%, transparent 45%),
-                       radial-gradient(ellipse at 95% 100%, rgba(255,197,61,0.06) 0%, transparent 45%)`,
-        }} />
-
       {/* ── GOAL SETTER ── */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 220px',
         gap: '32px',
         padding: '40px 44px 32px',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
         position: 'relative', zIndex: 1,
         alignItems: 'center',
       }}>
@@ -270,7 +262,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
            <div style={{
             fontFamily: 'var(--font-mono)', fontSize: '14px',
             letterSpacing: '0.3em', textTransform: 'uppercase',
-            color: 'rgba(255, 255, 255, 1)', marginBottom: '8px',
+            color: 'rgb(var(--foreground))', marginBottom: '8px',
           }}>
             Playground
           </div> 
@@ -278,12 +270,12 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
             display: 'flex', alignItems: 'baseline', gap: '12px',
             marginBottom: '24px', flexWrap: 'wrap',
           }}>
-            <div style={{ fontFamily: 'var(--font-heading)', fontSize: '24px', color: 'rgba(228,228,231,0.6)' }}>
+            <div style={{ fontFamily: 'var(--font-heading)', fontSize: '24px', color: 'rgb(var(--muted-foreground))' }}>
               I want to reach
             </div>
             <div style={{
               fontFamily: 'var(--font-heading)', fontSize: '56px',
-              color: 'rgb(var(--zinc-100))', lineHeight: 1,
+              color: 'rgb(var(--foreground))', lineHeight: 1,
               transition: 'all 0.25s cubic-bezier(0.16,1,0.3,1)',
             }}>
               {goalTarget}
@@ -339,13 +331,13 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
             <div style={{
               fontFamily: 'var(--font-mono)', fontSize: '9px',
               letterSpacing: '0.2em', textTransform: 'uppercase',
-              color: 'rgba(228,228,231,0.28)',
+              color: 'rgb(var(--muted-foreground))',
             }}>
               Projected Score
             </div>
             <div style={{
               fontFamily: 'var(--font-heading)', fontSize: '64px',
-              color: 'rgb(var(--zinc-100))', lineHeight: 1,
+              color: 'rgb(var(--foreground))', lineHeight: 1,
               transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
             }}>
               {projScore}

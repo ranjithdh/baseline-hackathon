@@ -40,7 +40,7 @@ const HealthScoreLimitCard = React.memo(({ score, onConsultClick }) => {
         display:        'flex',
         alignItems:     'center',
         padding:        '14px 20px',
-        borderRadius:   '10px',
+        borderRadius:   '12px',
         // ── Colours — design system tokens only ────────────────────────────
         background:     'transparent',
         border:         '1px solid rgb(var(--border))',
@@ -48,7 +48,7 @@ const HealthScoreLimitCard = React.memo(({ score, onConsultClick }) => {
         fontFamily:     'var(--font-main)',
         fontSize:       '12px',
         lineHeight:     '1.6',
-        color:          'rgb(var(--foreground))',
+        color:          'rgb(var(--muted-foreground))',
       }}
     >
       {/* ── Message ─────────────────────────────────────────────────────── */}
@@ -56,7 +56,7 @@ const HealthScoreLimitCard = React.memo(({ score, onConsultClick }) => {
         {'Reaching '}
 
         {/* Score — bold, inherits theme foreground */}
-        <strong style={{ fontWeight: 700 }}>{score}</strong>
+        <strong style={{ fontWeight: 700,color: 'rgb(var(--foreground))' }}>{score}</strong>
 
         {' requires improving markers beyond what current interventions can achieve. '}
 
