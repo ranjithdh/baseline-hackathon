@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import sliderMarker from '../../assets/slider_marker.png';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // UI CONFIGURATION
@@ -254,24 +255,9 @@ const HealthScoreSliderV2 = ({
           style={{
             ...S.thumb,
             left: `calc(${markerPct}% - ${R}px)`,
-            // Concentric blue glow rings matching the design image.
-            // Uses brand blue (43,127,255) independent of the active segment.
-            boxShadow: [
-              // Tight concentrated ring — visible bright halo
-              `0 0 0 ${Math.round(D * 0.10)}px rgba(43,127,255,0.55)`,
-              // Mid-range glow ring
-              `0 0 0 ${Math.round(D * 0.22)}px rgba(43,127,255,0.22)`,
-              // Outer soft halo
-              `0 0 0 ${Math.round(D * 0.38)}px rgba(43,127,255,0.08)`,
-              // Diffuse ambient glow
-              `0 0 ${Math.round(D * 0.70)}px ${Math.round(D * 0.22)}px rgba(43,127,255,0.30)`,
-              // Physical drop shadow
-              '0 4px 18px rgba(0,0,0,0.65)',
-            ].join(', '),
           }}
         >
-          {/* Inner accent ring — creates the layered-depth look from the design */}
-          <div style={S.thumbInnerRing} />
+          <img src={sliderMarker} alt="" style={S.thumbImg} />
         </div>
       </div>
 
@@ -395,38 +381,38 @@ const S = {
     flexShrink:      0,
   },
 
-  // Thumb — large dark circle; box-shadow (glow) injected inline so it animates with segment
+  // Thumb — container keeps fixed size; image fills it via thumbImg
   thumb: {
     position:     'absolute',
     top:          '50%',
     transform:    'translateY(-50%)',
     width:        `${D}px`,
     height:       `${D}px`,
-    borderRadius: '50%',
-    // Deep navy fill with a subtle top-left highlight for 3-D depth
-    background:   'radial-gradient(circle at 38% 32%, rgba(22,32,72,0.97) 0%, rgba(3,5,16,0.99) 100%)',
-    // Subtle border that separates thumb from track — faint blue tint
-    border:       '1.5px solid rgba(80,120,255,0.50)',
     display:      'flex',
     alignItems:   'center',
     justifyContent: 'center',
     cursor:       'grab',
     zIndex:       10,
     outline:      'none',
-    // `left` and `box-shadow` are injected inline (score-dependent)
-    transition:   'left 0.04s linear, box-shadow 0.35s ease',
+    overflow:     'hidden',
+    // `left` is injected inline (score-dependent)
+    transition:   'left 0.04s linear',
     willChange:   'left',
+    background:   'none',
+    border:       'none',
+    borderRadius: '50%',
   },
 
-  // Inner decorative ring — creates the concentric-circle depth in the design image
-  thumbInnerRing: {
-    width:        `${Math.round(D * 0.68)}px`,
-    height:       `${Math.round(D * 0.68)}px`,
-    borderRadius: '50%',
-    border:       '1px solid rgba(100,150,255,0.18)',
-    // Faint top-highlight to reinforce 3-D appearance
-    background:   'radial-gradient(circle at 36% 30%, rgba(60,90,200,0.14) 0%, transparent 65%)',
+  // Marker image — scaled to fill the fixed thumb container exactly
+  thumbImg: {
+    width:         '100%',
+    height:        '100%',
+    objectFit:     'contain',
+    display:       'block',
     pointerEvents: 'none',
+    userSelect:    'none',
+    WebkitUserSelect: 'none',
+    draggable:     false,
   },
 
   // Tick / label row — identical layout contract as HealthScoreSlider (V1)
