@@ -503,6 +503,9 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
         {/* ── TAB BAR ── */}
         <div style={{
           display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap',
+          opacity: showActionPlanButton ? 0.4 : 1,
+          pointerEvents: showActionPlanButton ? 'none' : 'auto',
+          transition: 'opacity 0.3s ease',
         }}>
           {CATEGORIES.map(cat => {
             const isActive = cat.id === activeTab;
