@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
 // HealthScoreSlider (V1) is intentionally kept untouched for other screens.
@@ -201,10 +201,21 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
   // Simple O(1) derived visibility — no memo needed.
   const showActionPlanButton = goalTarget !== baselineScore;
 
+  // Preserves the committed item selection across drift/restore cycles so that
+  // dragging the slider back to baseline restores the exact previous selection
+  // (including any manual tweaks) without recomputing from scratch.
+  const savedSelectedIdsRef = useRef(null);
+  if (savedSelectedIdsRef.current === null) {
+    savedSelectedIdsRef.current = new Set(computeNeeded(goalTarget));
+  }
+
   const handleBuildActionPlan = useCallback(() => {
-    // Commit the current slider position as the new baseline and regenerate the plan.
+    // Commit the current slider position as the new baseline, save selection,
+    // and regenerate the plan from the new goal.
+    const newIds = new Set(computeNeeded(goalTarget));
+    savedSelectedIdsRef.current = newIds;
     setBaselineScore(goalTarget);
-    setSelectedIds(new Set(computeNeeded(goalTarget)));
+    setSelectedIds(newIds);
   }, [goalTarget]);
 
   // Action plan computed values are driven by baselineScore (committed goal),
@@ -227,16 +238,21 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
   // Total selected across ALL categories (for header summary)
   const totalSelected = ALL_ITEMS.filter(i => selectedIds.has(i.id)).length;
 
-  // Only update the live slider value — do NOT touch selectedIds or baselineScore
-  // during drag. The Action Plan Card stays tied to baselineScore until the user
-  // explicitly clicks "Build your Action Plan".
+  // Live slider handler — updates goalTarget only.
+  // • Drift away from baseline → clear items (show fresh unselected state, faded)
+  // • Return exactly to baseline → restore the last committed selection
   const handleGoalChange = (val) => {
-    onGoalChange(parseInt(val));
+    const g = parseInt(val);
+    onGoalChange(g);
+    if (g === baselineScore) {
+      setSelectedIds(new Set(savedSelectedIdsRef.current));
+    } else {
+      setSelectedIds(new Set());
+    }
   };
 
-  // Clicking an item toggles selection, then commits the resulting projected
-  // score as both the slider position and the new baseline — keeping everything
-  // in sync exactly like choosing a new committed score.
+  // Clicking an item toggles selection, commits the resulting projected score as
+  // the new baseline, and saves the selection so drift/restore works correctly.
   const handleToggleItem = useCallback((id) => {
     const next = new Set(selectedIds);
     next.has(id) ? next.delete(id) : next.add(id);
@@ -244,6 +260,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
     const newGained = ALL_ITEMS.filter(i => next.has(i.id)).reduce((s, i) => s + i.gain, 0);
     const newProjScore = Math.min(GOAL_MAX, Math.max(GOAL_MIN, BASE_SCORE + newGained));
 
+    savedSelectedIdsRef.current = next;
     setSelectedIds(next);
     setBaselineScore(newProjScore);
     onGoalChange(newProjScore);
@@ -442,14 +459,11 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
 
       </DashboardCard>
       {/* ── ACTION PLAN: separate section ── */}
-      {/* Fades out when slider drifts from baseline; restores on commit. */}
+      {/* Card container stays fully visible at all times — only item cards fade. */}
       <DashboardCard style={{
         margin: '20px 48px 0',
         position: 'relative',
         padding: 0,
-        opacity: showActionPlanButton ? 0.4 : 1,
-        pointerEvents: showActionPlanButton ? 'none' : 'auto',
-        transition: 'opacity 0.3s ease',
       }}>
       <div style={{ padding: '28px 44px 40px', position: 'relative', zIndex: 1 }}>
 
@@ -561,11 +575,16 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
         </div>
 
         {/* ── CARD GRID for active tab ── */}
+        {/* Fades when slider drifts from baseline — items are cleared (unselected)
+            to signal the plan is outdated. Title and tabs stay fully visible. */}
         {activeCategory && (
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '12px',
+            opacity: showActionPlanButton ? 0.4 : 1,
+            pointerEvents: showActionPlanButton ? 'none' : 'auto',
+            transition: 'opacity 0.3s ease',
           }}>
             {activeCategory.items.map(item => (
               <ItemCard
