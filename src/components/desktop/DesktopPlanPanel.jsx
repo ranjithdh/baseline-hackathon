@@ -503,8 +503,8 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
                   background: isActive
                     ? 'rgba(43,127,255,0.18)'
                     : 'rgba(255,255,255,0.04)',
-                  color: isActive ? 'rgb(43,127,255)' : 'rgba(228,228,231,0.65)',
-                  fontSize: '13px', fontWeight: isActive ? 600 : 400,
+                  color: isActive ? 'rgb(43,127,255)' : 'rgb(var(--muted-foreground)',
+                  fontSize: '12px', fontWeight: isActive ? 600 : 400,
                   fontFamily: 'var(--font-main)',
                   cursor: 'pointer',
                   transition: 'all 0.18s',
@@ -512,7 +512,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
                   whiteSpace: 'nowrap',
                 }}
               >
-                <span style={{ fontSize: '15px', lineHeight: 1 }}>{cat.icon}</span>
+
 
                 {/* Name + count inline */}
                 <span>
@@ -521,8 +521,8 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
                     <span style={{
                       marginLeft: '5px',
                       fontSize: '11px',
-                      fontWeight: 700,
-                      color: isActive ? 'rgb(43,127,255)' : 'rgb(48,164,108)',
+                     fontWeight: isActive ? 600 : 400,
+                      color: 'rgb(var(--muted-foreground)',
                       fontFamily: 'var(--font-mono)',
                     }}>
                       ({catSelected})
