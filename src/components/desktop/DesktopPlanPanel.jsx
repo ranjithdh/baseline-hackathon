@@ -327,7 +327,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
                   display:        'inline-flex',
                   alignItems:     'center',
                   padding:        '6px 16px',
-                  borderRadius:   '100px',
+                  borderRadius:   '8px',
                   fontSize:       '13px',
                   fontWeight:     600,
                   fontFamily:     'var(--font-main)',
