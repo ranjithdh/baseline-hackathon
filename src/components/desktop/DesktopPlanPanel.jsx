@@ -228,6 +228,16 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
   const toGoal = baselineScore - projScore;
   const progressPct = ptsNeeded > 0 ? Math.min(100, (gained / ptsNeeded) * 100) : 100;
 
+  // ── Live projected score (real-time during drag) ──────────────────────────
+  // While the slider is drifting (showActionPlanButton = true) we show the
+  // potential achievable score for the current goalTarget so the number
+  // animates smoothly as the thumb moves. Once committed (at baseline) we
+  // fall back to the action-based projection driven by selectedIds.
+  const displayScore = showActionPlanButton
+    ? Math.min(goalTarget, MAX_ACHIEVABLE)
+    : projScore;
+  const displayGain = displayScore - BASE_SCORE;
+
   const badge = ptsNeeded <= 7
     ? { text: 'Achievable · 8 wks', bg: 'rgba(48,164,108,0.15)', color: 'rgb(48,164,108)', border: 'rgba(48,164,108,0.28)' }
     : ptsNeeded <= 12
@@ -390,33 +400,47 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
               color: 'rgb(var(--foreground))', lineHeight: 1,
               transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
             }}>
-              {projScore}
+              {displayScore}
             </div>
             <div style={{
               fontSize: '12px', fontWeight: 600, minHeight: '20px',
               fontFamily: 'var(--font-mono)',
-              color: gained === 0 ? 'rgba(228,228,231,0.25)'
-                : projScore >= baselineScore ? 'rgb(48,164,108)'
-                  : 'rgb(255,197,61)',
+              color: showActionPlanButton
+                ? displayGain > 0 ? 'rgb(48,164,108)' : 'rgba(228,228,231,0.25)'
+                : gained === 0 ? 'rgba(228,228,231,0.25)'
+                  : projScore >= baselineScore ? 'rgb(48,164,108)'
+                    : 'rgb(255,197,61)',
               transition: 'color 0.3s',
             }}>
-              {gained === 0 ? 'Select actions below'
-                : projScore >= baselineScore ? `+${gained} pts · Goal ✓`
-                  : `+${gained} pts · ${toGoal} more`}
+              {showActionPlanButton
+                ? displayGain > 0 ? `+${displayGain} pts · Potential` : 'Select actions below'
+                : gained === 0 ? 'Select actions below'
+                  : projScore >= baselineScore ? `+${gained} pts · Goal ✓`
+                    : `+${gained} pts · ${toGoal} more`}
             </div>
           </DashboardCard>
 
         </div>{/* end right column */}
           
 
-          {goalTarget > MAX_ACHIEVABLE && (
-          <div style={{ width:'100%',position: 'relative', top: 0, padding:'0px 0px' }}>
-            <HealthScoreLimitCard
-              score={goalTarget}
-              onConsultClick={() => {/* navigate to consult flow */}}
-            />
-          </div>
-        )}
+          {/* ── HealthScoreLimitCard — animated show/hide ── */}
+          <AnimatePresence>
+            {goalTarget > MAX_ACHIEVABLE && (
+              <motion.div
+                key="limit-card"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                style={{ gridColumn: '1 / -1', width: '100%' }}
+              >
+                <HealthScoreLimitCard
+                  score={goalTarget}
+                  onConsultClick={() => {/* navigate to consult flow */}}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
       </div>
 
       {/* ── PROGRESS BAR ── */}
