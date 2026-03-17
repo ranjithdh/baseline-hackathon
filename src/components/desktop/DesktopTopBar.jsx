@@ -1,4 +1,5 @@
 import React from 'react';
+import PrimaryButton from './PrimaryButton';
 
 const DesktopTopBar = ({ onBookConsult }) => {
   const now = new Date();
@@ -24,35 +25,9 @@ const DesktopTopBar = ({ onBookConsult }) => {
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-        <button
-          onClick={onBookConsult}
-          style={{
-            background: 'rgb(var(--primary))',
-            color: 'white',
-            border: 'none',
-            padding: '9px 20px',
-            borderRadius: '100px',
-            fontSize: '12px',
-            fontFamily: 'var(--font-main)',
-            fontWeight: 600,
-            cursor: 'pointer',
-            letterSpacing: '0.02em',
-            transition: 'all 0.2s',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.transform = 'translateY(-1px)';
-            e.currentTarget.style.opacity = '0.9';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.opacity = '1';
-          }}
-        >
+        <PrimaryButton onClick={onBookConsult}>
           <span>↓</span> Download your plan
-        </button>
+        </PrimaryButton>
       </div>
     </div>
   );

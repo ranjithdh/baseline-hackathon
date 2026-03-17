@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
 // HealthScoreSlider (V1) is intentionally kept untouched for other screens.
 // The Playground panel uses the new V2 design.
 import HealthScoreSliderV2 from './HealthScoreSliderV2';
 import DashboardCard from './DashboardCard';
+import PrimaryButton from './PrimaryButton';
 // ExpertGuidanceCard (V1) is intentionally kept for DesktopDashboard.
 // DesktopPlanPanel uses the redesigned HealthScoreLimitCard instead.
 import HealthScoreLimitCard from './HealthScoreLimitCard';
@@ -188,6 +190,22 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
   const [selectedIds, setSelectedIds] = useState(() => computeNeeded(goalTarget));
   const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
 
+  // ── Playground: baseline tracking ────────────────────────────────────────
+  // baselineScore is the "confirmed" goal the user started from.
+  // It only updates when the user clicks "Build your Action Plan", anchoring
+  // their chosen target. The button is visible any time the slider has drifted
+  // away from the baseline, giving the user a clear CTA to commit.
+  const [baselineScore, setBaselineScore] = useState(() => goalTarget);
+
+  // Simple O(1) derived visibility — no memo needed.
+  const showActionPlanButton = goalTarget !== baselineScore;
+
+  const handleBuildActionPlan = useCallback(() => {
+    // Confirm the current slider position as the new baseline.
+    setBaselineScore(goalTarget);
+    // TODO: wire up to action plan generation flow via prop callback.
+  }, [goalTarget]);
+
   const neededIds = useMemo(() => computeNeeded(goalTarget), [goalTarget]);
   const ptsNeeded = Math.min(goalTarget, MAX_ACHIEVABLE) - BASE_SCORE;
   const gained = ALL_ITEMS.filter(i => selectedIds.has(i.id)).reduce((s, i) => s + i.gain, 0);
@@ -310,39 +328,64 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
           />
         </div>
 
-        {/* Projected score card */}
-        <DashboardCard style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          padding: '28px 24px',
-          textAlign: 'center', gap: '6px',
-        }}>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: '9px',
-            letterSpacing: '0.2em', textTransform: 'uppercase',
-            color: 'rgba(228,228,231,0.28)',
+        {/* ── Right column: Build CTA + Projected Score card ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignSelf: 'center' }}>
+
+          {/* "Build your Action Plan" — appears when slider differs from baseline */}
+          <AnimatePresence>
+            {showActionPlanButton && (
+              <motion.div
+                key="build-action-plan-btn"
+                initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0,  scale: 1    }}
+                exit={{    opacity: 0, y: -6, scale: 0.97 }}
+                transition={{ duration: 0.22, ease: 'easeOut' }}
+              >
+                <PrimaryButton
+                  onClick={handleBuildActionPlan}
+                  style={{ width: '100%' }}
+                >
+                  Build your Action Plan
+                </PrimaryButton>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Projected score card */}
+          <DashboardCard style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
+            padding: '28px 24px',
+            textAlign: 'center', gap: '6px',
           }}>
-            Projected Score
-          </div>
-          <div style={{
-            fontFamily: 'var(--font-heading)', fontSize: '64px',
-            color: 'rgb(var(--zinc-100))', lineHeight: 1,
-            transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
-          }}>
-            {projScore}
-          </div>
-          <div style={{
-            fontSize: '12px', fontWeight: 600, minHeight: '20px',
-            fontFamily: 'var(--font-mono)',
-            color: gained === 0 ? 'rgba(228,228,231,0.25)'
-              : projScore >= goalTarget ? 'rgb(48,164,108)'
-                : 'rgb(255,197,61)',
-            transition: 'color 0.3s',
-          }}>
-            {gained === 0 ? 'Select actions below'
-              : projScore >= goalTarget ? `+${gained} pts · Goal ✓`
-                : `+${gained} pts · ${toGoal} more`}
-          </div>
-        </DashboardCard>
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: '9px',
+              letterSpacing: '0.2em', textTransform: 'uppercase',
+              color: 'rgba(228,228,231,0.28)',
+            }}>
+              Projected Score
+            </div>
+            <div style={{
+              fontFamily: 'var(--font-heading)', fontSize: '64px',
+              color: 'rgb(var(--zinc-100))', lineHeight: 1,
+              transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
+            }}>
+              {projScore}
+            </div>
+            <div style={{
+              fontSize: '12px', fontWeight: 600, minHeight: '20px',
+              fontFamily: 'var(--font-mono)',
+              color: gained === 0 ? 'rgba(228,228,231,0.25)'
+                : projScore >= goalTarget ? 'rgb(48,164,108)'
+                  : 'rgb(255,197,61)',
+              transition: 'color 0.3s',
+            }}>
+              {gained === 0 ? 'Select actions below'
+                : projScore >= goalTarget ? `+${gained} pts · Goal ✓`
+                  : `+${gained} pts · ${toGoal} more`}
+            </div>
+          </DashboardCard>
+
+        </div>{/* end right column */}
 
 
           {goalTarget > MAX_ACHIEVABLE && (
