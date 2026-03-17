@@ -1,7 +1,6 @@
 import React from 'react';
-import PrimaryButton from './PrimaryButton';
 
-const DesktopTopBar = ({ onBookConsult }) => {
+const DesktopTopBar = () => {
   const now = new Date();
   const dayName  = now.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
   const monthYear = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase();
@@ -11,7 +10,6 @@ const DesktopTopBar = ({ onBookConsult }) => {
       padding: '28px 48px 0',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'space-between',
     }}>
       {/* Greeting */}
       <div style={{
@@ -21,13 +19,6 @@ const DesktopTopBar = ({ onBookConsult }) => {
         letterSpacing: '0.05em',
       }}>
         {dayName}, {monthYear} · ARJUN'S DASHBOARD
-      </div>
-
-      {/* Actions */}
-      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-        <PrimaryButton onClick={onBookConsult}>
-          <span>↓</span> Download your plan
-        </PrimaryButton>
       </div>
     </div>
   );

@@ -46,7 +46,7 @@ const DesktopDashboard = () => {
         )} */}
 
         {/* Top bar */}
-        <DesktopTopBar onBookConsult={() => setActiveNav('consult')} />
+        <DesktopTopBar />
 
         {/* ── Row 1: Score Card + Consult Banner (side-by-side) ── */}
         <>
@@ -78,6 +78,7 @@ const DesktopDashboard = () => {
           planPanelRef={planPanelRef}
           goalTarget={goalTarget}
           onGoalChange={setGoalTarget}
+          onBookConsult={() => setActiveNav('consult')}
         />
 
       </main>

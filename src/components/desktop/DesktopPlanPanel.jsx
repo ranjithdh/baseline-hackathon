@@ -6,6 +6,7 @@ import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlan
 import HealthScoreSliderV2 from './HealthScoreSliderV2';
 import DashboardCard from './DashboardCard';
 import PrimaryButton from './PrimaryButton';
+import ActionPlanDownloadButton from './ActionPlanDownloadButton';
 // ExpertGuidanceCard (V1) is intentionally kept for DesktopDashboard.
 // DesktopPlanPanel uses the redesigned HealthScoreLimitCard instead.
 import HealthScoreLimitCard from './HealthScoreLimitCard';
@@ -187,7 +188,7 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
 };
 
 // ── Main Component ───────────────────────────────────────────────
-const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
+const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsult }) => {
   const [selectedIds, setSelectedIds] = useState(() => computeNeeded(goalTarget));
   const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
 
@@ -469,9 +470,10 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
 
         {/* Section header */}
         <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           marginBottom: '20px',
         }}>
+          {/* Left: title + subtitle */}
           <div>
             <div style={{
               fontSize: '18px', fontWeight: 700,
@@ -489,15 +491,23 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange }) => {
             </div>
           </div>
 
-          {/* Global count */}
-          {totalSelected > 0 && (
-            <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: '12px',
-              color: 'rgb(48,164,108)', fontWeight: 600,
-            }}>
-              +{gained} pts · {totalSelected} action{totalSelected !== 1 ? 's' : ''} chosen
-            </div>
-          )}
+          {/* Right: global count (when items selected) + download button */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0,
+            opacity: showActionPlanButton ? 0.4 : 1,
+            transition: 'opacity 0.3s ease',
+          }}>
+            {totalSelected > 0 && (
+              <div style={{
+                fontFamily: 'var(--font-mono)', fontSize: '12px',
+                color: 'rgb(48,164,108)', fontWeight: 600,
+                whiteSpace: 'nowrap',
+              }}>
+                +{gained} pts · {totalSelected} action{totalSelected !== 1 ? 's' : ''} chosen
+              </div>
+            )}
+            <ActionPlanDownloadButton onClick={onBookConsult} />
+          </div>
         </div>
 
         {/* ── TAB BAR ── */}
