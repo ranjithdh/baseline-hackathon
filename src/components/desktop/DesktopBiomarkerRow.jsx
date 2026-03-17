@@ -165,7 +165,7 @@ const DesktopBiomarkerRow = () => {
                 <button
                   className="view-more-btn"
                   onClick={() => toggleExpand(card.id)}
-                  style={{ color: '#3b82f6' }}
+                  style={{ color: 'rgb(var(--primary)' }}
                 >
                   {isExpanded ? 'View Less' : `View More (${hiddenCount})`}
                 </button>
