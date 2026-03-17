@@ -3,6 +3,7 @@ import DashboardCard from './DashboardCard';
 import BiomarkerStatusTag from './BiomarkerStatusTag';
 
 const SUMMARY_CARDS = [
+  // 1. Working For You
   {
     id: 'positive',
     label: 'Working For You',
@@ -17,29 +18,31 @@ const SUMMARY_CARDS = [
       { name: 'Resting HR',      value: '58 bpm',        bar: 74, color: 'green', status: 'normal'  },
     ],
   },
-  {
-    id: 'negative',
-    label: 'Needs Attention',
-    pillLabel: '5 markers',
-    pillType: 'act',
-    markers: [
-      { name: 'Vitamin D',    value: '19.69 ng/mL', bar: 28, color: 'red', status: 'borderline_high' },
-      { name: 'Body Fat %',   value: '33.7%',       bar: 32, color: 'red', status: 'moderately_high' },
-      { name: 'LDL',          value: '142 mg/dL',   bar: 35, color: 'red', status: 'borderline_high' },
-      { name: 'Triglycerides',value: '189 mg/dL',   bar: 30, color: 'red', status: 'borderline_high' },
-      { name: 'CRP',          value: '3.2 mg/L',    bar: 22, color: 'red', status: 'moderately_high' },
-    ],
-  },
+  // 2. Watch Closely
   {
     id: 'watch',
     label: 'Watch Closely',
     pillLabel: '4 markers',
     pillType: 'watch',
     markers: [
-      { name: 'TSH',          value: '5 µIU/mL',   bar: 58, color: 'amber', status: 'high' },
-      { name: 'Cortisol',     value: '20 µg/dL',   bar: 62, color: 'amber', status: 'high' },
-      { name: 'Ferritin',     value: '14 ng/mL',   bar: 45, color: 'amber', status: 'low'  },
-      { name: 'Homocysteine', value: '11 µmol/L',  bar: 50, color: 'amber', status: 'high' },
+      { name: 'TSH',          value: '5 µIU/mL',   bar: 58, color: 'amber', status: 'borderline_high' },
+      { name: 'Cortisol',     value: '20 µg/dL',   bar: 62, color: 'amber', status: 'borderline_high' },
+      { name: 'Ferritin',     value: '14 ng/mL',   bar: 45, color: 'amber', status: 'borderline_high' },
+      { name: 'Homocysteine', value: '11 µmol/L',  bar: 50, color: 'amber', status: 'moderately_high' },
+    ],
+  },
+  // 3. Needs Attention
+  {
+    id: 'negative',
+    label: 'Needs Attention',
+    pillLabel: '5 markers',
+    pillType: 'act',
+    markers: [
+      { name: 'Vitamin D',     value: '19.69 ng/mL', bar: 28, color: 'red', status: 'low'  },
+      { name: 'Body Fat %',    value: '33.7%',       bar: 32, color: 'red', status: 'high' },
+      { name: 'LDL',           value: '142 mg/dL',   bar: 35, color: 'red', status: 'high' },
+      { name: 'Triglycerides', value: '189 mg/dL',   bar: 30, color: 'red', status: 'high' },
+      { name: 'CRP',           value: '3.2 mg/L',    bar: 22, color: 'red', status: 'high' },
     ],
   },
 ];
