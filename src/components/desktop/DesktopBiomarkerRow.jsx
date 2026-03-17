@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import DashboardCard from './DashboardCard';
+import BiomarkerStatusTag from './BiomarkerStatusTag';
 
 const SUMMARY_CARDS = [
   {
@@ -8,12 +9,12 @@ const SUMMARY_CARDS = [
     pillLabel: '6 markers',
     pillType: 'good',
     markers: [
-      { name: 'HbA1c',           value: '5.4%',          bar: 85, color: 'green' },
-      { name: 'Fasting Insulin', value: '7.6 µU/mL',     bar: 78, color: 'green' },
-      { name: 'VO2 Max',         value: '41 mL/kg/min',  bar: 68, color: 'green' },
-      { name: 'HDL Cholesterol', value: '62 mg/dL',      bar: 80, color: 'green' },
-      { name: 'Blood Pressure',  value: '118/76 mmHg',   bar: 90, color: 'green' },
-      { name: 'Resting HR',      value: '58 bpm',        bar: 74, color: 'green' },
+      { name: 'HbA1c',           value: '5.4%',          bar: 85, color: 'green', status: 'optimal' },
+      { name: 'Fasting Insulin', value: '7.6 µU/mL',     bar: 78, color: 'green', status: 'optimal' },
+      { name: 'VO2 Max',         value: '41 mL/kg/min',  bar: 68, color: 'green', status: 'normal'  },
+      { name: 'HDL Cholesterol', value: '62 mg/dL',      bar: 80, color: 'green', status: 'optimal' },
+      { name: 'Blood Pressure',  value: '118/76 mmHg',   bar: 90, color: 'green', status: 'optimal' },
+      { name: 'Resting HR',      value: '58 bpm',        bar: 74, color: 'green', status: 'normal'  },
     ],
   },
   {
@@ -22,11 +23,11 @@ const SUMMARY_CARDS = [
     pillLabel: '5 markers',
     pillType: 'act',
     markers: [
-      { name: 'Vitamin D',    value: '19.69 ng/mL', bar: 28, color: 'red' },
-      { name: 'Body Fat %',   value: '33.7%',       bar: 32, color: 'red' },
-      { name: 'LDL',          value: '142 mg/dL',   bar: 35, color: 'red' },
-      { name: 'Triglycerides',value: '189 mg/dL',   bar: 30, color: 'red' },
-      { name: 'CRP',          value: '3.2 mg/L',    bar: 22, color: 'red' },
+      { name: 'Vitamin D',    value: '19.69 ng/mL', bar: 28, color: 'red', status: 'borderline_high' },
+      { name: 'Body Fat %',   value: '33.7%',       bar: 32, color: 'red', status: 'moderately_high' },
+      { name: 'LDL',          value: '142 mg/dL',   bar: 35, color: 'red', status: 'borderline_high' },
+      { name: 'Triglycerides',value: '189 mg/dL',   bar: 30, color: 'red', status: 'borderline_high' },
+      { name: 'CRP',          value: '3.2 mg/L',    bar: 22, color: 'red', status: 'moderately_high' },
     ],
   },
   {
@@ -35,10 +36,10 @@ const SUMMARY_CARDS = [
     pillLabel: '4 markers',
     pillType: 'watch',
     markers: [
-      { name: 'TSH',        value: '5 µIU/mL',   bar: 58, color: 'amber' },
-      { name: 'Cortisol',   value: '20 µg/dL',   bar: 62, color: 'amber' },
-      { name: 'Ferritin',   value: '14 ng/mL',   bar: 45, color: 'amber' },
-      { name: 'Homocysteine', value: '11 µmol/L', bar: 50, color: 'amber' },
+      { name: 'TSH',          value: '5 µIU/mL',   bar: 58, color: 'amber', status: 'high' },
+      { name: 'Cortisol',     value: '20 µg/dL',   bar: 62, color: 'amber', status: 'high' },
+      { name: 'Ferritin',     value: '14 ng/mL',   bar: 45, color: 'amber', status: 'low'  },
+      { name: 'Homocysteine', value: '11 µmol/L',  bar: 50, color: 'amber', status: 'high' },
     ],
   },
 ];
@@ -148,14 +149,8 @@ const DesktopBiomarkerRow = () => {
                     }}>
                       {m.value}
                     </div>
-                    <div style={{ width: '64px', height: '4px', background: 'var(--border-color)', borderRadius: '2px', flexShrink: 0 }}>
-                      <div style={{
-                        height: '4px',
-                        borderRadius: '2px',
-                        background: barColors[m.color],
-                        width: `${m.bar}%`,
-                      }} />
-                    </div>
+                    {/* Tags */}
+                    <BiomarkerStatusTag status={m.status} />
                   </div>
                 ))}
               </div>
