@@ -421,10 +421,10 @@ const BaselineScoreCard = ({
           display: flex;
           flex-direction: column;
 
-          /* Rich Blue Brand Background */
+          /* Rich Blue Brand Background – dark left, vivid indigo right */
           background:
-            radial-gradient(ellipse at 30% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 60%),
-            linear-gradient(270deg, rgb(151, 159, 254) 0%, rgb(141, 136, 248) 24.22%, rgb(0, 36, 145) 57.3%, rgb(0, 10, 41) 80.88%);
+            radial-gradient(ellipse at 20% 40%, rgba(0,0,0,0.35) 0%, transparent 55%),
+            linear-gradient(90deg, rgb(0, 10, 41) 0%, rgb(0, 36, 145) 38%, rgb(141, 136, 248) 72%, rgb(151, 159, 254) 100%);
 
           border: 1px solid rgba(var(--zinc-400), 0.15);
           box-shadow:
