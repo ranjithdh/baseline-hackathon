@@ -69,15 +69,15 @@ const BaselineScoreCard = ({
           flex-direction: column;
           gap: 20px;
           overflow: hidden;
-          background: #111318;
-          border: 1px solid rgba(255,255,255,0.07);
-          box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03) inset;
+          background: linear-gradient(135deg, #0f1729 0%, #111827 55%, #0e1a3a 100%);
+          border: 1px solid rgba(99,102,241,0.22);
+          box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.06) inset;
         }
         .bsc-card::before {
           content: '';
           position: absolute;
           inset: 0;
-          background: radial-gradient(ellipse at 80% 0%, rgba(74,222,128,0.07) 0%, transparent 60%);
+          background: radial-gradient(ellipse at 85% 0%, rgba(99,102,241,0.12) 0%, transparent 55%);
           pointer-events: none;
         }
 
@@ -102,9 +102,9 @@ const BaselineScoreCard = ({
           letter-spacing: 0.1em;
           padding: 2px 8px;
           border-radius: 100px;
-          background: rgba(74, 222, 128, 0.1);
-          color: #4ade80;
-          border: 1px solid rgba(74, 222, 128, 0.2);
+          background: rgba(43, 127, 255, 0.12);
+          color: #4c93ff;
+          border: 1px solid rgba(43, 127, 255, 0.28);
         }
         .bsc-info-btn {
           margin-left: auto;
@@ -336,20 +336,20 @@ const BaselineScoreCard = ({
           gap: 8px;
           padding: 12px 22px;
           border-radius: 14px;
-          background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+          background: linear-gradient(135deg, #1e40af 0%, #2b7fff 60%, #60a5fa 100%);
           color: #ffffff;
           font-family: var(--font-main);
           font-weight: 700;
           font-size: 14px;
           border: none;
           cursor: pointer;
-          box-shadow: 0 4px 16px rgba(34,197,94,0.3);
+          box-shadow: 0 4px 16px rgba(43,127,255,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
           transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
           white-space: nowrap;
         }
         .bsc-cta:hover {
           transform: translateY(-2px) scale(1.03);
-          box-shadow: 0 8px 24px rgba(34,197,94,0.45);
+          box-shadow: 0 8px 28px rgba(43,127,255,0.5);
         }
         .bsc-cta-arrow {
           transition: transform 0.25s ease;
