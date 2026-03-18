@@ -201,6 +201,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
 
   // Simple O(1) derived visibility — no memo needed.
   const showActionPlanButton = goalTarget !== baselineScore;
+  
 
   // Preserves the committed item selection across drift/restore cycles so that
   // dragging the slider back to baseline restores the exact previous selection
@@ -505,7 +506,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
               fontFamily: 'var(--font-main)',
               marginBottom: '4px',
             }}>
-              Build Your Action Plan
+              Your Action Plan
             </div>
             <div style={{
               fontSize: '13px', color: 'rgba(228,228,231,0.4)',
@@ -518,8 +519,6 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
           {/* Right: global count (when items selected) + download button */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0,
-            opacity: showActionPlanButton ? 0.4 : 1,
-            transition: 'opacity 0.3s ease',
           }}>
             {totalSelected > 0 && (
               <div style={{
@@ -537,9 +536,6 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
         {/* ── TAB BAR ── */}
         <div style={{
           display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap',
-          opacity: showActionPlanButton ? 0.4 : 1,
-          pointerEvents: showActionPlanButton ? 'none' : 'auto',
-          transition: 'opacity 0.3s ease',
         }}>
           {CATEGORIES.map(cat => {
             const isActive = cat.id === activeTab;
@@ -619,9 +615,6 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
             display: 'grid',
             gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '12px',
-            opacity: showActionPlanButton ? 0.4 : 1,
-            pointerEvents: showActionPlanButton ? 'none' : 'auto',
-            transition: 'opacity 0.3s ease',
           }}>
             {activeCategory.items.map(item => (
               <ItemCard
