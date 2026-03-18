@@ -85,6 +85,7 @@ const HealthScoreSliderV2 = ({
   min = 0,
   max = 100,
   onChange,
+  onDragEnd,
   minAllowedScore,
   maxRecommended,
   ticks = [],
@@ -123,7 +124,12 @@ const HealthScoreSliderV2 = ({
   useEffect(() => {
     const onMove      = (e) => { if (dragging.current) commit(e.clientX); };
     const onTouchMove = (e) => { if (dragging.current) commit(e.touches[0].clientX); };
-    const onUp        = ()  => { dragging.current = false; };
+    const onUp        = ()  => {
+      if (dragging.current) {
+        dragging.current = false;
+        onDragEnd?.();
+      }
+    };
 
     window.addEventListener('mousemove',  onMove);
     window.addEventListener('mouseup',    onUp);
