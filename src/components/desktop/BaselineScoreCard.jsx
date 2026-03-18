@@ -490,7 +490,7 @@ const BaselineScoreCard = ({
             <div className="bsc-pot-sub">Just a few targeted changes needed</div>
           </div>
 
-          <button className="bsc-cta" onClick={(e) => e.stopPropagation()}>
+          <button className="bsc-cta" onClick={onTap}>
             See how to improve
             <span className="bsc-cta-arrow">→</span>
           </button>
