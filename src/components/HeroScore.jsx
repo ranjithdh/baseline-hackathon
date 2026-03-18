@@ -7,6 +7,15 @@ const HeroScore = ({ onSetGoal }) => {
   const { score_details } = healthData.data;
   const [showDeepDive, setShowDeepDive] = useState(false);
 
+  const score = score_details.normalized_baseline_score;
+  const getStatus = (val) => {
+    if (val < 50) return 'Compromised';
+    if (val < 65) return 'Constrained';
+    if (val < 75) return 'Stable';
+    if (val < 85) return 'Robust';
+    return 'Elite';
+  };
+
   return (
     <div className="hero-section">
       <div className="geometric-container">
@@ -14,17 +23,17 @@ const HeroScore = ({ onSetGoal }) => {
         <div className="square-inner">
           <div className="score-box">
             <p className="score-label">Baseline Score</p>
-            <h1 className="score-value">{score_details.normalized_baseline_score}</h1>
+            <h1 className="score-value">{score}</h1>
             <div className="score-delta">
-              <p className="delta-text">Status: {score_details.inference}</p>
+              <p className="delta-text">Status: {getStatus(score)}</p>
             </div>
-            
+
             {/* Creative Explanation Tag */}
-            <motion.button 
-              whileHover={{ scale: 1.05, backgroundColor: '#FEF3C7' }}
+            <motion.button
+              whileHover={{ scale: 1.05, backgroundColor: 'rgba(var(--brand-color), 0.1)' }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowDeepDive(true)}
-              className="mt-6 flex items-center gap-2 px-4 py-2 rounded-full border border-amber-200/50 bg-amber-50/50 text-[10px] font-black tracking-[0.2em] text-amber-600 uppercase shadow-sm transition-all"
+              className="mt-6 flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/10 text-[10px] font-black tracking-[0.2em] text-primary-text uppercase shadow-sm transition-all"
             >
               <span className="material-symbols-outlined text-sm">rocket_launch</span>
               Deep Dive
@@ -38,7 +47,7 @@ const HeroScore = ({ onSetGoal }) => {
       <div className="system-description">
         <p className="description-text">{score_details.baseline_score_description}</p>
         <button className="goal-btn group" onClick={onSetGoal}>
-          <span>Set Goal for Stable</span>
+          <span>Set Goal</span>
           <div className="btn-glow"></div>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="ml-2">
             <path d="M12 5v14M5 12h14" />
@@ -86,9 +95,10 @@ const HeroScore = ({ onSetGoal }) => {
           position: absolute;
           width: 180px;
           height: 180px;
-          border: 1px solid var(--accent-secondary);
-          background: linear-gradient(135deg, #FFFFFF 0%, #F9F7F5 100%);
-          box-shadow: var(--shadow-md);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: var(--gradient-score);
+          backdrop-filter: blur(var(--glass-blur));
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -99,7 +109,7 @@ const HeroScore = ({ onSetGoal }) => {
           position: absolute;
           width: 350px;
           height: 350px;
-          background: radial-gradient(circle, rgba(230, 126, 34, 0.08) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(var(--brand-color), 0.08) 0%, transparent 70%);
           z-index: 1;
           pointer-events: none;
         }
@@ -115,7 +125,7 @@ const HeroScore = ({ onSetGoal }) => {
         .score-label {
           font-family: var(--font-mono);
           font-size: 0.65rem;
-          color: var(--accent-color);
+          color: rgba(255, 255, 255, 0.8);
           text-transform: uppercase;
           letter-spacing: 3px;
           margin-bottom: 8px;
@@ -123,21 +133,23 @@ const HeroScore = ({ onSetGoal }) => {
         }
 
         .score-value {
+          font-family: var(--font-heading);
           font-size: 5.5rem;
           font-weight: 900;
           line-height: 1;
           margin-bottom: 12px;
-          color: var(--text-primary);
+          color: #FFFFFF;
           letter-spacing: -2px;
         }
 
         .score-delta {
-          background: var(--text-primary);
+          background: rgba(255, 255, 255, 0.2);
+          backdrop-filter: blur(10px);
           color: #FFF;
           padding: 4px 12px;
           border-radius: 20px;
           display: inline-block;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .delta-text {
@@ -171,6 +183,7 @@ const HeroScore = ({ onSetGoal }) => {
           border: none;
           padding: 18px 32px;
           border-radius: 40px;
+          font-family: var(--font-heading);
           font-size: 0.85rem;
           font-weight: 800;
           cursor: pointer;
@@ -180,13 +193,13 @@ const HeroScore = ({ onSetGoal }) => {
           letter-spacing: 2px;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           overflow: hidden;
-          box-shadow: 0 10px 20px rgba(230, 126, 34, 0.2);
+          box-shadow: var(--shadow-md);
         }
 
         .goal-btn:hover {
           transform: translateY(-2px);
-          box-shadow: 0 15px 30px rgba(230, 126, 34, 0.3);
-          background: #E67E22;
+          box-shadow: var(--shadow-lg);
+          opacity: 0.9;
         }
 
         .btn-glow {

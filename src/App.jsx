@@ -1,15 +1,62 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Dashboard from './components/Dashboard';
+
+import Dashboard            from './components/Dashboard';
+import DesktopDashboard     from './components/desktop/DesktopDashboard';
+import ViewSelectorScreen   from './components/ViewSelectorScreen';
 import GoalPage from './components/GoalPage';
 import ActionPlan from './components/ActionPlan';
+
 import ContributorDetail from './components/ContributorDetail';
 import BookConsultation from './components/BookConsultation';
 import ActionPlanTimeline from './components/ActionPlanTimeline';
+import DetailedActionPlan from './components/DetailedActionPlan';
+import Settings from './components/Settings';
+import Home from './components/Home';
+import GoalActionCombined from './components/GoalActionCombined';
+import BaselineScoreDeepDive from './components/BaselineScoreDeepDive';
+import BottomNav from './components/BottomNav';
 
 function App() {
-  const [view, setView] = useState('dashboard');
+  const [view, setView] = useState('home');
   const [detailTab, setDetailTab] = useState('positive');
+  const [showConsultation, setShowConsultation] = useState(true);
+  const [theme, setTheme] = React.useState(() => {
+    return localStorage.getItem('theme') || 'dark';
+  });
+
+  // ── Layout mode — null means "not yet chosen" (show selector) ──────────────
+  // Reads from localStorage on mount so returning users skip the selector.
+  const [isDesktop, setIsDesktop] = useState(() => {
+    const saved = localStorage.getItem('IS_DESKTOP');
+    if (saved === null) return null;   // first visit → show ViewSelectorScreen
+    return saved === 'true';
+  });
+
+  React.useLayoutEffect(() => {
+    document.documentElement.className = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  // Sync body class whenever the layout mode is committed.
+  React.useLayoutEffect(() => {
+    if (isDesktop !== null) {
+      document.body.classList.toggle('desktop', isDesktop);
+    }
+  }, [isDesktop]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  // ── Reset view selection → show ViewSelectorScreen again ────────
+  // Clears both the in-memory state and localStorage so the selector
+  // is shown immediately and the decision isn't re-applied on reload.
+  const handleSwitchView = () => {
+    localStorage.removeItem('IS_DESKTOP');
+    document.body.classList.remove('desktop');
+    setIsDesktop(null);
+  };
 
   const onHandleDetail = (tab) => {
     setDetailTab(tab);
@@ -22,45 +69,96 @@ function App() {
     exit: { opacity: 0, x: -20, transition: { duration: 0.2, ease: "easeIn" } }
   };
 
+  // ── No selection yet → show the launch screen ──────────────────
+  if (isDesktop === null) {
+    return <ViewSelectorScreen onSelect={setIsDesktop} />;
+  }
+
+  // ── Desktop mode → full desktop layout ──────────────────────────
+  if (isDesktop === true) {
+    return <DesktopDashboard onSwitchView={handleSwitchView} />;
+  }
+
   return (
     <div className="App">
       <AnimatePresence mode="wait">
+        {view === 'home' && (
+          <motion.div key="home" variants={pageVariants} initial="initial" animate="enter" exit="exit">
+            <Home
+              onDetail={onHandleDetail}
+              onSetGoal={() => setView('goal')}
+              onScoreClick={() => setView('baseline-deep-dive')}
+              showConsultation={showConsultation}
+            />
+          </motion.div>
+        )}
         {view === 'dashboard' && (
           <motion.div key="dashboard" variants={pageVariants} initial="initial" animate="enter" exit="exit">
             <Dashboard
               onSetGoal={() => setView('goal')}
               onDetail={onHandleDetail}
+              onSettings={() => setView('settings')}
+              onSwitchView={handleSwitchView}
+            />
+          </motion.div>
+        )}
+        {view === 'settings' && (
+          <motion.div key="settings" variants={pageVariants} initial="initial" animate="enter" exit="exit">
+            <Settings
+              onBack={() => setView('home')}
+              currentTheme={theme}
+              onToggleTheme={toggleTheme}
+              showConsultation={showConsultation}
+              onToggleConsultation={() => setShowConsultation(prev => !prev)}
+            />
+          </motion.div>
+        )}
+
+        {view === 'action-plan' && (
+          <motion.div key="action-plan" variants={pageVariants} initial="initial" animate="enter" exit="exit">
+            <GoalActionCombined
+              onBack={() => setView('home')}
+              onAnalyze={() => setView('book-consultation')}
+              onViewDetailed={(data) => {
+                setActionPlanData(data);
+                setView('detailed-action-plan');
+              }}
+              isEmpty={true}
             />
           </motion.div>
         )}
         {view === 'goal' && (
           <motion.div key="goal" variants={pageVariants} initial="initial" animate="enter" exit="exit">
-            <GoalPage
-              onBack={() => setView('dashboard')}
-              onNext={() => setView('action-plan')}
+            <GoalActionCombined
+              onBack={() => setView('home')}
+              onAnalyze={() => setView('book-consultation')}
+              onViewDetailed={(data) => {
+                setActionPlanData(data);
+                setView('detailed-action-plan');
+              }}
             />
           </motion.div>
         )}
-        {view === 'action-plan' && (
-          <motion.div key="action-plan" variants={pageVariants} initial="initial" animate="enter" exit="exit">
-            <ActionPlan 
-              onBack={() => setView('goal')} 
-              onAnalyze={() => setView('book-consultation')}
+        {view === 'detailed-action-plan' && (
+          <motion.div key="detailed-action-plan" variants={pageVariants} initial="initial" animate="enter" exit="exit">
+            <DetailedActionPlan
+              data={actionPlanData}
+              onBack={() => setView('goal')}
             />
           </motion.div>
         )}
         {view === 'book-consultation' && (
           <motion.div key="book-consultation" variants={pageVariants} initial="initial" animate="enter" exit="exit">
-            <BookConsultation 
-              onBack={() => setView('action-plan')} 
+            <BookConsultation
+              onBack={() => setView('goal')}
               onShowTimeline={() => setView('timeline')}
             />
           </motion.div>
         )}
         {view === 'timeline' && (
           <motion.div key="timeline" variants={pageVariants} initial="initial" animate="enter" exit="exit">
-            <ActionPlanTimeline 
-              onBack={() => setView('dashboard')} 
+            <ActionPlanTimeline
+              onBack={() => setView('home')}
             />
           </motion.div>
         )}
@@ -68,11 +166,24 @@ function App() {
           <motion.div key="detail" variants={pageVariants} initial="initial" animate="enter" exit="exit">
             <ContributorDetail
               initialTab={detailTab}
-              onBack={() => setView('dashboard')}
+              onBack={() => setView('home')}
+            />
+          </motion.div>
+        )}
+        {view === 'baseline-deep-dive' && (
+          <motion.div key="baseline-deep-dive" variants={pageVariants} initial="initial" animate="enter" exit="exit">
+            <BaselineScoreDeepDive
+              onClose={() => setView('home')}
+              onSetGoal={() => setView('goal')}
             />
           </motion.div>
         )}
       </AnimatePresence>
+
+      <BottomNav 
+        activeView={view} 
+        onNavigate={(newView) => setView(newView)} 
+      />
     </div>
   );
 }

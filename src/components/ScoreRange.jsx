@@ -2,11 +2,11 @@ import React from 'react';
 
 const ScoreRange = ({ score }) => {
     const ranges = [
-        { label: 'Compromised', color: '#E57373', min: 0, max: 50 },
-        { label: 'Constrained', color: '#FFB74D', min: 50, max: 65 },
-        { label: 'Stable', color: '#81C784', min: 65, max: 75 },
-        { label: 'Robust', color: '#4DB6AC', min: 75, max: 85 },
-        { label: 'Elite', color: '#4FC3F7', min: 85, max: 100 }
+        { label: 'Compromised', color: '#ef4444', min: 0, max: 50 },
+        { label: 'Constrained', color: '#f59e0b', min: 50, max: 65 },
+        { label: 'Stable', color: '#10b981', min: 65, max: 75 },
+        { label: 'Robust', color: '#2b7fff', min: 75, max: 85 },
+        { label: 'Elite', color: '#06b6d4', min: 85, max: 100 }
     ];
 
     // Helper to calculate position percentage (0-100)
@@ -14,7 +14,7 @@ const ScoreRange = ({ score }) => {
         return Math.min(Math.max((val / 100) * 100, 0), 100);
     };
 
-    const currentRange = ranges.find(r => score > r.min && score <= r.max) || ranges[0];
+    const currentRange = ranges.find(r => score >= r.min && score < r.max) || ranges[ranges.length - 1];
 
     return (
         <div className="score-range-container">

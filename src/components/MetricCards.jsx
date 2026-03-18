@@ -2,19 +2,28 @@ import React from 'react';
 import healthData from '../data.json';
 
 const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
+  const isCaution = variant === 'caution';
+  const isWatch = variant === 'watch';
+  const statusColor = isCaution ? 'var(--red-9)' : isWatch ? '245, 158, 11' : 'var(--green-9)';
+
   return (
-    <div className="card-white" onClick={onClick} style={{ cursor: 'pointer' }}>
+    <div
+      className={`card-white ${variant}`}
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+    >
       <div className="card-header">
         <div className="card-title-group">
-          {variant === 'caution' ? (
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-100/50">
-                <span className="material-symbols-outlined text-orange-600 text-[18px]">warning</span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-100/50">
-                <span className="material-symbols-outlined text-emerald-600 text-[18px]">check_circle</span>
-            </div>
-          )}
+          <div className="status-icon-container">
+            <span
+              className="material-symbols-outlined text-[18px]"
+              style={{ color: `rgb(${statusColor})` }}
+            >
+              {isCaution ? 'warning' : isWatch ? 'visibility' : 'check_circle'}
+            </span>
+            <div className="icon-glow" style={{ '--glow-color': `rgb(${statusColor})` }} />
+          </div>
           <span className="card-title">{title}</span>
         </div>
       </div>
@@ -22,10 +31,9 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
         <div className="main-stat flex-1">
           <div className="flex items-center justify-between pointer-events-none">
             <h1 className="stat-value">{mainValue < 10 ? `0${mainValue}` : mainValue}</h1>
-            <span className="material-symbols-outlined text-3xl text-slate-200">dock_to_right</span>
+            <span className="material-symbols-outlined text-3xl opacity-20">dock_to_right</span>
           </div>
           <p className="stat-label">
-            <span className={`w-1.5 h-1.5 rounded-full ${variant === 'caution' ? 'bg-orange-500 shadow-[0_0_8px_rgba(230,126,34,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.5)]'}`} />
             {label}
           </p>
         </div>
@@ -33,47 +41,73 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
 
       <style jsx>{`
         .card-white {
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
           width: 100%;
-          padding: 30px;
-          border-radius: 28px;
-          margin-bottom: 24px;
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          padding: 24px;
+          border-radius: 20px;
+          margin-bottom: 16px;
+          background: rgb(var(--card));
+          border: none;
+          box-shadow: var(--shadow-sm);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
           overflow: hidden;
+          color: var(--text-primary);
+          cursor: pointer;
+          outline: none;
         }
 
-        .card-white::before {
+        .card-white:hover, .card-white:focus, .card-white:active {
+          transform: translateY(-2px);
+          border-color: rgba(var(--brand-color), 0.3);
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+          background: rgb(var(--card)) !important; /* Force consistent background */
+        }
+
+        .status-icon-container {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: #121214;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          
+          /* Deep inner shadow for the "recessed" feel */
+          box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.8);
+          transition: all 0.3s ease;
+        }
+
+        /* Razor-sharp top-rim highlight using mask-composite */
+        .status-icon-container::after {
           content: "";
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(230, 126, 34, 0.2), transparent);
-          opacity: 0;
-          transition: opacity 0.3s;
+          inset: -0.5px;
+          border-radius: 50%;
+          padding: 1px;
+          background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 45%);
+          -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
         }
 
-        .card-white:hover {
-          transform: translateY(-6px) scale(1.01);
-          border-color: rgba(230, 126, 34, 0.2);
-          box-shadow: 0 20px 40px rgba(230, 126, 34, 0.05);
-        }
-
-        .card-white:hover::before {
-          opacity: 1;
+        .icon-glow {
+          position: absolute;
+          inset: -2px;
+          border-radius: 50%;
+          background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
+          opacity: 0.1;
+          filter: blur(8px);
+          pointer-events: none;
         }
 
         .card-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 20px;
+          margin-bottom: 24px;
         }
 
         .card-title-group {
@@ -83,48 +117,41 @@ const MetricCard = ({ title, mainValue, label, variant, onClick }) => {
         }
 
         .card-title {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-heading);
           font-weight: 800;
-          font-size: 0.75rem;
+          font-size: 0.7rem;
           text-transform: uppercase;
-          letter-spacing: 0.2em;
-          color: #64748B;
+          letter-spacing: 0.15em;
+          color: var(--text-secondary);
         }
 
         .card-content {
           display: flex;
           justify-content: flex-start;
           align-items: flex-end;
+          margin-bottom: 12px;
         }
 
         .stat-value {
-          font-family: 'Space Mono', monospace;
-          font-size: 4.8rem;
+          font-family: var(--font-mono);
+          font-size: 4rem;
           font-weight: 900;
           line-height: 1;
-          letter-spacing: -4px;
-          color: #1A1A1B;
+          letter-spacing: -2px;
+          color: var(--text-primary);
         }
 
         .stat-label {
-          font-family: 'Inter', sans-serif;
+          font-family: var(--font-main);
           font-weight: 700;
-          font-size: 0.65rem;
+          font-size: 0.6rem;
           text-transform: uppercase;
-          margin-top: 12px;
-          letter-spacing: 0.15em;
-          color: #94A3B8;
+          margin-top: 8px;
+          letter-spacing: 0.1em;
+          color: var(--text-secondary);
           display: flex;
           align-items: center;
           gap: 6px;
-        }
-
-        .status-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: full;
-          background: var(--accent-color);
-          box-shadow: 0 0 8px var(--accent-color);
         }
       `}</style>
     </div>
@@ -135,12 +162,19 @@ const MetricCards = ({ onDetail }) => {
   const { contributors } = healthData.data;
 
   return (
-    <div className="metrics-group" style={{ width: '100%', padding: '0 10px' }}>
+    <div className="metrics-group" style={{ width: '100%', padding: '0 1px' }}>
       <MetricCard
         title="What's Working Well"
         mainValue={contributors.positive_count}
         label="POSITIVE FACTORS"
         onClick={() => onDetail('positive')}
+      />
+      <MetricCard
+        title="Watch Closely"
+        mainValue={3}
+        label="MONITORING REQUIRED"
+        variant="watch"
+        onClick={() => onDetail('watch')}
       />
       <MetricCard
         title="Needs Attention"
