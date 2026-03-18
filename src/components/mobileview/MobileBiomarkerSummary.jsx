@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DashboardCard from '../desktop/DashboardCard';
-import BiomarkerStatusTag from '../desktop/BiomarkerStatusTag';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const SUMMARY_CARDS = [
@@ -57,122 +56,177 @@ const pillColors = {
 };
 
 const MobileBiomarkerSummary = () => {
-  const [expandedCards, setExpandedCards] = useState({});
+  const [activeTab, setActiveTab] = useState(SUMMARY_CARDS[0].id);
+  const sectionRefs = useRef({});
+  const isSelfScrolling = useRef(false);
 
-  const toggleExpand = (cardId) => {
-    setExpandedCards(prev => ({ ...prev, [cardId]: !prev[cardId] }));
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Only sync from scroll if we aren't currently middle-of-a-click-scroll
+        if (isSelfScrolling.current) return;
+
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveTab(entry.target.id);
+          }
+        });
+      },
+      {
+        // Trigger when section hits the upper-middle part of the screen
+        rootMargin: '-15% 0px -70% 0px',
+        threshold: 0,
+      }
+    );
+
+    Object.values(sectionRefs.current).forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToSection = (id) => {
+    isSelfScrolling.current = true;
+    setActiveTab(id);
+    
+    const el = sectionRefs.current[id];
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Reset after the smooth scroll finishes (approx 800ms)
+    setTimeout(() => {
+      isSelfScrolling.current = false;
+    }, 800);
   };
 
   return (
-    <div className="flex flex-col gap-4 px-4 w-full mb-6 relative z-10">
-      {SUMMARY_CARDS.map(card => {
-        const isExpanded = !!expandedCards[card.id];
-        const hasMore = card.markers.length > VISIBLE_LIMIT;
-        const visibleMarkers = isExpanded ? card.markers : card.markers.slice(0, VISIBLE_LIMIT);
-        const hiddenCount = card.markers.length - VISIBLE_LIMIT;
+    <div className="w-full relative z-10">
+      {/* Sticky Tab Bar */}
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        background: 'rgba(0,0,0,0.85)',
+        backdropFilter: 'blur(12px)',
+        padding: '0 16px',
+        display: 'flex',
+        gap: '24px',
+        overflowX: 'auto',
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        msOverflowStyle: 'none',
+        scrollbarWidth: 'none',
+      }}
+      className="scrollbar-hide"
+      >
+        <style>{`.scrollbar-hide::-webkit-scrollbar { display: none; }`}</style>
+        {SUMMARY_CARDS.map(card => {
+          const isActive = activeTab === card.id;
+          return (
+            <button
+              key={`tab-${card.id}`}
+              onClick={() => scrollToSection(card.id)}
+              style={{
+                padding: '16px 0',
+                whiteSpace: 'nowrap',
+                fontSize: '14px',
+                fontWeight: isActive ? 600 : 500,
+                fontFamily: 'var(--font-main)',
+                transition: 'all 0.2s ease',
+                background: 'transparent',
+                color: isActive ? '#ffffff' : 'rgba(255,255,255,0.5)',
+                border: 'none',
+                borderBottom: isActive ? '2px solid #ffffff' : '2px solid transparent',
+                cursor: 'pointer',
+                marginBottom: '-1px', // Pull down to cover the container's bottom border
+              }}
+            >
+              {card.label}
+            </button>
+          );
+        })}
+      </div>
 
-        return (
-          <DashboardCard
-            key={card.id}
-            style={{ padding: '20px 20px', display: 'flex', flexDirection: 'column' }}
-          >
-            {/* Header */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '16px',
-            }}>
-              <div style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
-                color: 'var(--text-secondary)',
-              }}>
-                {card.label}
-              </div>
-              <div style={{
-                fontSize: '10px',
-                fontWeight: 600,
-                padding: '3px 10px',
-                borderRadius: '100px',
-                letterSpacing: '0.05em',
-                background: pillColors[card.pillType].bg,
-                color: pillColors[card.pillType].color,
-              }}>
-                {card.pillLabel}
-              </div>
-            </div>
+      <div className="flex flex-col gap-6 px-4 w-full mb-6 mt-4">
+        {SUMMARY_CARDS.map(card => {
+          return (
+            <div 
+              key={card.id} 
+              id={card.id}
+              ref={(el) => (sectionRefs.current[card.id] = el)}
+              style={{ scrollMarginTop: '100px' }}
+            >
+              <DashboardCard
+                style={{ padding: '20px 20px', display: 'flex', flexDirection: 'column' }}
+              >
+                {/* Header */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '16px',
+                }}>
+                  <div style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    color: 'var(--text-secondary)',
+                  }}>
+                    {card.label}
+                  </div>
+                  <div style={{
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    padding: '3px 10px',
+                    borderRadius: '100px',
+                    letterSpacing: '0.05em',
+                    background: pillColors[card.pillType].bg,
+                    color: pillColors[card.pillType].color,
+                  }}>
+                    {card.pillLabel}
+                  </div>
+                </div>
 
-            {/* Markers */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <AnimatePresence>
-                {visibleMarkers.map(m => (
-                  <motion.div 
-                    key={m.name} 
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                  >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                      <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '15px' }}>{m.name}</div>
+                {/* Markers (All shown by default) */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {card.markers.map(m => (
+                    <div 
+                      key={m.name} 
+                      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '15px' }}>{m.name}</div>
+                        <div style={{
+                          fontFamily: 'var(--font-main)',
+                          fontSize: '13px',
+                          color: 'rgba(255,255,255,0.4)',
+                        }}>
+                          {m.value}
+                        </div>
+                      </div>
+                      {/* Status Tag */}
                       <div style={{
-                        fontFamily: 'var(--font-main)',
-                        fontSize: '13px',
-                        color: 'rgba(255,255,255,0.4)',
+                        padding: '6px 14px',
+                        borderRadius: '100px',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        background: m.color === 'green' ? 'rgba(48,164,108,0.1)' : m.color === 'amber' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)',
+                        color: m.color === 'green' ? '#30A46C' : m.color === 'amber' ? '#F59E0B' : '#EF4444',
+                        border: `1px solid ${m.color === 'green' ? 'rgba(48,164,108,0.2)' : m.color === 'amber' ? 'rgba(245,158,11,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                        textTransform: 'capitalize'
                       }}>
-                        {m.value}
+                        {m.status.replace('_', ' ')}
                       </div>
                     </div>
-                    {/* Status Tag */}
-                    <div style={{
-                      padding: '6px 14px',
-                      borderRadius: '100px',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      background: m.color === 'green' ? 'rgba(48,164,108,0.1)' : m.color === 'amber' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)',
-                      color: m.color === 'green' ? '#30A46C' : m.color === 'amber' ? '#F59E0B' : '#EF4444',
-                      border: `1px solid ${m.color === 'green' ? 'rgba(48,164,108,0.2)' : m.color === 'amber' ? 'rgba(245,158,11,0.2)' : 'rgba(239,68,68,0.2)'}`,
-                      textTransform: 'capitalize'
-                    }}>
-                      {m.status.replace('_', ' ')}
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+                  ))}
+                </div>
+              </DashboardCard>
             </div>
-
-            {/* View More / View Less */}
-            {hasMore && (
-              <button
-                onClick={() => toggleExpand(card.id)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  padding: '16px 0 0',
-                  marginTop: '4px',
-                  cursor: 'pointer',
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: 'rgb(var(--primary))',
-                  opacity: 0.7,
-                  transition: 'opacity 0.15s',
-                  alignSelf: 'center',
-                }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '0.7'}
-              >
-                {isExpanded ? 'View Less' : `View More (${hiddenCount})`}
-              </button>
-            )}
-          </DashboardCard>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };

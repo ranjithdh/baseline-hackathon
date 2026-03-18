@@ -46,7 +46,7 @@
 html, body {
   width: 100%;
   max-width: 100%;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
   margin: 0 !important;
   padding: 0 !important;
   position: relative;
@@ -63,7 +63,7 @@ html, body {
   box-sizing: border-box !important;
   margin: 0 !important;
   padding: 0 !important;
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
 }
 
 .dashboard-container {
@@ -74,7 +74,7 @@ html, body {
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 h1,

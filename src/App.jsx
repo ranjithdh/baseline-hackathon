@@ -82,7 +82,7 @@ function App() {
   }
 
   return (
-    <div className="App w-full overflow-x-hidden">
+    <div className="App w-full">
       <AnimatePresence mode="wait">
         {view === 'home' && (
           <motion.div key="home" variants={pageVariants} initial="initial" animate="enter" exit="exit">

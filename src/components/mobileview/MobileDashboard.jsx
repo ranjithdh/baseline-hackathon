@@ -6,7 +6,7 @@ import MobileBiomarkerSummary from './MobileBiomarkerSummary';
 
 const MobileDashboard = ({ onDetail, onSetGoal, onScoreClick, goalTarget }) => {
   return (
-    <div className="dashboard-container relative overflow-y-auto overflow-x-hidden min-h-screen" style={{ paddingBottom: '120px' }}>
+    <div className="dashboard-container relative h-[100dvh] overflow-y-auto overflow-x-hidden" style={{ paddingBottom: '120px' }}>
       {/* Header */}
       <header className="w-full pt-8 mb-4 px-4 flex items-center justify-between relative z-10">
         <div>
