@@ -28,11 +28,11 @@ const BaselineScoreInfoOverlay = ({ isOpen, onClose }) => {
             >
               {/* Header with Theme Gradient */}
               <div className="relative h-56 flex flex-col items-center justify-center overflow-hidden">
-                {/* Smooth Gradient Layer */}
+                {/* Smooth Gradient Layer (Brand Theme) */}
                 <div 
                   className="absolute inset-0"
                   style={{
-                    background: 'linear-gradient(to bottom right, #cd4a15 0%, #78260b 45%, #220b05 100%)'
+                    background: 'linear-gradient(to bottom right, #1e40af 0%, #3b82f6 45%, #0f172a 100%)'
                   }}
                 />
 
