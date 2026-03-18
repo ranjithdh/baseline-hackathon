@@ -191,13 +191,9 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
 const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsult }) => {
   const [selectedIds, setSelectedIds] = useState(() => computeNeeded(goalTarget));
   const [activeTab, setActiveTab] = useState('all');
+  const [baselineScore, setBaselineScore] = useState(() => goalTarget);
 
   // ── Playground: baseline tracking ────────────────────────────────────────
-  // baselineScore is the "confirmed" goal the user started from.
-  // It only updates when the user clicks "Build your Action Plan", anchoring
-  // their chosen target. The button is visible any time the slider has drifted
-  // away from the baseline, giving the user a clear CTA to commit.
-  const [baselineScore, setBaselineScore] = useState(() => goalTarget);
 
   // Simple O(1) derived visibility — no memo needed.
   const showActionPlanButton = goalTarget !== baselineScore;
@@ -227,6 +223,9 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
   const projScore = Math.min(100, BASE_SCORE + gained);
   const toGoal = baselineScore - projScore;
   const progressPct = ptsNeeded > 0 ? Math.min(100, (gained / ptsNeeded) * 100) : 100;
+
+  const allSelectedCount = ALL_ITEMS.filter(i => selectedIds.has(i.id)).length;
+  const anyNeeded = ALL_ITEMS.some(i => neededIds.has(i.id));
 
   // ── Live projected score (real-time during drag) ──────────────────────────
   // While the slider is drifting (showActionPlanButton = true) we show the
@@ -362,7 +361,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
           />
         </div>
 
-          
+
 
           {/* ── HealthScoreLimitCard — animated show/hide ── */}
           <AnimatePresence>
@@ -563,7 +562,52 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
         {/* ── TAB BAR ── */}
         <div style={{
           display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap',
+          alignItems: 'center',
         }}>
+          {/* ALL Tab */}
+          <button
+            onClick={() => setActiveTab('all')}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '7px',
+              padding: '8px 16px',
+              borderRadius: '100px',
+              border: activeTab === 'all'
+                ? '1px solid rgba(43,127,255,0.5)'
+                : anyNeeded
+                  ? '1px solid rgba(255,197,61,0.25)'
+                  : '1px solid rgba(255,255,255,0.10)',
+              background: activeTab === 'all'
+                ? 'rgba(43,127,255,0.18)'
+                : 'rgba(255,255,255,0.04)',
+              color: activeTab === 'all' ? 'rgb(43,127,255)' : 'rgb(var(--muted-foreground)',
+              fontSize: '12px', fontWeight: activeTab === 'all' ? 600 : 400,
+              fontFamily: 'var(--font-main)',
+              cursor: 'pointer',
+              transition: 'all 0.18s',
+              outline: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <span>All</span>
+            {allSelectedCount > 0 && (
+              <span style={{
+                marginLeft: '4px',
+                fontSize: '11px',
+                color: 'rgb(var(--muted-foreground)',
+                fontFamily: 'var(--font-mono)',
+              }}>
+                ({allSelectedCount})
+              </span>
+            )}
+            {allSelectedCount > 0 && (
+              <span style={{
+                width: '7px', height: '7px', borderRadius: '50%',
+                background: 'rgb(48,164,108)',
+                flexShrink: 0,
+              }} />
+            )}
+          </button>
+
           {CATEGORIES.map(cat => {
             const isActive = cat.id === activeTab;
             const catSelected = cat.items.filter(i => selectedIds.has(i.id)).length;
@@ -632,32 +676,8 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
               </button>
             );
           })}
-
-          {/* ALL Tab */}
-          <button
-            onClick={() => setActiveTab('all')}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '7px',
-              padding: '8px 16px',
-              borderRadius: '100px',
-              border: activeTab === 'all'
-                ? '1px solid rgba(43,127,255,0.5)'
-                : '1px solid rgba(255,255,255,0.10)',
-              background: activeTab === 'all'
-                ? 'rgba(43,127,255,0.18)'
-                : 'rgba(255,255,255,0.04)',
-              color: activeTab === 'all' ? 'rgb(43,127,255)' : 'rgb(var(--muted-foreground)',
-              fontSize: '12px', fontWeight: activeTab === 'all' ? 600 : 400,
-              fontFamily: 'var(--font-main)',
-              cursor: 'pointer',
-              transition: 'all 0.18s',
-              outline: 'none',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            All
-          </button>
         </div>
+
 
         {/* ── CARD GRID for active tab ── */}
         {activeTab === 'all' ? (
