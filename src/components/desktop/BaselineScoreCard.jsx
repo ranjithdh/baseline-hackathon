@@ -1,277 +1,357 @@
 import React, { useEffect, useState } from 'react';
 
-// ── Arc helpers (same pattern as DesktopScoreHero) ─────────────
-const ARC_CIRC    = 283;
-const ARC_VISIBLE = 226;
-const getArcOffset = (score) => ARC_CIRC - (score / 100) * ARC_VISIBLE;
+// ── Arc helpers ─────────────────────────────────────────────
+const RADIUS      = 48;
+const CIRC        = 2 * Math.PI * RADIUS;
+const ARC_VISIBLE = CIRC * (270 / 360);
+const GAP         = CIRC - ARC_VISIBLE;
+const getArcOffset = (score) => CIRC - (score / 100) * ARC_VISIBLE;
 
 const BaselineScoreCard = ({
-  score          = 65,
-  status         = 'Stable',
-  nextLevel      = 'Strong (70)',
-  progress       = 65,
-  progressMax    = 70,
-  weeklyGain     = 4,
-  pointsToUnlock = 5,
-  topPercentage  = 35,
-  biggestBoost   = 'Vitamin D3 + K2',
-  biggestBoostGain = 7,
-  onImprove,
+  score            = 65,
+  status           = 'Stable',
+  headline         = "You're doing well — but there's strong potential to improve your energy, appearance, and performance.",
+  topPercentage    = 35,
+  pointsToGrow     = 18,
+  onTap,
 }) => {
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setRevealed(true), 300);
+    const t = setTimeout(() => setRevealed(true), 200);
     return () => clearTimeout(t);
   }, []);
 
-  const arcOffset = revealed ? getArcOffset(score) : ARC_CIRC;
-  const barPct    = Math.min((progress / progressMax) * 100, 100);
+  const arcOffset = revealed ? getArcOffset(score) : CIRC;
 
   return (
     <>
       <style>{`
-        .bsc-root {
-          background: linear-gradient(135deg, #0f1729 0%, #111827 55%, #0e1a3a 100%);
-          border-radius: 20px;
-          border: 1px solid rgba(99,102,241,0.28);
-          box-shadow: 0 0 48px rgba(99,102,241,0.09), 0 2px 24px rgba(0,0,0,0.4);
-          padding: 28px 32px;
+        .hso-root {
+          position: relative;
+          border-radius: 24px;
+          padding: 32px;
           height: 100%;
           box-sizing: border-box;
-          position: relative;
-          overflow: hidden;
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 24px;
+          overflow: hidden;
+          cursor: pointer;
+          background: rgb(var(--card));
+          border: 1px solid rgba(var(--zinc-700), 0.5);
+          box-shadow: 
+            0 24px 64px rgba(0,0,0,0.4),
+            0 0 0 1px rgba(255,255,255,0.03) inset;
+          transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
         }
-        .bsc-main-row {
+        .hso-root:hover {
+          transform: translateY(-4px);
+          box-shadow: 
+            0 32px 80px rgba(0,0,0,0.5),
+            0 0 20px rgba(43, 127, 255, 0.1),
+            0 0 0 1px rgba(255,255,255,0.08) inset;
+        }
+
+        /* ── Header ── */
+        .hso-header {
           display: flex;
           align-items: center;
-          gap: 28px;
+          gap: 12px;
         }
-        .bsc-bottom-row {
+        .hso-title {
+          font-family: var(--font-heading);
+          font-size: 18px;
+          font-weight: 700;
+          color: #ffffff;
+          letter-spacing: -0.01em;
+        }
+        .hso-beta {
+          font-family: var(--font-mono);
+          font-size: 9px;
+          font-weight: 700;
+          text-transform: uppercase;
+          padding: 2px 8px;
+          border-radius: 100px;
+          background: rgba(43, 127, 255, 0.15);
+          color: #4c93ff;
+          border: 1px solid rgba(43, 127, 255, 0.3);
+        }
+        .hso-info-btn {
+          margin-left: auto;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          justify-content: center;
+          background: rgba(255,255,255,0.05);
+          color: rgba(255,255,255,0.4);
+          font-size: 12px;
+          border: 1px solid rgba(255,255,255,0.1);
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .hso-info-btn:hover {
+          background: rgba(255,255,255,0.1);
+          color: #ffffff;
+        }
+
+        /* ── Main Content Area (Layout Split) ── */
+        .hso-content-grid {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 32px;
+          align-items: center;
+        }
+
+        /* ── Score Rings ── */
+        .hso-score-wrap {
+          position: relative;
+          width: 140px;
+          height: 140px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .hso-score-rings svg {
+          transform: rotate(135deg);
+          width: 140px;
+          height: 140px;
+          filter: drop-shadow(0 0 15px rgba(43, 127, 255, 0.25));
+        }
+        .hso-score-center {
+          position: absolute;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .hso-score-num {
+          font-family: var(--font-heading);
+          font-size: 48px;
+          font-weight: 800;
+          color: #ffffff;
+          line-height: 1;
+        }
+        .hso-score-max {
+          font-family: var(--font-mono);
+          font-size: 12px;
+          color: rgba(255,255,255,0.4);
+          margin-top: 2px;
+        }
+        .hso-score-label {
+          font-size: 11px;
+          color: rgba(255,255,255,0.5);
+          text-align: center;
+          margin-top: 12px;
+          line-height: 1.4;
+          font-family: var(--font-main);
+        }
+
+        /* ── Right Meta ── */
+        .hso-meta {
+          display: flex;
+          flex-direction: column;
           gap: 16px;
+        }
+        .hso-status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 14px;
+          border-radius: 100px;
+          background: rgba(16, 185, 129, 0.1);
+          color: #10b981;
+          font-size: 12px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          border: 1px solid rgba(16, 185, 129, 0.2);
+          box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+          width: fit-content;
+        }
+        .hso-insight {
+          font-family: var(--font-main);
+          font-size: 15px;
+          color: rgba(var(--zinc-200), 0.9);
+          line-height: 1.5;
+          font-weight: 500;
+        }
+
+        /* ── Ranking & Improvement ── */
+        .hso-footer-grid {
+          display: grid;
+          grid-template-columns: 1fr 1.2fr;
+          gap: 20px;
+          margin-top: 8px;
+          padding-top: 24px;
+          border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .hso-rank-card {
+          padding: 16px;
+          background: rgba(255,255,255,0.03);
+          border-radius: 16px;
+          border: 1px solid rgba(255,255,255,0.05);
+        }
+        .hso-rank-title {
+          font-family: var(--font-heading);
+          font-size: 14px;
+          font-weight: 700;
+          color: #ffffff;
+        }
+        .hso-rank-sub {
+          font-size: 11px;
+          color: rgba(255,255,255,0.4);
+          margin-top: 4px;
+        }
+
+        .hso-improve-section {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .hso-potential {
+          font-family: var(--font-mono);
+          font-size: 13px;
+          color: #4c93ff;
+          font-weight: 700;
+        }
+        .hso-cta-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 12px 20px;
+          border-radius: 12px;
+          background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);
+          color: #ffffff;
+          font-weight: 600;
+          font-size: 14px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.2s;
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .hso-cta-btn:hover {
+          background: linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%);
+          transform: translateX(4px);
+          box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+        }
+
+        /* ── Key Issues Tags ── */
+        .hso-tags {
+          display: flex;
           flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 8px;
         }
-        @media (max-width: 640px) {
-          .bsc-main-row { flex-wrap: wrap; }
-          .bsc-bottom-row { flex-direction: column; align-items: flex-start; }
+        .hso-tag {
+          padding: 4px 10px;
+          border-radius: 8px;
+          background: rgba(239, 68, 68, 0.08);
+          color: #fca5a5;
+          font-size: 11px;
+          font-weight: 600;
+          border: 1px solid rgba(239, 68, 68, 0.15);
         }
+
+        /* ── Ambient Glows ── */
+        .hso-glow {
+          position: absolute;
+          width: 200px;
+          height: 200px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(43, 127, 255, 0.1) 0%, transparent 70%);
+          pointer-events: none;
+          z-index: 0;
+        }
+        .hso-glow-1 { top: -50px; left: -50px; }
+        .hso-glow-2 { bottom: -50px; right: -50px; background: radial-gradient(circle, rgba(6, 182, 212, 0.08) 0%, transparent 70%); }
       `}</style>
 
-      <div className="bsc-root">
-        {/* Subtle radial glow */}
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse at 85% 10%, rgba(99,102,241,0.14) 0%, transparent 55%)',
-        }} />
+      <div className="hso-root" onClick={onTap}>
+        <div className="hso-glow hso-glow-1" />
+        <div className="hso-glow hso-glow-2" />
 
-        {/* ── Row 1: Label + BETA + weekly gain ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '10px',
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.38)',
-          }}>
-            Baseline Score
-          </span>
-          <span style={{
-            fontSize: '10px',
-            fontWeight: 700,
-            padding: '2px 9px',
-            borderRadius: '100px',
-            background: 'rgba(99,102,241,0.18)',
-            color: 'rgb(165,180,252)',
-            border: '1px solid rgba(99,102,241,0.32)',
-            letterSpacing: '0.08em',
-          }}>
-            BETA
-          </span>
-
-          {/* Weekly gain — pushed right */}
-          <div style={{
-            marginLeft: 'auto',
-            display: 'flex', alignItems: 'center', gap: '5px',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '12px',
-            color: 'rgb(74,222,128)',
-            fontWeight: 600,
-            opacity: revealed ? 1 : 0,
-            transition: 'opacity 0.5s 2s',
-          }}>
-            <span style={{ fontSize: '10px' }}>▲</span>
-            {weeklyGain} this week
-          </div>
+        {/* ── Header ── */}
+        <div className="hso-header">
+          <span className="hso-title">Your Health Score</span>
+          <span className="hso-beta">Beta</span>
+          <button className="hso-info-btn">i</button>
         </div>
 
-        {/* ── Row 2: Arc + Score info ── */}
-        <div className="bsc-main-row" style={{ flex: 1 }}>
-          {/* Circular arc */}
-          <div style={{ position: 'relative', width: '120px', height: '120px', flexShrink: 0 }}>
-            <svg
-              width="120" height="120"
-              viewBox="0 0 110 110"
-              style={{ transform: 'rotate(-220deg)' }}
-            >
-              <defs>
-                <linearGradient id="bscArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%"   stopColor="#6366f1" />
-                  <stop offset="100%" stopColor="#38bdf8" />
-                </linearGradient>
-              </defs>
-              {/* Track */}
-              <circle
-                cx="55" cy="55" r="45"
-                fill="none"
-                stroke="rgba(255,255,255,0.07)"
-                strokeWidth="9"
-                strokeLinecap="round"
-                strokeDasharray="226 57"
-              />
-              {/* Fill */}
-              <circle
-                cx="55" cy="55" r="45"
-                fill="none"
-                stroke="url(#bscArcGrad)"
-                strokeWidth="9"
-                strokeLinecap="round"
-                strokeDasharray={String(ARC_CIRC)}
-                strokeDashoffset={arcOffset}
-                style={{ transition: 'stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1)' }}
-              />
-            </svg>
-            {/* Center score */}
-            <div style={{
-              position: 'absolute', inset: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <span style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '38px',
-                fontWeight: 700,
-                color: 'white',
-                lineHeight: 1,
-                opacity: revealed ? 1 : 0,
-                transform: revealed ? 'translateY(0)' : 'translateY(5px)',
-                transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.8s',
-              }}>
-                {score}
-              </span>
-            </div>
-          </div>
-
-          {/* Score meta */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {/* Score + status */}
-            <div style={{
-              display: 'flex', alignItems: 'baseline', gap: '10px',
-              marginBottom: '6px',
-              opacity: revealed ? 1 : 0,
-              transform: revealed ? 'translateY(0)' : 'translateY(6px)',
-              transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 2s',
-            }}>
-              <span style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '34px', fontWeight: 700, color: 'white', lineHeight: 1,
-              }}>
-                {score}
-              </span>
-              <span style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '26px', fontWeight: 600,
-                color: 'rgb(74,222,128)',
-              }}>
-                {status}
-              </span>
-            </div>
-
-            {/* Next level */}
-            <div style={{
-              fontSize: '13px',
-              color: 'rgba(255,255,255,0.48)',
-              marginBottom: '16px',
-              opacity: revealed ? 1 : 0,
-              transition: 'opacity 0.4s 2.2s',
-            }}>
-              Next Level: <strong style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 600 }}>{nextLevel}</strong>
-            </div>
-
-            {/* Progress bar */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '12px',
-              marginBottom: '10px',
-            }}>
-              <div style={{
-                flex: 1,
-                height: '8px',
-                background: 'rgba(255,255,255,0.08)',
-                borderRadius: '100px',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  height: '100%',
-                  borderRadius: '100px',
-                  background: 'linear-gradient(90deg, #6366f1 0%, #38bdf8 100%)',
-                  width: revealed ? `${barPct}%` : '0%',
-                  transition: 'width 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s',
-                  boxShadow: '0 0 10px rgba(99,102,241,0.55)',
-                }} />
+        {/* ── Content ── */}
+        <div className="hso-content-grid">
+          <div className="hso-score-column">
+            <div className="hso-score-wrap">
+              <div className="hso-score-rings">
+                <svg viewBox="0 0 110 110">
+                  <defs>
+                    <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#3b82f6" />
+                      <stop offset="100%" stopColor="#06b6d4" />
+                    </linearGradient>
+                  </defs>
+                  {/* Track */}
+                  <circle
+                    cx="55" cy="55" r={RADIUS}
+                    fill="none"
+                    stroke="rgba(255,255,255,0.06)"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeDasharray={`${ARC_VISIBLE} ${GAP}`}
+                  />
+                  {/* Fill */}
+                  <circle
+                    cx="55" cy="55" r={RADIUS}
+                    fill="none"
+                    stroke="url(#scoreGrad)"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeDasharray={`${CIRC}`}
+                    strokeDashoffset={arcOffset}
+                    style={{ transition: 'stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s' }}
+                  />
+                </svg>
               </div>
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '12px',
-                color: 'rgba(255,255,255,0.38)',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-              }}>
-                {progress} / {progressMax}
-              </span>
+              <div className="hso-score-center">
+                <span className="hso-score-num">{score}</span>
+                <span className="hso-score-max">/ 100</span>
+              </div>
             </div>
+            <p className="hso-score-label">Based on Sleep, Fitness,<br/>Nutrition, Stress</p>
+          </div>
 
-            {/* Points to unlock */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '6px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '12px',
-              color: 'rgb(74,222,128)',
-              opacity: revealed ? 1 : 0,
-              transition: 'opacity 0.4s 2.4s',
-            }}>
-              <span>⚡</span>
-              <span>{pointsToUnlock} points to unlock</span>
+          <div className="hso-meta">
+            <div className="hso-status-badge">
+              <span>●</span> {status}
+            </div>
+            <p className="hso-insight">
+              {headline}
+            </p>
+            <div className="hso-tags">
+              <span className="hso-tag">Low Protein Intake</span>
+              <span className="hso-tag">Poor Sleep</span>
+              <span className="hso-tag">High Stress</span>
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', flexShrink: 0 }} />
-
-        {/* ── Row 3: Insights + CTA ── */}
-        <div className="bsc-bottom-row">
-          {/* Insights */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
-              fontSize: '13px', color: 'rgba(255,255,255,0.55)',
-            }}>
-              <span>🏆</span>
-              <span>You are in top <strong style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>{topPercentage}%</strong> of your age group</span>
-            </div>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
-              fontSize: '13px', color: 'rgba(255,255,255,0.55)',
-            }}>
-              <span>🌟</span>
-              <span>Biggest Boost: <strong style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>{biggestBoost}</strong> (+{biggestBoostGain})</span>
-            </div>
+        {/* ── Footer Stats ── */}
+        <div className="hso-footer-grid">
+          <div className="hso-rank-card">
+            <div className="hso-rank-title">Top {topPercentage}% in age group</div>
+            <div className="hso-rank-sub">Better than {100 - topPercentage}% of people your age</div>
           </div>
 
+          <div className="hso-improve-section">
+            <div className="hso-potential">+{pointsToGrow} points to reach potential</div>
+            <button className="hso-cta-btn">
+              See how to improve <span style={{ fontSize: '18px' }}>→</span>
+            </button>
+          </div>
         </div>
       </div>
     </>

@@ -9,15 +9,10 @@ const DesktopScoreHero = ({ onSimulate }) => {
     <BaselineScoreCard
       score={score}
       status="Stable"
-      nextLevel="Strong (70)"
-      progress={score}
-      progressMax={70}
-      weeklyGain={4}
-      pointsToUnlock={5}
+      headline="You're doing well — but there's strong potential to improve your energy, appearance, and performance."
       topPercentage={35}
-      biggestBoost="Vitamin D3 + K2"
-      biggestBoostGain={7}
-      onImprove={onSimulate}
+      pointsToGrow={18}
+      onTap={onSimulate}
     />
   );
 };
