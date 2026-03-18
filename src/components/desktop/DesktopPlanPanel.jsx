@@ -545,7 +545,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
     borderRadius: '16px',
     padding: '20px 24px',
     marginBottom: '24px',
-    width: '20%',
+    width: '25%',
 
     display: 'flex',
     alignItems: 'center',        // 🔥 vertical center
@@ -556,7 +556,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
   <div
     style={{
       fontFamily: 'var(--font-mono)',
-      fontSize: '9px',
+      fontSize: '12px',
       letterSpacing: '0.2em',
       textTransform: 'uppercase',
       color: 'rgb(var(--muted-foreground))',
