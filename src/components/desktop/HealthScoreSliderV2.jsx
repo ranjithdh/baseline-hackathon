@@ -6,18 +6,18 @@ import sliderMarker from '../../assets/slider_marker.png';
 // Change any value here to scale every visual aspect of the slider uniformly.
 // ─────────────────────────────────────────────────────────────────────────────
 const SLIDER_UI_CONFIG = {
-  sliderHeight:  10,   // px — colored track height
-  thumbSize:     30,   // thumb diameter in px
-  trackRadius:   999,  // px — pill-shaped segment ends
+  sliderHeight: 10,   // px — colored track height
+  thumbSize: 30,   // thumb diameter in px
+  trackRadius: 999,  // px — pill-shaped segment ends
   labelFontSize: 10,    // px — tick / label text (matches V1)
-  segmentGap:    3,    // px — space between adjacent segment pills
-  iconSize:      10,   // px — SVG icons inside each segment
+  segmentGap: 3,    // px — space between adjacent segment pills
+  iconSize: 10,   // px — SVG icons inside each segment
   scoreFontSize: 18,   // px — reserved for future score-inside-thumb use
 };
 
 // Derived constants — computed once from config, never hard-coded in JSX
-const D  = SLIDER_UI_CONFIG.thumbSize;          // thumb diameter  (60 px)
-const R  = D / 2;                               // thumb radius    (30 px)
+const D = SLIDER_UI_CONFIG.thumbSize;          // thumb diameter  (60 px)
+const R = D / 2;                               // thumb radius    (30 px)
 const WH = D + Math.round(D * 0.5);            // wrapper height  = thumb + 50% breathing room for glow
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -27,11 +27,11 @@ const WH = D + Math.round(D * 0.5);            // wrapper height  = thumb + 50% 
 // icon    : key into ICON_MAP
 // ─────────────────────────────────────────────────────────────────────────────
 const SEGMENTS = [
-  { min: 0,  max: 50,  label: 'Compromised', color: 'rgb(var(--chart-2))', glowRgb: '241,121,104', icon: 'heartbeat'   },
-  { min: 50, max: 65,  label: 'Constrained', color: 'rgb(var(--chart-3))', glowRgb: '244,199,100', icon: 'restriction' },
-  { min: 65, max: 75,  label: 'Stable',      color: 'rgb(var(--chart-4))', glowRgb: '141,226,141', icon: 'heart'       },
-  { min: 75, max: 85,  label: 'Strong',      color: 'rgb(var(--chart-5))', glowRgb: '31,120,76',   icon: 'shield'      },
-  { min: 85, max: 100, label: 'Elite',       color: 'rgb(var(--chart-6))', glowRgb: '0,158,148',   icon: 'crown'       },
+  { min: 0, max: 50, label: 'Compromised', color: 'rgb(var(--chart-2))', glowRgb: '241,121,104', icon: 'heartbeat' },
+  { min: 50, max: 65, label: 'Constrained', color: 'rgb(var(--chart-3))', glowRgb: '244,199,100', icon: 'restriction' },
+  { min: 65, max: 75, label: 'Stable', color: 'rgb(var(--chart-4))', glowRgb: '141,226,141', icon: 'heart' },
+  { min: 75, max: 85, label: 'Strong', color: 'rgb(var(--chart-5))', glowRgb: '31,120,76', icon: 'shield' },
+  { min: 85, max: 100, label: 'Elite', color: 'rgb(var(--chart-6))', glowRgb: '0,158,148', icon: 'crown' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -90,9 +90,9 @@ const HealthScoreSliderV2 = ({
   ticks = [],
 }) => {
   const floorVal = minAllowedScore != null ? clamp(minAllowedScore, min, max) : min;
-  const [score, setScore]   = useState(clamp(scoreProp, floorVal, max));
-  const trackRef            = useRef(null);
-  const dragging            = useRef(false);
+  const [score, setScore] = useState(clamp(scoreProp, floorVal, max));
+  const trackRef = useRef(null);
+  const dragging = useRef(false);
 
   // Sync with controlled prop changes from parent
   useEffect(() => {
@@ -100,8 +100,8 @@ const HealthScoreSliderV2 = ({
   }, [scoreProp, floorVal, max]);
 
   const activeSeg = getSegment(score, min, max);
-  const visSegs   = buildVisibleSegments(min, max);
-  const span      = max - min;
+  const visSegs = buildVisibleSegments(min, max);
+  const span = max - min;
 
   // Thumb horizontal position as % of track width
   const markerPct = ((score - min) / span) * 100;
@@ -121,19 +121,19 @@ const HealthScoreSliderV2 = ({
   }, [clientXToScore, floorVal, max, onChange]);
 
   useEffect(() => {
-    const onMove      = (e) => { if (dragging.current) commit(e.clientX); };
+    const onMove = (e) => { if (dragging.current) commit(e.clientX); };
     const onTouchMove = (e) => { if (dragging.current) commit(e.touches[0].clientX); };
-    const onUp        = ()  => { dragging.current = false; };
+    const onUp = () => { dragging.current = false; };
 
-    window.addEventListener('mousemove',  onMove);
-    window.addEventListener('mouseup',    onUp);
-    window.addEventListener('touchmove',  onTouchMove, { passive: true });
-    window.addEventListener('touchend',   onUp);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onUp);
     return () => {
-      window.removeEventListener('mousemove',  onMove);
-      window.removeEventListener('mouseup',    onUp);
-      window.removeEventListener('touchmove',  onTouchMove);
-      window.removeEventListener('touchend',   onUp);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onUp);
     };
   }, [commit]);
 
@@ -142,7 +142,7 @@ const HealthScoreSliderV2 = ({
     const delta = {
       ArrowRight: 1, ArrowUp: 1,
       ArrowLeft: -1, ArrowDown: -1,
-      Home: -span,   End: span,
+      Home: -span, End: span,
     }[e.key];
     if (delta == null) return;
     e.preventDefault();
@@ -156,7 +156,7 @@ const HealthScoreSliderV2 = ({
   // glowRgba  : rgba() builder  → needed when embedding in template-literal box-shadow / gradient
   //             (CSS var strings cannot be suffixed with hex alpha like `${var}44`)
   const glowColor = activeSeg.color;
-  const glowRgba  = (a) => `rgba(${activeSeg.glowRgb},${a})`;
+  const glowRgba = (a) => `rgba(${activeSeg.glowRgb},${a})`;
 
   // ── Render ─────────────────────────────────────────────────────
   return (
@@ -176,7 +176,7 @@ const HealthScoreSliderV2 = ({
                 style={{
                   ...S.segment,
                   // flex-grow is proportional to segment width — handles gaps correctly
-                  flex:       `${seg.widthPct} 0 0`,
+                  flex: `${seg.widthPct} 0 0`,
                   background: seg.color,
                 }}
               >
@@ -195,7 +195,7 @@ const HealthScoreSliderV2 = ({
           tabIndex={0}
           onKeyDown={onKeyDown}
           onMouseDown={(e) => { e.preventDefault(); dragging.current = true; }}
-          onTouchStart={()  => { dragging.current = true; }}
+          onTouchStart={() => { dragging.current = true; }}
           style={{
             ...S.thumb,
             left: `calc(${markerPct}% - ${R}px)`,
@@ -213,10 +213,10 @@ const HealthScoreSliderV2 = ({
       <div style={S.tickRow}>
         {ticks.length > 0 ? (
           ticks.map(v => {
-            const pct       = ((v - min) / span) * 100;
+            const pct = ((v - min) / span) * 100;
             const isCurrent = v === score;
-            const isPast    = v < score;
-            const isBeyond  = maxRecommended != null && v > maxRecommended;
+            const isPast = v < score;
+            const isBeyond = maxRecommended != null && v > maxRecommended;
             return (
               <span
                 key={v}
@@ -227,18 +227,18 @@ const HealthScoreSliderV2 = ({
                   onChange?.(next);
                 }}
                 style={{
-                  position:   'absolute',
-                  left:       `${pct}%`,
-                  transform:  'translateX(-50%)',
+                  position: 'absolute',
+                  left: `${pct}%`,
+                  transform: 'translateX(-50%)',
                   fontFamily: 'var(--font-mono, monospace)',
-                  fontSize:   `${SLIDER_UI_CONFIG.labelFontSize}px`,
+                  fontSize: `${SLIDER_UI_CONFIG.labelFontSize}px`,
                   fontWeight: isCurrent ? 700 : 400,
                   color: isCurrent
                     ? glowColor
-                    : isBeyond  ? 'rgb(var(--foreground))'
-                    : isPast    ? 'rgb(var(--foreground))'
-                    :             'rgb(var(--foreground))',
-                  cursor:     'pointer',
+                    : isBeyond ? 'rgb(var(--foreground))'
+                      : isPast ? 'rgb(var(--foreground))'
+                        : 'rgb(var(--foreground))',
+                  cursor: 'pointer',
                   transition: 'color 0.2s',
                   userSelect: 'none',
                   whiteSpace: 'nowrap',
@@ -255,18 +255,18 @@ const HealthScoreSliderV2 = ({
               <div
                 key={seg.label}
                 style={{
-                  width:         `${seg.widthPct}%`,
-                  textAlign:     'center',
-                  fontSize:      `${SLIDER_UI_CONFIG.labelFontSize}px`,
+                  width: `${seg.widthPct}%`,
+                  textAlign: 'center',
+                  fontSize: `${SLIDER_UI_CONFIG.labelFontSize}px`,
                   letterSpacing: '0.11em',
                   textTransform: 'uppercase',
-                  fontFamily:    'var(--font-mono, monospace)',
-                  color:         isActive ? seg.color : 'rgba(255,255,255,0.20)',
-                  fontWeight:    isActive ? 700 : 400,
-                  transition:    'color 0.3s',
-                  overflow:      'hidden',
-                  textOverflow:  'ellipsis',
-                  whiteSpace:    'nowrap',
+                  fontFamily: 'var(--font-mono, monospace)',
+                  color: isActive ? seg.color : 'rgba(255,255,255,0.20)',
+                  fontWeight: isActive ? 700 : 400,
+                  transition: 'color 0.3s',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                 }}
               >
                 {seg.label}
@@ -286,85 +286,85 @@ const { sliderHeight: SH, trackRadius: TR, segmentGap: SG, labelFontSize: LF } =
 
 const S = {
   root: {
-    width:             '100%',
-    userSelect:        'none',
-    WebkitUserSelect:  'none',
+    width: '100%',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
   },
 
   // Outer wrapper — must be tall enough so the thumb + full glow rings are visible
   outerWrap: {
-    position:     'relative',
-    height:       `${WH}px`,
-    marginTop:    '4px',
+    position: 'relative',
+    height: `${WH}px`,
+    marginTop: '4px',
     marginBottom: '0px',
-    cursor:       'pointer',
+    cursor: 'pointer',
   },
 
   // Thin segmented pill track, vertically centered inside outerWrap
   track: {
-    position:     'absolute',
-    top:          '50%',
-    left:         0,
-    right:        0,
-    transform:    'translateY(-50%)',
-    height:       `${SH}px`,
-    display:      'flex',
-    gap:          `${SG}px`,
+    position: 'absolute',
+    top: '50%',
+    left: 0,
+    right: 0,
+    transform: 'translateY(-50%)',
+    height: `${SH}px`,
+    display: 'flex',
+    gap: `${SG}px`,
     // overflow:hidden is intentionally omitted — segment border-radii handle clipping,
     // and absence of overflow:hidden lets segments render their own full pill shape.
   },
 
   // Individual segment — each is a fully rounded pill with centered icon
   segment: {
-    height:          '100%',
-    display:         'flex',
-    alignItems:      'center',
-    justifyContent:  'center',
-    borderRadius:    `${TR}px`,   // full pill per segment (not just first/last)
-    overflow:        'hidden',    // clips icon to track height
-    flexShrink:      0,
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: `${TR}px`,   // full pill per segment (not just first/last)
+    overflow: 'hidden',    // clips icon to track height
+    flexShrink: 0,
   },
 
   // Thumb — container keeps fixed size; image fills it via thumbImg
   thumb: {
-    position:     'absolute',
-    top:          '50%',
-    transform:    'translateY(-50%)',
-    width:        `${D}px`,
-    height:       `${D}px`,
-    display:      'flex',
-    alignItems:   'center',
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    width: `${D}px`,
+    height: `${D}px`,
+    display: 'flex',
+    alignItems: 'center',
     justifyContent: 'center',
-    cursor:       'grab',
-    zIndex:       10,
-    outline:      'none',
+    cursor: 'grab',
+    zIndex: 10,
+    outline: 'none',
     // overflow: visible — intentionally not set so marker image renders unclipped
     // `left` is injected inline (score-dependent)
-    transition:   'left 0.04s linear',
-    willChange:   'left',
-    background:   'none',
-    border:       'none',
+    transition: 'left 0.04s linear',
+    willChange: 'left',
+    background: 'none',
+    border: 'none',
     borderRadius: '50%',
   },
 
   // Marker image — scaled to fill the fixed thumb container exactly
   thumbImg: {
-    width:         '100%',
-    height:        '100%',
-    objectFit:     'contain',
-    display:       'block',
+    width: '100%',
+    height: '100%',
+    objectFit: 'contain',
+    display: 'block',
     pointerEvents: 'none',
-    userSelect:    'none',
+    userSelect: 'none',
     WebkitUserSelect: 'none',
-    draggable:     false,
+    draggable: false,
   },
 
   // Tick / label row — identical layout contract as HealthScoreSlider (V1)
   tickRow: {
-    position:   'relative',
-    display:    'flex',
-    height:     `${Math.max(LF + 2, 11)}px`,
-    marginTop:  '0px',
+    position: 'relative',
+    display: 'flex',
+    height: `${Math.max(LF + 2, 11)}px`,
+    marginTop: '0px',
   },
 };
 

@@ -90,6 +90,7 @@ function App() {
               onDetail={onHandleDetail}
               onSetGoal={() => setView('mobile-plan')}
               onScoreClick={() => setView('baseline-deep-dive')}
+              onSwitchView={handleSwitchView}
               showConsultation={showConsultation}
               goalTarget={goalTarget}
             />

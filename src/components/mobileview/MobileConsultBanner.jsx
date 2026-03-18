@@ -11,7 +11,7 @@ const MobileConsultBanner = ({ onBookNow }) => {
           borderRadius: '24px',
           overflow: 'hidden',
           position: 'relative',
-          background: '#2B63FF',
+          background: 'linear-gradient(135deg, #253282 0%, #374DAE 50%, #537DD3 100%)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',

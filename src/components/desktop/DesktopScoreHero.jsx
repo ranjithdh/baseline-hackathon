@@ -18,6 +18,8 @@ const DesktopScoreHero = ({ onSimulate }) => {
       biggestBoost="Vitamin D3 + K2"
       biggestBoostGain={7}
       onImprove={onSimulate}
+      showRangeBar={false}
+      showActionButton={false}
     />
   );
 };

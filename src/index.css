@@ -43,7 +43,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   max-width: 100%;
   overflow-x: clip !important;
@@ -64,6 +65,20 @@ html, body {
   margin: 0 !important;
   padding: 0 !important;
   overflow-x: clip !important;
+}
+
+/* Mobile device simulation on larger screens */
+body:not(.desktop) {
+  background-color: #050505;
+}
+
+body:not(.desktop) #root {
+  max-width: 430px;
+  margin: 0 auto;
+  box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
+  position: relative;
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .dashboard-container {
