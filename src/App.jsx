@@ -12,13 +12,15 @@ import BookConsultation from './components/BookConsultation';
 import ActionPlanTimeline from './components/ActionPlanTimeline';
 import DetailedActionPlan from './components/DetailedActionPlan';
 import Settings from './components/Settings';
-import Home from './components/Home';
+import MobileDashboard from './components/mobileview/MobileDashboard';
+import MobilePlanPanel from './components/mobileview/MobilePlanPanel';
 import GoalActionCombined from './components/GoalActionCombined';
 import BaselineScoreDeepDive from './components/BaselineScoreDeepDive';
 import BottomNav from './components/BottomNav';
 
 function App() {
   const [view, setView] = useState('home');
+  const [goalTarget, setGoalTarget] = useState(70);
   const [detailTab, setDetailTab] = useState('positive');
   const [showConsultation, setShowConsultation] = useState(true);
   const [theme, setTheme] = React.useState(() => {
@@ -80,15 +82,16 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App w-full overflow-x-hidden">
       <AnimatePresence mode="wait">
         {view === 'home' && (
           <motion.div key="home" variants={pageVariants} initial="initial" animate="enter" exit="exit">
-            <Home
+            <MobileDashboard
               onDetail={onHandleDetail}
-              onSetGoal={() => setView('goal')}
+              onSetGoal={() => setView('mobile-plan')}
               onScoreClick={() => setView('baseline-deep-dive')}
               showConsultation={showConsultation}
+              goalTarget={goalTarget}
             />
           </motion.div>
         )}
@@ -174,16 +177,28 @@ function App() {
           <motion.div key="baseline-deep-dive" variants={pageVariants} initial="initial" animate="enter" exit="exit">
             <BaselineScoreDeepDive
               onClose={() => setView('home')}
-              onSetGoal={() => setView('goal')}
+              onSetGoal={() => setView('mobile-plan')}
+            />
+          </motion.div>
+        )}
+        {view === 'mobile-plan' && (
+          <motion.div key="mobile-plan" variants={pageVariants} initial="initial" animate="enter" exit="exit">
+            <MobilePlanPanel 
+              goalTarget={goalTarget} 
+              onGoalChange={setGoalTarget} 
+              onBookConsult={() => setView('book-consultation')}
+              onBack={() => setView('home')}
             />
           </motion.div>
         )}
       </AnimatePresence>
 
-      <BottomNav 
-        activeView={view} 
-        onNavigate={(newView) => setView(newView)} 
-      />
+      {view !== 'home' && view !== 'mobile-plan' && (
+        <BottomNav 
+          activeView={view} 
+          onNavigate={(newView) => setView(newView)} 
+        />
+      )}
     </div>
   );
 }

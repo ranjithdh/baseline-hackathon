@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PrimaryButton from './PrimaryButton';
 
 // ── Arc helpers (same pattern as DesktopScoreHero) ─────────────
 const ARC_CIRC    = 283;
@@ -32,12 +33,11 @@ const BaselineScoreCard = ({
     <>
       <style>{`
         .bsc-root {
-          background: linear-gradient(135deg, #0f1729 0%, #111827 55%, #0e1a3a 100%);
-          border-radius: 20px;
-          border: 1px solid rgba(99,102,241,0.28);
-          box-shadow: 0 0 48px rgba(99,102,241,0.09), 0 2px 24px rgba(0,0,0,0.4);
-          padding: 28px 32px;
-          height: 100%;
+          background: #121212;
+          border-radius: 24px;
+          border: 1px solid rgba(255,255,255,0.08);
+          padding: 24px;
+          height: auto;
           box-sizing: border-box;
           position: relative;
           overflow: hidden;
@@ -45,235 +45,190 @@ const BaselineScoreCard = ({
           flex-direction: column;
           gap: 20px;
         }
+        .bsc-header-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
         .bsc-main-row {
           display: flex;
           align-items: center;
-          gap: 28px;
+          gap: 24px;
+        }
+        .bsc-stats-col {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          flex: 1;
         }
         .bsc-bottom-row {
           display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          flex-wrap: wrap;
+          flex-direction: column;
+          gap: 12px;
+          padding-top: 16px;
+          border-top: 1px solid rgba(255,255,255,0.06);
         }
-        @media (max-width: 640px) {
-          .bsc-main-row { flex-wrap: wrap; }
-          .bsc-bottom-row { flex-direction: column; align-items: flex-start; }
+        .insight-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 13px;
+          color: rgba(255,255,255,0.6);
+        }
+        .insight-item strong {
+          color: #ffffff;
+          font-weight: 600;
+        }
+
+        @media (max-width: 400px) {
+          .bsc-main-row { gap: 16px; }
+          .bsc-header-row { flex-wrap: wrap; }
         }
       `}</style>
 
       <div className="bsc-root">
-        {/* Subtle radial glow */}
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse at 85% 10%, rgba(99,102,241,0.14) 0%, transparent 55%)',
-        }} />
-
-        {/* ── Row 1: Label + BETA + weekly gain ── */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', position: 'relative' }}>
+        {/* Row 1: Label + BETA + Weekly Gain */}
+        <div className="bsc-header-row">
           <span style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '10px',
-            letterSpacing: '0.22em',
+            letterSpacing: '0.1em',
             textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.38)',
+            color: 'rgba(255,255,255,0.4)',
           }}>
             Baseline Score
           </span>
           <span style={{
             fontSize: '10px',
             fontWeight: 700,
-            padding: '2px 9px',
+            padding: '2px 8px',
             borderRadius: '100px',
-            background: 'rgba(99,102,241,0.18)',
-            color: 'rgb(165,180,252)',
-            border: '1px solid rgba(99,102,241,0.32)',
-            letterSpacing: '0.08em',
+            background: 'rgba(255,255,255,0.1)',
+            color: 'rgba(255,255,255,0.8)',
+            border: '1px solid rgba(255,255,255,0.15)',
           }}>
             BETA
           </span>
 
-          {/* Weekly gain — pushed right */}
           <div style={{
             marginLeft: 'auto',
-            display: 'flex', alignItems: 'center', gap: '5px',
-            fontFamily: 'var(--font-mono)',
+            display: 'flex', alignItems: 'center', gap: '4px',
+            fontFamily: 'var(--font-main)',
             fontSize: '12px',
-            color: 'rgb(74,222,128)',
+            color: '#30A46C',
             fontWeight: 600,
-            opacity: revealed ? 1 : 0,
-            transition: 'opacity 0.5s 2s',
           }}>
             <span style={{ fontSize: '10px' }}>▲</span>
             {weeklyGain} this week
           </div>
         </div>
 
-        {/* ── Row 2: Arc + Score info ── */}
-        <div className="bsc-main-row" style={{ flex: 1 }}>
+        {/* Row 2: Arc + Score info */}
+        <div className="bsc-main-row">
           {/* Circular arc */}
-          <div style={{ position: 'relative', width: '120px', height: '120px', flexShrink: 0 }}>
+          <div style={{ position: 'relative', width: '130px', height: '130px', flexShrink: 0 }}>
             <svg
-              width="120" height="120"
+              width="130" height="130"
               viewBox="0 0 110 110"
               style={{ transform: 'rotate(-220deg)' }}
             >
               <defs>
                 <linearGradient id="bscArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%"   stopColor="#6366f1" />
+                  <stop offset="0%"   stopColor="#2B63FF" />
                   <stop offset="100%" stopColor="#38bdf8" />
                 </linearGradient>
               </defs>
-              {/* Track */}
               <circle
                 cx="55" cy="55" r="45"
                 fill="none"
-                stroke="rgba(255,255,255,0.07)"
-                strokeWidth="9"
+                stroke="rgba(255,255,255,0.05)"
+                strokeWidth="10"
                 strokeLinecap="round"
                 strokeDasharray="226 57"
               />
-              {/* Fill */}
               <circle
                 cx="55" cy="55" r="45"
                 fill="none"
                 stroke="url(#bscArcGrad)"
-                strokeWidth="9"
+                strokeWidth="10"
                 strokeLinecap="round"
                 strokeDasharray={String(ARC_CIRC)}
                 strokeDashoffset={arcOffset}
                 style={{ transition: 'stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1)' }}
               />
             </svg>
-            {/* Center score */}
             <div style={{
               position: 'absolute', inset: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <span style={{
                 fontFamily: 'var(--font-heading)',
-                fontSize: '38px',
-                fontWeight: 700,
+                fontSize: '40px',
+                fontWeight: 800,
                 color: 'white',
                 lineHeight: 1,
-                opacity: revealed ? 1 : 0,
-                transform: revealed ? 'translateY(0)' : 'translateY(5px)',
-                transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.8s',
               }}>
                 {score}
               </span>
             </div>
           </div>
 
-          {/* Score meta */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {/* Score + status */}
-            <div style={{
-              display: 'flex', alignItems: 'baseline', gap: '10px',
-              marginBottom: '6px',
-              opacity: revealed ? 1 : 0,
-              transform: revealed ? 'translateY(0)' : 'translateY(6px)',
-              transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1) 2s',
-            }}>
-              <span style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '34px', fontWeight: 700, color: 'white', lineHeight: 1,
-              }}>
-                {score}
-              </span>
-              <span style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '26px', fontWeight: 600,
-                color: 'rgb(74,222,128)',
-              }}>
-                {status}
-              </span>
+          {/* Score stats group */}
+          <div className="bsc-stats-col">
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+              <span style={{ fontSize: '42px', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-heading)' }}>{score}</span>
+              <span style={{ fontSize: '24px', fontWeight: 700, color: '#30A46C', fontFamily: 'var(--font-heading)' }}>{status}</span>
+            </div>
+            
+            <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
+              Next Level: <span style={{ color: '#ffffff', fontWeight: 600 }}>{nextLevel}</span>
             </div>
 
-            {/* Next level */}
-            <div style={{
-              fontSize: '13px',
-              color: 'rgba(255,255,255,0.48)',
-              marginBottom: '16px',
-              opacity: revealed ? 1 : 0,
-              transition: 'opacity 0.4s 2.2s',
-            }}>
-              Next Level: <strong style={{ color: 'rgba(255,255,255,0.85)', fontWeight: 600 }}>{nextLevel}</strong>
-            </div>
-
-            {/* Progress bar */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '12px',
-              marginBottom: '10px',
-            }}>
-              <div style={{
-                flex: 1,
-                height: '8px',
-                background: 'rgba(255,255,255,0.08)',
-                borderRadius: '100px',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  height: '100%',
-                  borderRadius: '100px',
-                  background: 'linear-gradient(90deg, #6366f1 0%, #38bdf8 100%)',
-                  width: revealed ? `${barPct}%` : '0%',
-                  transition: 'width 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.5s',
-                  boxShadow: '0 0 10px rgba(99,102,241,0.55)',
-                }} />
-              </div>
-              <span style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '12px',
-                color: 'rgba(255,255,255,0.38)',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-              }}>
-                {progress} / {progressMax}
-              </span>
-            </div>
-
-            {/* Points to unlock */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '6px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '12px',
-              color: 'rgb(74,222,128)',
-              opacity: revealed ? 1 : 0,
-              transition: 'opacity 0.4s 2.4s',
-            }}>
-              <span>⚡</span>
-              <span>{pointsToUnlock} points to unlock</span>
+            {/* Progress Bar Item */}
+            <div style={{ width: '100%', marginBottom: '4px' }}>
+               <div style={{ height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '100px', overflow: 'hidden', marginBottom: '6px' }}>
+                  <div style={{ height: '100%', background: '#2B63FF', width: `${barPct}%`, borderRadius: '100px' }} />
+               </div>
+               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-mono)' }}>
+                  <span>{progress}/{progressMax}</span>
+                  <span style={{ color: '#30A46C' }}>🔥 {pointsToUnlock} points to unlock</span>
+               </div>
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: '1px', background: 'rgba(255,255,255,0.07)', flexShrink: 0 }} />
-
-        {/* ── Row 3: Insights + CTA ── */}
         <div className="bsc-bottom-row">
-          {/* Insights */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
-              fontSize: '13px', color: 'rgba(255,255,255,0.55)',
-            }}>
-              <span>🏆</span>
-              <span>You are in top <strong style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>{topPercentage}%</strong> of your age group</span>
-            </div>
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
-              fontSize: '13px', color: 'rgba(255,255,255,0.55)',
-            }}>
-              <span>🌟</span>
-              <span>Biggest Boost: <strong style={{ color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>{biggestBoost}</strong> (+{biggestBoostGain})</span>
-            </div>
+          <div className="insight-item">
+            <span>🏆</span>
+            <span>You are in top <strong>{topPercentage}%</strong> of your age group</span>
           </div>
-
+          <div className="insight-item">
+            <span>🌟</span>
+            <span>Biggest Boost: <strong>{biggestBoost}</strong> (+{biggestBoostGain})</span>
+          </div>
         </div>
+
+        {/* Action Button */}
+        {onImprove && (
+          <div style={{ marginTop: 'auto', paddingTop: '8px' }}>
+            <PrimaryButton 
+              onClick={onImprove} 
+              style={{ 
+                width: '100%', 
+                padding: '14px 20px', 
+                fontSize: '14px', 
+                borderRadius: '12px',
+                background: 'linear-gradient(to right, #253282 0%, 21.09704613685608%, #374DAE 42.19409227371216%, 71.09704613685608%, #537DD3 100%)',
+                justifyContent: 'space-between'
+              }}
+            >
+              <span>Build your Action Plan</span>
+              <span style={{ fontSize: '18px' }}>→</span>
+            </PrimaryButton>
+          </div>
+        )}
       </div>
+
     </>
   );
 };

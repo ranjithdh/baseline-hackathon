@@ -13,7 +13,7 @@ import HealthScoreLimitCard from './HealthScoreLimitCard';
 import BuildActionPlanBanner from './BuildActionPlanBanner';
 import { InferenceBadge } from '../../ui/inference-badge';
 
-const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
+const TICK_VALS = [65, 75, 85, 100];
 const GOAL_MIN = BASE_SCORE;
 const GOAL_MAX = 100;
 
