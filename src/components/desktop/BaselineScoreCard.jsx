@@ -1,21 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import BaselineScoreInfoOverlay from './BaselineScoreInfoOverlay';
+
 
 // ── Arc helpers ─────────────────────────────────────────────
-const RADIUS      = 48;
-const CIRC        = 2 * Math.PI * RADIUS;
+const RADIUS = 48;
+const CIRC = 2 * Math.PI * RADIUS;
 const ARC_VISIBLE = CIRC * (270 / 360);
-const GAP         = CIRC - ARC_VISIBLE;
+const GAP = CIRC - ARC_VISIBLE;
 const getArcOffset = (score) => CIRC - (score / 100) * ARC_VISIBLE;
 
 const BaselineScoreCard = ({
-  score            = 65,
-  status           = 'Stable',
-  headline         = "You're doing well — but there's strong potential to improve your energy, appearance, and performance.",
-  topPercentage    = 35,
-  pointsToGrow     = 18,
+  score = 65,
+  status = 'Stable',
+  headline = "You're doing well — but there's strong potential to improve your energy, appearance, and performance.",
+  topPercentage = 35,
+  pointsToGrow = 18,
   onTap,
 }) => {
   const [revealed, setRevealed] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+
 
   useEffect(() => {
     const t = setTimeout(() => setRevealed(true), 200);
@@ -272,15 +276,21 @@ const BaselineScoreCard = ({
       `}</style>
 
       <div className="hso-root" onClick={onTap}>
-        <div className="hso-glow hso-glow-1" />
-        <div className="hso-glow hso-glow-2" />
-
         {/* ── Header ── */}
         <div className="hso-header">
           <span className="hso-title">Your Health Score</span>
           <span className="hso-beta">Beta</span>
-          <button className="hso-info-btn">i</button>
+          <button
+            className="hso-info-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsInfoOpen(true);
+            }}
+          >
+            i
+          </button>
         </div>
+
 
         {/* ── Content ── */}
         <div className="hso-content-grid">
@@ -321,7 +331,7 @@ const BaselineScoreCard = ({
                 <span className="hso-score-max">/ 100</span>
               </div>
             </div>
-            <p className="hso-score-label">Based on Sleep, Fitness,<br/>Nutrition, Stress</p>
+            <p className="hso-score-label">Based on Sleep, Fitness,<br />Nutrition, Stress</p>
           </div>
 
           <div className="hso-meta">
@@ -354,6 +364,11 @@ const BaselineScoreCard = ({
           </div>
         </div>
       </div>
+
+      <BaselineScoreInfoOverlay
+        isOpen={isInfoOpen}
+        onClose={() => setIsInfoOpen(false)}
+      />
     </>
   );
 };
