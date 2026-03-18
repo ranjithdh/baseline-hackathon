@@ -331,8 +331,8 @@ const BaselineScoreCard = ({
                 <span className="hso-score-max">/ 100</span>
               </div>
             </div>
-            <p className="hso-score-label">Based on Sleep, Fitness,<br />Nutrition, Stress</p>
           </div>
+
 
           <div className="hso-meta">
             <div className="hso-status-badge">
@@ -341,13 +341,9 @@ const BaselineScoreCard = ({
             <p className="hso-insight">
               {headline}
             </p>
-            <div className="hso-tags">
-              <span className="hso-tag">Low Protein Intake</span>
-              <span className="hso-tag">Poor Sleep</span>
-              <span className="hso-tag">High Stress</span>
-            </div>
           </div>
         </div>
+
 
         {/* ── Footer Stats ── */}
         <div className="hso-footer-grid">
