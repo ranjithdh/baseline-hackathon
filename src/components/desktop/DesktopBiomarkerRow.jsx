@@ -6,14 +6,14 @@ import { BIOMARKERS, SECTION_META, getBySection, groupByCategory } from './bioma
 // Status map
 // ─────────────────────────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
-  optimal:        { label: 'Optimal',       color: 'rgb(34,197,94)',   bg: 'rgba(34,197,94,0.12)',   dot: '#16a34a' },
-  normal:         { label: 'Normal',        color: 'rgb(74,222,128)',  bg: 'rgba(74,222,128,0.12)',  dot: '#22c55e' },
-  borderline_high:{ label: 'Borderline ↑',  color: 'rgb(251,191,36)',  bg: 'rgba(251,191,36,0.12)',  dot: '#f59e0b' },
-  borderline_low: { label: 'Borderline ↓',  color: 'rgb(253,186,116)', bg: 'rgba(253,186,116,0.12)', dot: '#f97316' },
-  high:           { label: 'High',          color: 'rgb(252,165,165)', bg: 'rgba(252,165,165,0.12)', dot: '#ef4444' },
-  low:            { label: 'Low',           color: 'rgb(252,165,165)', bg: 'rgba(252,165,165,0.12)', dot: '#ef4444' },
-  critical_high:  { label: 'Critical ↑',    color: 'rgb(254,202,202)', bg: 'rgba(254,202,202,0.15)', dot: '#dc2626' },
-  critical_low:   { label: 'Critical ↓',    color: 'rgb(254,202,202)', bg: 'rgba(254,202,202,0.15)', dot: '#dc2626' },
+  optimal: { label: 'Optimal', color: 'rgb(34,197,94)', bg: 'rgba(34,197,94,0.12)', dot: '#16a34a' },
+  normal: { label: 'Normal', color: 'rgb(74,222,128)', bg: 'rgba(74,222,128,0.12)', dot: '#22c55e' },
+  borderline_high: { label: 'Borderline ↑', color: 'rgb(251,191,36)', bg: 'rgba(251,191,36,0.12)', dot: '#f59e0b' },
+  borderline_low: { label: 'Borderline ↓', color: 'rgb(253,186,116)', bg: 'rgba(253,186,116,0.12)', dot: '#f97316' },
+  high: { label: 'High', color: 'rgb(252,165,165)', bg: 'rgba(252,165,165,0.12)', dot: '#ef4444' },
+  low: { label: 'Low', color: 'rgb(252,165,165)', bg: 'rgba(252,165,165,0.12)', dot: '#ef4444' },
+  critical_high: { label: 'Critical ↑', color: 'rgb(254,202,202)', bg: 'rgba(254,202,202,0.15)', dot: '#dc2626' },
+  critical_low: { label: 'Critical ↓', color: 'rgb(254,202,202)', bg: 'rgba(254,202,202,0.15)', dot: '#dc2626' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -178,7 +178,6 @@ const CollapsedCard = ({ sectionKey, onExpand }) => {
   const meta = SECTION_META[sectionKey];
   const markers = useMemo(() => getBySection(sectionKey), [sectionKey]);
   const alertCount = markers.filter(m => ['high', 'low'].includes(m.status)).length;
-  const watchCount = markers.filter(m => ['borderline_high', 'borderline_low'].includes(m.status)).length;
   const preview = markers.slice(0, 5); // 5 items for visual height balance
 
   return (
@@ -229,12 +228,6 @@ const CollapsedCard = ({ sectionKey, onExpand }) => {
         )}
       </div>
 
-      {/* Summary footer */}
-      <div style={{ padding: '5px 12px 8px', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', gap: '10px' }}>
-        {alertCount > 0 && <span style={{ fontSize: '10px', color: 'rgb(252,165,165)', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>⚠ {alertCount} need action</span>}
-        {watchCount > 0 && <span style={{ fontSize: '10px', color: 'rgb(251,191,36)', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>◑ {watchCount} borderline</span>}
-        {alertCount === 0 && watchCount === 0 && <span style={{ fontSize: '10px', color: 'rgb(74,222,128)', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>✓ All good</span>}
-      </div>
     </div>
   );
 };
@@ -251,7 +244,7 @@ const DesktopBiomarkerRow = () => {
 
   // Split evenly: first half left, second half right
   const mid = Math.ceil(activeMarkers.length / 2);
-  const leftMarkers  = activeMarkers.slice(0, mid);
+  const leftMarkers = activeMarkers.slice(0, mid);
   const rightMarkers = activeMarkers.slice(mid);
 
   const collapsedSections = ['negative', 'watch', 'positive'].filter(s => s !== activeSection);
@@ -260,10 +253,10 @@ const DesktopBiomarkerRow = () => {
   const totalCount = BIOMARKERS.length;
   const alertCount = BIOMARKERS.filter(m => ['high', 'low'].includes(m.status)).length;
   const watchCount = BIOMARKERS.filter(m => ['borderline_high', 'borderline_low'].includes(m.status)).length;
-  const goodCount  = BIOMARKERS.filter(m => ['optimal', 'normal'].includes(m.status)).length;
+  const goodCount = BIOMARKERS.filter(m => ['optimal', 'normal'].includes(m.status)).length;
 
   // Section alert/watch summary for header chips
-  const secAlerts  = activeMarkers.filter(m => ['high', 'low'].includes(m.status)).length;
+  const secAlerts = activeMarkers.filter(m => ['high', 'low'].includes(m.status)).length;
   const secWatches = activeMarkers.filter(m => ['borderline_high', 'borderline_low'].includes(m.status)).length;
 
   return (
@@ -274,10 +267,10 @@ const DesktopBiomarkerRow = () => {
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Biomarker Panel</span>
         <div style={{ display: 'flex', gap: '6px' }}>
           {[
-            { label: `${totalCount} Total`,  bg: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.45)' },
-            { label: `${goodCount} Optimal`, bg: 'rgba(34,197,94,0.1)',    color: 'rgb(74,222,128)' },
-            { label: `${watchCount} Watch`,  bg: 'rgba(245,158,11,0.1)',   color: 'rgb(251,191,36)' },
-            { label: `${alertCount} Alert`,  bg: 'rgba(239,68,68,0.1)',    color: 'rgb(252,165,165)' },
+            { label: `${totalCount} Total`, bg: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.45)' },
+            { label: `${goodCount} Optimal`, bg: 'rgba(34,197,94,0.1)', color: 'rgb(74,222,128)' },
+            { label: `${watchCount} Watch`, bg: 'rgba(245,158,11,0.1)', color: 'rgb(251,191,36)' },
+            { label: `${alertCount} Alert`, bg: 'rgba(239,68,68,0.1)', color: 'rgb(252,165,165)' },
           ].map(b => (
             <span key={b.label} style={{ fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '100px', background: b.bg, color: b.color, fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
               {b.label}
