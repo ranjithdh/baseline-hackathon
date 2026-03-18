@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Dashboard from './components/Dashboard';
+
+import Dashboard            from './components/Dashboard';
+import DesktopDashboard     from './components/desktop/DesktopDashboard';
+import ViewSelectorScreen   from './components/ViewSelectorScreen';
+import GoalPage from './components/GoalPage';
+import ActionPlan from './components/ActionPlan';
+
 import ContributorDetail from './components/ContributorDetail';
 import BookConsultation from './components/BookConsultation';
 import ActionPlanTimeline from './components/ActionPlanTimeline';
@@ -19,15 +25,38 @@ function App() {
     return localStorage.getItem('theme') || 'dark';
   });
 
+  // ── Layout mode — null means "not yet chosen" (show selector) ──────────────
+  // Reads from localStorage on mount so returning users skip the selector.
+  const [isDesktop, setIsDesktop] = useState(() => {
+    const saved = localStorage.getItem('IS_DESKTOP');
+    if (saved === null) return null;   // first visit → show ViewSelectorScreen
+    return saved === 'true';
+  });
+
   React.useLayoutEffect(() => {
     document.documentElement.className = theme;
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // Sync body class whenever the layout mode is committed.
+  React.useLayoutEffect(() => {
+    if (isDesktop !== null) {
+      document.body.classList.toggle('desktop', isDesktop);
+    }
+  }, [isDesktop]);
+
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
+  // ── Reset view selection → show ViewSelectorScreen again ────────
+  // Clears both the in-memory state and localStorage so the selector
+  // is shown immediately and the decision isn't re-applied on reload.
+  const handleSwitchView = () => {
+    localStorage.removeItem('IS_DESKTOP');
+    document.body.classList.remove('desktop');
+    setIsDesktop(null);
+  };
 
   const onHandleDetail = (tab) => {
     setDetailTab(tab);
@@ -39,6 +68,16 @@ function App() {
     enter: { opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } },
     exit: { opacity: 0, x: -20, transition: { duration: 0.2, ease: "easeIn" } }
   };
+
+  // ── No selection yet → show the launch screen ──────────────────
+  if (isDesktop === null) {
+    return <ViewSelectorScreen onSelect={setIsDesktop} />;
+  }
+
+  // ── Desktop mode → full desktop layout ──────────────────────────
+  if (isDesktop === true) {
+    return <DesktopDashboard onSwitchView={handleSwitchView} />;
+  }
 
   return (
     <div className="App">
@@ -59,7 +98,7 @@ function App() {
               onSetGoal={() => setView('goal')}
               onDetail={onHandleDetail}
               onSettings={() => setView('settings')}
-              isEmpty={true}
+              onSwitchView={handleSwitchView}
             />
           </motion.div>
         )}

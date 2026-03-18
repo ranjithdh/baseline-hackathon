@@ -7,7 +7,8 @@ import TimelineDial from './TimelineDial';
 import { motion, AnimatePresence } from 'framer-motion';
 import consultationCrystal from '../assets/consultation_crystal.png';
 
-const Dashboard = ({ onSetGoal, onDetail, onSettings, isEmpty = false }) => {
+
+const Dashboard = ({ onSetGoal, onDetail, onSettings, onSwitchView, isEmpty = false }) => {
     const [heroView, setHeroView] = useState('score'); // 'score' or 'timeline'
 
     return (
@@ -28,7 +29,20 @@ const Dashboard = ({ onSetGoal, onDetail, onSettings, isEmpty = false }) => {
                             </p>
                         </div>
 
+
                         <div className="flex gap-2 shrink-0">
+                            {/* Switch View — returns to ViewSelectorScreen */}
+                            <motion.button
+                                whileTap={{ scale: 0.9 }}
+                                onClick={onSwitchView}
+                                title="Switch View"
+                                className="w-10 h-10 rounded-full bg-card/10 backdrop-blur-md shadow-lg border border-white/10 flex items-center justify-center text-white/40 hover:text-primary transition-all"
+                            >
+                                <span className="material-symbols-outlined text-[20px]">
+                                    devices
+                                </span>
+                            </motion.button>
+
                             <motion.button
                                 whileTap={{ scale: 0.9 }}
                                 onClick={onSettings}
