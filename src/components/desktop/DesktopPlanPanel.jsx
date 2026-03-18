@@ -292,7 +292,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
       {/* ── GOAL SETTER ── */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 220px',
+        gridTemplateColumns: '1fr',
         gap: '32px',
         padding: '40px 44px 32px',
         position: 'relative', zIndex: 1,
@@ -381,47 +381,6 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
           />
         </div>
 
-        {/* ── Right column: Build CTA + Projected Score card ── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignSelf: 'center' }}>
-          {/* Projected score card */}
-          <DashboardCard style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-            padding: '28px 24px',
-            textAlign: 'center', gap: '6px',
-          }}>
-            <div style={{
-              fontFamily: 'var(--font-mono)', fontSize: '9px',
-              letterSpacing: '0.2em', textTransform: 'uppercase',
-              color: 'rgb(var(--muted-foreground))',
-            }}>
-              Projected Score
-            </div>
-            <div style={{
-              fontFamily: 'var(--font-heading)', fontSize: '64px',
-              color: 'rgb(var(--foreground))', lineHeight: 1,
-              transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
-            }}>
-              {displayScore}
-            </div>
-            <div style={{
-              fontSize: '12px', fontWeight: 600, minHeight: '20px',
-              fontFamily: 'var(--font-mono)',
-              color: showActionPlanButton
-                ? displayGain > 0 ? 'rgb(48,164,108)' : 'rgba(228,228,231,0.25)'
-                : gained === 0 ? 'rgba(228,228,231,0.25)'
-                  : projScore >= baselineScore ? 'rgb(48,164,108)'
-                    : 'rgb(255,197,61)',
-              transition: 'color 0.3s',
-            }}>
-              {showActionPlanButton
-                ? displayGain > 0 ? `+${displayGain} pts · Potential` : 'Select actions below'
-                : gained === 0 ? 'Select actions below'
-                  : projScore >= baselineScore ? `+${gained} pts · Goal ✓`
-                    : `+${gained} pts · ${toGoal} more`}
-            </div>
-          </DashboardCard>
-
-        </div>{/* end right column */}
           
 
           {/* ── HealthScoreLimitCard — animated show/hide ── */}
@@ -532,6 +491,93 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
             <ActionPlanDownloadButton onClick={onBookConsult} />
           </div>
         </div>
+
+        {/* ── Projected Score sub-section (35% width) ── */}
+        {/* <div style={{ width: '35%', marginBottom: '24px' }}>
+          <div style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '16px',
+            padding: '20px 24px',
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '2px',
+          }}>
+            <div style={{
+              fontFamily: 'var(--font-mono)', fontSize: '9px',
+              letterSpacing: '0.2em', textTransform: 'uppercase',
+              color: 'rgb(var(--muted-foreground))',
+              marginBottom: '4px',
+            }}>
+              Projected Score
+            </div>
+            <div style={{
+              fontFamily: 'var(--font-heading)', fontSize: '56px',
+              color: 'rgb(var(--foreground))', lineHeight: 1,
+              transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
+            }}>
+              {displayScore}
+            </div>
+            { <div style={{
+              fontSize: '12px', fontWeight: 600, minHeight: '18px',
+              fontFamily: 'var(--font-mono)',
+              marginTop: '6px',
+              color: showActionPlanButton
+                ? displayGain > 0 ? 'rgb(48,164,108)' : 'rgba(228,228,231,0.25)'
+                : gained === 0 ? 'rgba(228,228,231,0.25)'
+                  : projScore >= baselineScore ? 'rgb(48,164,108)'
+                    : 'rgb(255,197,61)',
+              transition: 'color 0.3s',
+            }}>
+              {showActionPlanButton
+                ? displayGain > 0 ? `+${displayGain} pts · Potential` : 'Select actions below'
+                : gained === 0 ? 'Select actions below'
+                  : projScore >= baselineScore ? `+${gained} pts · Goal ✓`
+                    : `+${gained} pts · ${toGoal} more`}
+            </div> }
+          </div>
+        </div> */}
+
+<div
+  style={{
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '16px',
+    padding: '20px 24px',
+    marginBottom: '24px',
+    width: '20%',
+
+    display: 'flex',
+    alignItems: 'center',        // 🔥 vertical center
+    justifyContent: 'space-between', // 🔥 push ends
+    minHeight: '60px',
+  }}
+>
+  <div
+    style={{
+      fontFamily: 'var(--font-mono)',
+      fontSize: '9px',
+      letterSpacing: '0.2em',
+      textTransform: 'uppercase',
+      color: 'rgb(var(--muted-foreground))',
+    }}
+  >
+    Projected Score
+  </div>
+
+  <div
+    style={{
+      fontFamily: 'var(--font-heading)',
+      fontSize: '36px',
+      color: 'rgb(var(--foreground))',
+      lineHeight: 1,
+    }}
+  >
+    {displayScore}
+  </div>
+</div>
+        
+
 
         {/* ── TAB BAR ── */}
         <div style={{
