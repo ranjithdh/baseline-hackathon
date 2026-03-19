@@ -169,8 +169,8 @@ const SelectableItemCard = React.memo(({ item, catType, isSelected, isNeeded, on
           flexShrink:    0,
         }}>
 
-          {/* +N pts — always visible */}
-          {item.gain > 0 && (
+          {/* +N pts — only when unselected */}
+          {!isSelected && item.gain > 0 && (
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
               <span style={{
                 fontFamily: 'var(--font-heading)',
@@ -201,7 +201,7 @@ const SelectableItemCard = React.memo(({ item, catType, isSelected, isNeeded, on
                 display:      'inline-flex',
                 alignItems:   'center',
                 justifyContent: 'center',
-                width:        '32px',
+                width:        '54px',
                 height:       '32px',
                 borderRadius: '100px',
                 background:   'rgba(255,255,255,0.08)',
