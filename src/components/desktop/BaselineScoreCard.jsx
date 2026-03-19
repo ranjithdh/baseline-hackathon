@@ -109,22 +109,24 @@ const BaselineScoreCard = ({
           border: 1px solid rgba(43, 127, 255, 0.28);
         }
         .bsc-info-btn {
-          margin-left: auto;
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          display: flex;
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  z-index: 999;
+  position: relative;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+       display: flex;
           align-items: center;
           justify-content: center;
           background: rgba(255,255,255,0.04);
           color: rgba(255,255,255,0.25);
           border: 1px solid rgba(255,255,255,0.07);
-          cursor: pointer;
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           flex-shrink: 0;
           box-shadow: 0 4px 12px rgba(0,0,0,0.1);
           backdrop-filter: blur(4px);
-          position: relative;
           overflow: hidden;
           animation: bsc-pulse 4s infinite ease-in-out;
         }
@@ -405,13 +407,21 @@ const BaselineScoreCard = ({
         <div className="bsc-header">
           <span className="bsc-title">Your Health Score</span>
           <span className="bsc-beta">Beta</span>
-          <button
-            className="bsc-info-btn"
-            onClick={(e) => { e.stopPropagation(); setIsInfoOpen(true); }}
-            aria-label="More information"
-          >
-            <Info size={13} strokeWidth={2.5} />
-          </button>
+          <div
+      className="bsc-info-btn"
+      onMouseDown={(e) => { e.stopPropagation(); }}
+      onMouseUp={(e) => { e.stopPropagation(); }}
+      onClick={(e) => { 
+        console.log('Info clicked');
+        e.preventDefault();
+        e.stopPropagation(); 
+        setIsInfoOpen(true); 
+      }}
+      role="button"
+      aria-label="More information"
+    >
+      <Info size={16} strokeWidth={2.5} style={{ pointerEvents: 'none' }} />
+    </div>
         </div>
 
         {/* ── Score Ring + Meta ── */}
