@@ -97,6 +97,9 @@ const HealthScoreSliderV2 = ({
   // Tracks the last committed score so onDragEnd receives the correct final value
   // even if the React state hasn't flushed by the time the mouseup fires.
   const lastCommittedScore  = useRef(clamp(scoreProp, floorVal, max));
+  // Set to true by onUp after a drag/thumb-click so the bubbled onClick on the
+  // outer wrapper knows the interaction was already committed and skips re-firing.
+  const wasDragging         = useRef(false);
 
   // Sync with controlled prop changes from parent
   useEffect(() => {
@@ -131,6 +134,9 @@ const HealthScoreSliderV2 = ({
     const onUp        = ()  => {
       if (dragging.current) {
         dragging.current = false;
+        // Signal onClick on the outer wrapper to skip — this interaction is
+        // already committed here. onClick fires after mouseup on the same element.
+        wasDragging.current = true;
         onDragEnd?.(lastCommittedScore.current);
       }
     };
@@ -148,6 +154,8 @@ const HealthScoreSliderV2 = ({
   }, [commit, onDragEnd]);
 
   // ── Keyboard nav (matches V1 exactly) ─────────────────────────
+  // Each key press is a discrete commit — fire onDragEnd so the action plan
+  // updates immediately (same behaviour as a track click).
   const onKeyDown = (e) => {
     const delta = {
       ArrowRight: 1, ArrowUp: 1,
@@ -157,8 +165,10 @@ const HealthScoreSliderV2 = ({
     if (delta == null) return;
     e.preventDefault();
     const next = clamp(score + delta, floorVal, max);
+    lastCommittedScore.current = next;
     setScore(next);
     onChange?.(next);
+    onDragEnd?.(next);
   };
 
   // Active segment color helpers
@@ -175,7 +185,16 @@ const HealthScoreSliderV2 = ({
       {/* ── Outer wrapper — tall enough to contain thumb + glow ── */}
       <div
         style={S.outerWrap}
-        onClick={(e) => commit(e.clientX)}
+        onClick={(e) => {
+          // If onUp already fired (drag or thumb-click), skip to avoid double commit.
+          if (wasDragging.current) { wasDragging.current = false; return; }
+          // Pure track click — commit the position and immediately trigger the plan.
+          const next = clamp(clientXToScore(e.clientX), floorVal, max);
+          lastCommittedScore.current = next;
+          setScore(next);
+          onChange?.(next);
+          onDragEnd?.(next);
+        }}
       >
         {/* ── Segmented pill track ── */}
         <div ref={trackRef} style={S.track}>
@@ -204,8 +223,8 @@ const HealthScoreSliderV2 = ({
           aria-label={`Health score: ${score}`}
           tabIndex={0}
           onKeyDown={onKeyDown}
-          onMouseDown={(e) => { e.preventDefault(); dragging.current = true; }}
-          onTouchStart={()  => { dragging.current = true; }}
+          onMouseDown={(e) => { e.preventDefault(); wasDragging.current = false; dragging.current = true; }}
+          onTouchStart={()  => { wasDragging.current = false; dragging.current = true; }}
           style={{
             ...S.thumb,
             left: `calc(${markerPct}% - ${R}px)`,
@@ -233,8 +252,10 @@ const HealthScoreSliderV2 = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   const next = clamp(v, floorVal, max);
+                  lastCommittedScore.current = next;
                   setScore(next);
                   onChange?.(next);
+                  onDragEnd?.(next);
                 }}
                 style={{
                   position:   'absolute',

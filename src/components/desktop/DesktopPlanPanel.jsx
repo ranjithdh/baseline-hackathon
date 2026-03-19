@@ -243,6 +243,21 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
   // Total selected across ALL categories (for header summary)
   const totalSelected = ALL_ITEMS.filter(i => selectedIds.has(i.id)).length;
 
+  // ── Sorted item list for the active tab ──────────────────────────────────
+  // Selected items float to the top (stable relative order preserved within
+  // each group). Recomputes only when the tab or selection changes.
+  const sortedTabItems = useMemo(() => {
+    const raw = activeTab === 'all'
+      ? CATEGORIES.flatMap(cat => cat.items.map(item => ({ ...item, _catType: cat.type })))
+      : (CATEGORIES.find(c => c.id === activeTab)?.items || [])
+          .map(item => ({ ...item, _catType: CATEGORIES.find(c => c.id === activeTab)?.type }));
+
+    return [
+      ...raw.filter(item => selectedIds.has(item.id)),
+      ...raw.filter(item => !selectedIds.has(item.id)),
+    ];
+  }, [activeTab, selectedIds]);
+
   // Live slider handler — updates display score only while dragging.
   // Plan regeneration happens in handleSliderRelease (on drag end).
   const handleGoalChange = (val) => {
@@ -660,30 +675,23 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
         </div>
 
         {/* ── CARD GRID for active tab ── */}
-        {(() => {
-          const items = activeTab === 'all'
-            ? CATEGORIES.flatMap(cat => cat.items.map(item => ({ ...item, _catType: cat.type })))
-            : (activeCategory?.items || []).map(item => ({ ...item, _catType: activeCategory.type }));
-
-          return (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '12px',
-            }}>
-              {items.map(item => (
-                <ItemCard
-                  key={item.id}
-                  item={item}
-                  catType={item._catType}
-                  isSelected={selectedIds.has(item.id)}
-                  isNeeded={neededIds.has(item.id)}
-                  onToggle={handleToggleItem}
-                />
-              ))}
-            </div>
-          );
-        })()}
+        {/* Selected items are always sorted to the top (stable within each group). */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '12px',
+        }}>
+          {sortedTabItems.map(item => (
+            <ItemCard
+              key={item.id}
+              item={item}
+              catType={item._catType}
+              isSelected={selectedIds.has(item.id)}
+              isNeeded={neededIds.has(item.id)}
+              onToggle={handleToggleItem}
+            />
+          ))}
+        </div>
       </div>
       </DashboardCard>
     </>
