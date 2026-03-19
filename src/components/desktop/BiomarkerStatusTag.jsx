@@ -28,9 +28,12 @@ const STATUS_CONFIG = {
   optimal:         { label: 'Optimal',          bg: 'rgb(var(--chart-5))', text: 'rgb(var(--chart-5-foreground))' },
   normal:          { label: 'Normal',            bg: 'rgb(var(--chart-4))', text: 'rgb(var(--chart-4-foreground))' },
   borderline_high: { label: 'Borderline High',  bg: 'rgb(var(--chart-3))', text: 'rgb(var(--chart-3-foreground))' },
+  borderline_low:  { label: 'Borderline Low',   bg: 'rgb(var(--chart-3))', text: 'rgb(var(--chart-3-foreground))' },
   moderately_high: { label: 'Moderately High',  bg: 'rgb(var(--chart-3))', text: 'rgb(var(--chart-3-foreground))' },
   low:             { label: 'Low',               bg: 'rgb(var(--chart-2))', text: 'rgb(var(--chart-2-foreground))' },
   high:            { label: 'High',              bg: 'rgb(var(--chart-2))', text: 'rgb(var(--chart-2-foreground))' },
+  critical_high:   { label: 'Critical High',    bg: 'rgb(var(--chart-1))', text: 'rgb(var(--chart-1-foreground))' },
+  critical_low:    { label: 'Critical Low',     bg: 'rgb(var(--chart-1))', text: 'rgb(var(--chart-1-foreground))' },
 };
 
 const BiomarkerStatusTag = React.memo(({ status }) => {
@@ -44,7 +47,7 @@ const BiomarkerStatusTag = React.memo(({ status }) => {
       padding:       '4px 12px',
       borderRadius:  '999px',
       fontSize:      '11px',
-      fontWeight:    600,
+      fontWeight:    700,
       fontFamily:    'var(--font-main)',
       background:    config.bg,
       color:         config.text,
