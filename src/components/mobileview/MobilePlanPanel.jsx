@@ -35,10 +35,8 @@ function computeNeeded(goalTarget) {
 const ItemCard = ({ item, isSelected, isNeeded, onToggle }) => {
   const [hovered, setHovered] = useState(false);
 
-  const bg = hovered ? 'rgba(255,255,255,0.05)' : 'rgba(20, 24, 35, 0.85)';
-
   const borderColor = isSelected
-    ? 'rgba(43,127,255,0.45)'
+    ? 'rgba(43,127,255,0.55)'
     : hovered ? 'rgba(255,255,255,0.13)' : 'rgba(255, 255, 255, 0.06)';
 
   return (
@@ -47,16 +45,17 @@ const ItemCard = ({ item, isSelected, isNeeded, onToggle }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: bg,
-        border: `1px solid ${borderColor}`,
-        borderRadius: '16px',
+        background: 'rgba(20, 24, 35, 0.85)',
+        border: isSelected ? `1.5px solid ${borderColor}` : `1px solid ${borderColor}`,
+        borderRadius: '20px',
         padding: '16px',
         cursor: 'pointer',
-        transition: 'background 0.18s, border-color 0.18s',
+        backdropFilter: 'blur(10px)',
+        transition: 'border-color 0.18s',
         display: 'flex',
         flexDirection: 'column',
         gap: '10px',
-        boxShadow: isSelected ? '0 0 0 4px rgba(43,127,255,0.08)' : 'none',
+        boxShadow: '0 12px 32px rgba(0, 0, 0, 0.35)',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
