@@ -10,7 +10,6 @@ import ActionPlanDownloadButton from './ActionPlanDownloadButton';
 // ExpertGuidanceCard (V1) is intentionally kept for DesktopDashboard.
 // DesktopPlanPanel uses the redesigned HealthScoreLimitCard instead.
 import HealthScoreLimitCard from './HealthScoreLimitCard';
-import BuildActionPlanBanner from './BuildActionPlanBanner';
 import { InferenceBadge } from '../../ui/inference-badge';
 
 const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
@@ -190,18 +189,12 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
 // ── Main Component ───────────────────────────────────────────────
 const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsult }) => {
   const [selectedIds, setSelectedIds] = useState(() => computeNeeded(goalTarget));
-  const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
+  // 'all' is the default — shows every category's items in one view
+  const [activeTab, setActiveTab] = useState('all');
 
   // ── Playground: baseline tracking ────────────────────────────────────────
-  // baselineScore is the "confirmed" goal the user started from.
-  // It only updates when the user clicks "Build your Action Plan", anchoring
-  // their chosen target. The button is visible any time the slider has drifted
-  // away from the baseline, giving the user a clear CTA to commit.
+  // baselineScore is the "confirmed" goal — updated automatically on slider release.
   const [baselineScore, setBaselineScore] = useState(() => goalTarget);
-
-  // Simple O(1) derived visibility — no memo needed.
-  const showActionPlanButton = goalTarget !== baselineScore;
-  
 
   // Preserves the committed item selection across drift/restore cycles so that
   // dragging the slider back to baseline restores the exact previous selection
@@ -211,14 +204,21 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
     savedSelectedIdsRef.current = new Set(computeNeeded(goalTarget));
   }
 
-  const handleBuildActionPlan = useCallback(() => {
-    // Commit the current slider position as the new baseline, save selection,
-    // and regenerate the plan from the new goal.
-    const newIds = new Set(computeNeeded(goalTarget));
+  // ── generateActionPlan — single source of truth for plan generation ───────
+  // Accepts an explicit score (from slider release) so it never reads stale
+  // goalTarget from a closed-over prop.
+  const generateActionPlan = useCallback((score) => {
+    const newIds = new Set(computeNeeded(score));
     savedSelectedIdsRef.current = newIds;
-    setBaselineScore(goalTarget);
+    setBaselineScore(score);
     setSelectedIds(newIds);
-  }, [goalTarget]);
+    onGoalChange(score);
+  }, [onGoalChange]);
+
+  // Called by HealthScoreSliderV2's onDragEnd — fires once per drag gesture.
+  const handleSliderRelease = useCallback((finalScore) => {
+    generateActionPlan(finalScore);
+  }, [generateActionPlan]);
 
   // Action plan computed values are driven by baselineScore (committed goal),
   // NOT goalTarget (live slider) — so the card never re-renders during drag.
@@ -229,14 +229,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
   const toGoal = baselineScore - projScore;
   const progressPct = ptsNeeded > 0 ? Math.min(100, (gained / ptsNeeded) * 100) : 100;
 
-  // ── Live projected score (real-time during drag) ──────────────────────────
-  // While the slider is drifting (showActionPlanButton = true) we show the
-  // potential achievable score for the current goalTarget so the number
-  // animates smoothly as the thumb moves. Once committed (at baseline) we
-  // fall back to the action-based projection driven by selectedIds.
-  const displayScore = showActionPlanButton
-    ? Math.min(goalTarget, MAX_ACHIEVABLE)
-    : projScore;
+  const displayScore = projScore;
   const displayGain = displayScore - BASE_SCORE;
 
   const badge = ptsNeeded <= 7
@@ -250,17 +243,10 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
   // Total selected across ALL categories (for header summary)
   const totalSelected = ALL_ITEMS.filter(i => selectedIds.has(i.id)).length;
 
-  // Live slider handler — updates goalTarget only.
-  // • Drift away from baseline → clear items (show fresh unselected state, faded)
-  // • Return exactly to baseline → restore the last committed selection
+  // Live slider handler — updates display score only while dragging.
+  // Plan regeneration happens in handleSliderRelease (on drag end).
   const handleGoalChange = (val) => {
-    const g = parseInt(val);
-    onGoalChange(g);
-    if (g === baselineScore) {
-      setSelectedIds(new Set(savedSelectedIdsRef.current));
-    } else {
-      setSelectedIds(new Set());
-    }
+    onGoalChange(parseInt(val));
   };
 
   // Clicking an item toggles selection, commits the resulting projected score as
@@ -348,24 +334,6 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
             })()}
 
 
-            <div style={{ marginLeft: 'auto', alignSelf: 'center' }}>
-              <AnimatePresence>
-                {showActionPlanButton && (
-                  <motion.div
-                    key="build-action-plan-btn"
-                    initial={{ opacity: 0, scale: 0.95, y: -4 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                    transition={{ duration: 0.2, ease: 'easeOut' }}
-                  >
-                    <BuildActionPlanBanner
-                      targetScore={goalTarget}
-                      onClick={handleBuildActionPlan}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
 
           </div> 
 
@@ -378,6 +346,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
             maxRecommended={MAX_ACHIEVABLE}
             ticks={TICK_VALS}
             onChange={handleGoalChange}
+            onDragEnd={handleSliderRelease}
           />
         </div>
 
@@ -583,6 +552,58 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
         <div style={{
           display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap',
         }}>
+          {/* "All" tab — always first */}
+          {(() => {
+            const isActive = activeTab === 'all';
+            const allSelected = ALL_ITEMS.filter(i => selectedIds.has(i.id)).length;
+            const anyNeeded = ALL_ITEMS.some(i => neededIds.has(i.id));
+            return (
+              <button
+                key="all"
+                onClick={() => setActiveTab('all')}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '7px',
+                  padding: '8px 16px',
+                  borderRadius: '100px',
+                  border: isActive
+                    ? '1px solid rgba(43,127,255,0.5)'
+                    : anyNeeded
+                      ? '1px solid rgba(255,197,61,0.25)'
+                      : '1px solid rgba(255,255,255,0.10)',
+                  background: isActive ? 'rgba(43,127,255,0.18)' : 'rgba(255,255,255,0.04)',
+                  color: isActive ? 'rgb(43,127,255)' : 'rgb(var(--muted-foreground)',
+                  fontSize: '12px', fontWeight: isActive ? 600 : 400,
+                  fontFamily: 'var(--font-main)',
+                  cursor: 'pointer',
+                  transition: 'all 0.18s',
+                  outline: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <span>
+                  All
+                  {allSelected > 0 && (
+                    <span style={{
+                      marginLeft: '5px', fontSize: '11px',
+                      fontWeight: isActive ? 600 : 400,
+                      color: 'rgb(var(--muted-foreground)',
+                      fontFamily: 'var(--font-mono)',
+                    }}>
+                      ({allSelected})
+                    </span>
+                  )}
+                </span>
+                {allSelected > 0 && (
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'rgb(48,164,108)', flexShrink: 0 }} />
+                )}
+                {allSelected === 0 && anyNeeded && (
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'rgb(255,197,61)', flexShrink: 0 }} />
+                )}
+              </button>
+            );
+          })()}
+
+          {/* Per-category tabs */}
           {CATEGORIES.map(cat => {
             const isActive = cat.id === activeTab;
             const catSelected = cat.items.filter(i => selectedIds.has(i.id)).length;
@@ -613,16 +634,13 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
                   whiteSpace: 'nowrap',
                 }}
               >
-
-
-                {/* Name + count inline */}
                 <span>
                   {cat.name}
                   {catSelected > 0 && (
                     <span style={{
                       marginLeft: '5px',
                       fontSize: '11px',
-                     fontWeight: isActive ? 600 : 400,
+                      fontWeight: isActive ? 600 : 400,
                       color: 'rgb(var(--muted-foreground)',
                       fontFamily: 'var(--font-mono)',
                     }}>
@@ -630,23 +648,11 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
                     </span>
                   )}
                 </span>
-
-                {/* Green dot — items selected */}
                 {catSelected > 0 && (
-                  <span style={{
-                    width: '7px', height: '7px', borderRadius: '50%',
-                    background: 'rgb(48,164,108)',
-                    flexShrink: 0,
-                  }} />
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'rgb(48,164,108)', flexShrink: 0 }} />
                 )}
-
-                {/* Amber dot — needed but nothing selected yet */}
                 {catSelected === 0 && catNeeded && (
-                  <span style={{
-                    width: '7px', height: '7px', borderRadius: '50%',
-                    background: 'rgb(255,197,61)',
-                    flexShrink: 0,
-                  }} />
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'rgb(255,197,61)', flexShrink: 0 }} />
                 )}
               </button>
             );
@@ -654,26 +660,30 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
         </div>
 
         {/* ── CARD GRID for active tab ── */}
-        {/* Fades when slider drifts from baseline — items are cleared (unselected)
-            to signal the plan is outdated. Title and tabs stay fully visible. */}
-        {activeCategory && (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: '12px',
-          }}>
-            {activeCategory.items.map(item => (
-              <ItemCard
-                key={item.id}
-                item={item}
-                catType={activeCategory.type}
-                isSelected={selectedIds.has(item.id)}
-                isNeeded={neededIds.has(item.id)}
-                onToggle={handleToggleItem}
-              />
-            ))}
-          </div>
-        )}
+        {(() => {
+          const items = activeTab === 'all'
+            ? CATEGORIES.flatMap(cat => cat.items.map(item => ({ ...item, _catType: cat.type })))
+            : (activeCategory?.items || []).map(item => ({ ...item, _catType: activeCategory.type }));
+
+          return (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '12px',
+            }}>
+              {items.map(item => (
+                <ItemCard
+                  key={item.id}
+                  item={item}
+                  catType={item._catType}
+                  isSelected={selectedIds.has(item.id)}
+                  isNeeded={neededIds.has(item.id)}
+                  onToggle={handleToggleItem}
+                />
+              ))}
+            </div>
+          );
+        })()}
       </div>
       </DashboardCard>
     </>

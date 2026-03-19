@@ -85,6 +85,7 @@ const HealthScoreSliderV2 = ({
   min = 0,
   max = 100,
   onChange,
+  onDragEnd,
   minAllowedScore,
   maxRecommended,
   ticks = [],
@@ -93,6 +94,9 @@ const HealthScoreSliderV2 = ({
   const [score, setScore]   = useState(clamp(scoreProp, floorVal, max));
   const trackRef            = useRef(null);
   const dragging            = useRef(false);
+  // Tracks the last committed score so onDragEnd receives the correct final value
+  // even if the React state hasn't flushed by the time the mouseup fires.
+  const lastCommittedScore  = useRef(clamp(scoreProp, floorVal, max));
 
   // Sync with controlled prop changes from parent
   useEffect(() => {
@@ -116,6 +120,7 @@ const HealthScoreSliderV2 = ({
 
   const commit = useCallback((clientX) => {
     const next = clamp(clientXToScore(clientX), floorVal, max);
+    lastCommittedScore.current = next;
     setScore(next);
     onChange?.(next);
   }, [clientXToScore, floorVal, max, onChange]);
@@ -123,7 +128,12 @@ const HealthScoreSliderV2 = ({
   useEffect(() => {
     const onMove      = (e) => { if (dragging.current) commit(e.clientX); };
     const onTouchMove = (e) => { if (dragging.current) commit(e.touches[0].clientX); };
-    const onUp        = ()  => { dragging.current = false; };
+    const onUp        = ()  => {
+      if (dragging.current) {
+        dragging.current = false;
+        onDragEnd?.(lastCommittedScore.current);
+      }
+    };
 
     window.addEventListener('mousemove',  onMove);
     window.addEventListener('mouseup',    onUp);
@@ -135,7 +145,7 @@ const HealthScoreSliderV2 = ({
       window.removeEventListener('touchmove',  onTouchMove);
       window.removeEventListener('touchend',   onUp);
     };
-  }, [commit]);
+  }, [commit, onDragEnd]);
 
   // ── Keyboard nav (matches V1 exactly) ─────────────────────────
   const onKeyDown = (e) => {
