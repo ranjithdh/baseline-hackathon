@@ -524,7 +524,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
             />
           ))}
         </div>
-      </div>
+
       </DashboardCard>
     </>
   );
