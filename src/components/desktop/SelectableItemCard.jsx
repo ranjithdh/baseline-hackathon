@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
 
+// Inject fade-scale keyframe once
+if (typeof document !== 'undefined' && !document.getElementById('sic-keyframes')) {
+  const s = document.createElement('style');
+  s.id = 'sic-keyframes';
+  s.textContent = `@keyframes fadeScaleIn { from { opacity: 0; transform: scale(0.7); } to { opacity: 1; transform: scale(1); } }`;
+  document.head.appendChild(s);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // SelectableItemCard
 //
@@ -152,16 +160,16 @@ const SelectableItemCard = React.memo(({ item, catType, isSelected, isNeeded, on
           </div>
         </div>
 
-        {/* Right: pill action button stacked above +N points */}
+        {/* Right: +N pts label + remove pill (selected only) */}
         <div style={{
           display:       'flex',
           flexDirection: 'row',
-          alignItems:    'flex-end',
+          alignItems:    'center',
           gap:           '8px',
           flexShrink:    0,
         }}>
 
-              {/* ── +N points — visible in both states ── */}
+          {/* +N pts — always visible */}
           {item.gain > 0 && (
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
               <span style={{
@@ -183,50 +191,41 @@ const SelectableItemCard = React.memo(({ item, catType, isSelected, isNeeded, on
             </div>
           )}
 
+          {/* Minus pill — only when selected */}
+          {isSelected && (
+            <div
+              aria-label="Remove item"
+              role="button"
+              onClick={e => { e.stopPropagation(); onToggle(item.id); }}
+              style={{
+                display:      'inline-flex',
+                alignItems:   'center',
+                justifyContent: 'center',
+                width:        '32px',
+                height:       '32px',
+                borderRadius: '100px',
+                background:   'rgba(255,255,255,0.08)',
+                border:       '1px solid rgba(255,255,255,0.13)',
+                cursor:       'pointer',
+                userSelect:   'none',
+                flexShrink:   0,
+                animation:    'fadeScaleIn 0.15s ease',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.15)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
+            >
+              <span style={{
+                fontSize:   '18px',
+                fontWeight: 700,
+                lineHeight: 1,
+                color:      'rgba(255,255,255,0.65)',
+                marginTop:  '-1px',
+              }}>
+                −
+              </span>
+            </div>
+          )}
 
-          {/* ── Pill button (+ Add / − Remove) ── */}
-          {/* stopPropagation so clicking the button doesn't double-fire the card onClick */}
-          <div
-            onClick={e => { e.stopPropagation(); onToggle(item.id); }}
-            style={{
-              display:     'inline-flex',
-              alignItems:  'center',
-              gap:         '6px',
-              padding:     '6px 14px',
-              borderRadius: '100px',
-              background:  'rgba(255,255,255,0.08)',
-              border:      '1px solid rgba(255,255,255,0.13)',
-              cursor:      'pointer',
-              userSelect:  'none',
-              transition:  'background 0.15s, border-color 0.15s',
-              whiteSpace:  'nowrap',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.13)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
-          >
-            {/* Icon — green "+" when unselected, muted "−" when selected */}
-            <span style={{
-              fontSize:   '18px',
-              fontWeight: 700,
-              lineHeight: 1,
-              color:      isSelected ? 'rgba(255,255,255,0.65)' : 'rgb(255,255,255,1)',
-            }}>
-              {isSelected ? '−' : '+'}
-            </span>
-
-            {/* Label */}
-            {/* { <span style={{
-              fontSize:      '12px',
-              fontWeight:    400,
-              fontFamily:    'var(--font-main)',
-              color:         'rgba(255,255,255,0.85)',
-              letterSpacing: '0.01em',
-            }}>
-              {isSelected ? 'Remove' : 'Add'}
-            </span> } */}
-          </div>
-
-      
         </div>
       </div>
 
