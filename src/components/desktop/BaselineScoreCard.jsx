@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Info } from 'lucide-react';
 import BaselineScoreInfoOverlay from './BaselineScoreInfoOverlay';
 
 
@@ -109,25 +110,63 @@ const BaselineScoreCard = ({
         }
         .bsc-info-btn {
           margin-left: auto;
-          width: 20px;
-          height: 20px;
+          width: 24px;
+          height: 24px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(255,255,255,0.05);
-          color: rgba(255,255,255,0.35);
-          font-size: 10px;
-          font-style: italic;
-          font-weight: 700;
-          border: 1px solid rgba(255,255,255,0.08);
+          background: rgba(255,255,255,0.04);
+          color: rgba(255,255,255,0.25);
+          border: 1px solid rgba(255,255,255,0.07);
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           flex-shrink: 0;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          backdrop-filter: blur(4px);
+          position: relative;
+          overflow: hidden;
+          animation: bsc-pulse 4s infinite ease-in-out;
+        }
+        .bsc-info-btn::after {
+          content: '';
+          position: absolute;
+          top: -100%;
+          left: -150%;
+          width: 200%;
+          height: 300%;
+          background: linear-gradient(
+            135deg,
+            transparent 0%,
+            transparent 45%,
+            rgba(255, 255, 255, 0.15) 50%,
+            transparent 55%,
+            transparent 100%
+          );
+          transform: rotate(45deg);
+          animation: bsc-glint 6s infinite ease-in-out;
+          pointer-events: none;
+        }
+        @keyframes bsc-glint {
+          0% { left: -150%; }
+          15% { left: 150%; }
+          100% { left: 150%; }
+        }
+        @keyframes bsc-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.03), 0 4px 12px rgba(0,0,0,0.1); }
+          50% { box-shadow: 0 0 0 8px rgba(255,255,255,0), 0 4px 12px rgba(0,0,0,0.1); }
+          100% { box-shadow: 0 0 0 0 rgba(255,255,255,0), 0 4px 12px rgba(0,0,0,0.1); }
         }
         .bsc-info-btn:hover {
           background: rgba(255,255,255,0.1);
           color: #fff;
+          border-color: rgba(255,255,255,0.2);
+          transform: scale(1.08);
+          box-shadow: 0 0 12px rgba(255,255,255,0.08);
+          animation-play-state: paused;
+        }
+        .bsc-info-btn:active {
+          transform: scale(0.95);
         }
 
         /* ── Score + Meta Row ── */
@@ -369,8 +408,9 @@ const BaselineScoreCard = ({
           <button
             className="bsc-info-btn"
             onClick={(e) => { e.stopPropagation(); setIsInfoOpen(true); }}
+            aria-label="More information"
           >
-            i
+            <Info size={13} strokeWidth={2.5} />
           </button>
         </div>
 
