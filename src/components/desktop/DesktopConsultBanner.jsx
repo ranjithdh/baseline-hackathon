@@ -166,10 +166,10 @@ const DesktopConsultBanner = ({ onBookNow }) => {
 
             <div className="dcb-trust">
               <div className="dcb-trust-item">
-                <span>★</span> 4.8 review
+                <span>★</span> 4.9 review
               </div>
               <div className="dcb-trust-item">
-                10,000+ Users
+                10,0000+ Users
               </div>
               <div className="dcb-trust-item">
                 30-min free session
