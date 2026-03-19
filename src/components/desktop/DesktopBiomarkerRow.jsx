@@ -25,24 +25,24 @@ const BiomarkerRow = React.memo(({ marker }) => {
       onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
     >
-      {/* Marker Name (Fixed baseline for "straight" alignment of next col) */}
-      <span style={{ 
-        width: '120px', 
-        fontSize: '13px', 
-        fontWeight: 600, 
-        color: '#e4e4e7', 
-        fontFamily: 'var(--font-main)',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        flexShrink: 0
-      }}>
-        {marker.name}
-      </span>
+      {/* Marker Name (Leading) */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
+        <span style={{ 
+          fontSize: '13px', 
+          fontWeight: 600, 
+          color: '#e4e4e7', 
+          fontFamily: 'var(--font-main)',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}>
+          {marker.name}
+        </span>
+      </div>
 
-      {/* Value (Left-aligned within its slot) */}
-      <div style={{ width: '70px', display: 'flex', alignItems: 'baseline', justifyContent: 'flex-start', gap: '4px', flexShrink: 0 }}>
-        <span style={{ fontSize: '12px', color: '#fff', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
+      {/* Value (Center-aligned) */}
+      <div style={{ width: '80px', display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '4px', flexShrink: 0 }}>
+        <span style={{ fontSize: '13px', color: '#fff', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
           {marker.value}
         </span>
         <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
@@ -50,7 +50,7 @@ const BiomarkerRow = React.memo(({ marker }) => {
         </span>
       </div>
 
-      {/* Inference (Status Pill) (Trailing alignment) */}
+      {/* Inference (Status Pill) (Trailing) */}
       <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
         <StatusBadge status={marker.status} />
       </div>
