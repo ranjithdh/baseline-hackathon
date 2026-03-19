@@ -25,10 +25,10 @@ const ConversionCTA = React.memo(({
 
   const baseStyle = {
     // 1. Visual Style (Modern, premium, gradient)
-    background: 'linear-gradient(135deg, #10b981 0%, #14b8a6 100%)', // vibrant green -> teal
+    background: '#E4E4E7', // vibrant green -> teal
     border: 'none',
-    borderRadius: '100px', // pill-shaped
-    color: '#ffffff',
+    borderRadius: '12px', // pill-shaped
+    color: '#000000',
     cursor: 'pointer',
     position: 'relative',
     overflow: 'hidden',
@@ -46,13 +46,8 @@ const ConversionCTA = React.memo(({
     // 3. Typography (bold, clean, high contrast)
     fontFamily: 'var(--font-main), -apple-system, sans-serif',
     fontSize: '14px',
-    fontWeight: '700',
+    fontWeight: '500',
     letterSpacing: '0.02em',
-
-    // 1. Elevation & Glow
-    boxShadow: isHovered 
-      ? '0 10px 25px -5px rgba(16, 185, 129, 0.5), 0 8px 10px -6px rgba(16, 185, 129, 0.5)'
-      : '0 4px 12px rgba(16, 185, 129, 0.3)',
 
     // 5. Interaction States (Smooth transitions)
     transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
