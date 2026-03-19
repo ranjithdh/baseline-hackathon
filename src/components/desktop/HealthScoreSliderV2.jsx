@@ -86,6 +86,7 @@ const HealthScoreSliderV2 = ({
   max = 100,
   onChange,
   onDragEnd,
+  onDragEnd,
   minAllowedScore,
   maxRecommended,
   ticks = [],

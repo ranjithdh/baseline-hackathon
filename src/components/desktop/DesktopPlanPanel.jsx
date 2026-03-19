@@ -5,18 +5,13 @@ import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlan
 // The Playground panel uses PlaygroundScoreSlider (Current vs Potential design).
 import PlaygroundScoreSlider from './PlaygroundScoreSlider';
 import DashboardCard from './DashboardCard';
-import PrimaryButton from './PrimaryButton';
 import ActionPlanDownloadButton from './ActionPlanDownloadButton';
-// ExpertGuidanceCard (V1) is intentionally kept for DesktopDashboard.
-// DesktopPlanPanel uses the redesigned HealthScoreLimitCard instead.
 import HealthScoreLimitCard from './HealthScoreLimitCard';
 import { InferenceBadge } from '../../ui/inference-badge';
 
 const GOAL_MIN = BASE_SCORE;
 const GOAL_MAX = 100;
 
-// Aligned with SEGMENTS in HealthScoreSliderV2 — uses chart CSS vars for
-// solid pill background. Text is dark on bright fills, white on dark fills.
 const getScoreStatus = (score) => {
   if (score >= 85) return { text: 'Elite',       tagBg: 'rgb(var(--chart-6))', tagText: 'rgba(255,255,255,0.92)' };
   if (score >= 75) return { text: 'Strong',      tagBg: 'rgb(var(--chart-5))', tagText: 'rgba(255,255,255,0.92)' };
@@ -25,7 +20,6 @@ const getScoreStatus = (score) => {
   return             { text: 'Compromised',  tagBg: 'rgb(var(--chart-2))', tagText: 'rgba(0,0,0,0.72)'       };
 };
 
-// ── Helper: greedy pick of top-gain items to reach pts needed ────
 function computeNeeded(goalTarget) {
   const ptsNeeded = Math.min(goalTarget, MAX_ACHIEVABLE) - BASE_SCORE;
   let running = 0;
@@ -40,17 +34,10 @@ function computeNeeded(goalTarget) {
   return needed;
 }
 
-// ── Item Card ────────────────────────────────────────────────────
 const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
   const [hovered, setHovered] = useState(false);
-
-  const bg = isSelected
-    ? 'rgba(43,127,255,0.07)'
-    : hovered ? 'rgba(255,255,255,0.055)' : 'rgba(255,255,255,0.03)';
-
-  const borderColor = isSelected
-    ? 'rgba(43,127,255,0.45)'
-    : hovered ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.07)';
+  const bg = isSelected ? 'rgba(43,127,255,0.07)' : hovered ? 'rgba(255,255,255,0.055)' : 'rgba(255,255,255,0.03)';
+  const borderColor = isSelected ? 'rgba(43,127,255,0.45)' : hovered ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.07)';
 
   return (
     <div
@@ -70,122 +57,48 @@ const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
         boxShadow: isSelected ? '0 0 0 4px rgba(43,127,255,0.08)' : 'none',
       }}
     >
-      {/* Row 1: Title + ★ needed (left)  |  +X points or ✓ Added (right) */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        gap: '12px',
-      }}>
-        {/* Left: name + timeline + needed chip */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <span style={{
-              fontSize: '15px', fontWeight: 700,
-              color: 'rgb(var(--zinc-100))',
-              fontFamily: 'var(--font-main)',
-              lineHeight: 1.3,
-            }}>
+            <span style={{ fontSize: '15px', fontWeight: 700, color: 'rgb(var(--zinc-100))', fontFamily: 'var(--font-main)', lineHeight: 1.3 }}>
               {item.name}
             </span>
             {item.timeline && item.gain > 0 && (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: '4px',
-                padding: '3px 9px', borderRadius: '100px',
-                fontSize: '10px', color: 'rgba(255,255,255,0.45)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.04)',
-                fontFamily: 'var(--font-mono)',
-                whiteSpace: 'nowrap',
-              }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '100px', fontSize: '10px', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
                 <span style={{ opacity: 0.6, fontSize: '16px', lineHeight: 1 }}>⊙</span>
                 {item.timeline}
               </span>
             )}
             {isNeeded && (
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: '3px',
-                padding: '2px 8px', borderRadius: '100px',
-                fontSize: '9px', fontWeight: 600,
-                fontFamily: 'var(--font-mono)',
-                letterSpacing: '0.07em', textTransform: 'uppercase',
-                background: 'rgba(255,197,61,0.14)',
-                color: 'rgb(255,197,61)',
-                border: '1px solid rgba(255,197,61,0.28)',
-                whiteSpace: 'nowrap',
-              }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '100px', fontSize: '9px', fontWeight: 600, fontFamily: 'var(--font-mono)', letterSpacing: '0.07em', textTransform: 'uppercase', background: 'rgba(255,197,61,0.14)', color: 'rgb(255,197,61)', border: '1px solid rgba(255,197,61,0.28)', whiteSpace: 'nowrap' }}>
                 ★ needed
               </span>
             )}
           </div>
         </div>
-
-        {/* Right: ✓ Added chip (selected) or +X points (unselected) */}
         {isSelected ? (
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: '5px',
-            padding: '4px 12px', borderRadius: '100px',
-            fontSize: '10px', fontWeight: 600,
-            fontFamily: 'var(--font-mono)',
-            background: 'rgba(43,127,255,0.18)',
-            color: 'rgb(43,127,255)',
-            border: '1px solid rgba(43,127,255,0.3)',
-            letterSpacing: '0.04em',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-          }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 12px', borderRadius: '100px', fontSize: '10px', fontWeight: 600, fontFamily: 'var(--font-mono)', background: 'rgba(43,127,255,0.18)', color: 'rgb(43,127,255)', border: '1px solid rgba(43,127,255,0.3)', letterSpacing: '0.04em', whiteSpace: 'nowrap', flexShrink: 0 }}>
             ✓ Added
           </span>
         ) : (
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', flexShrink: 0 }}>
-            <span style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: item.gain > 0 ? '22px' : '15px',
-              fontWeight: 700,
-              color: item.gain > 0 ? 'rgb(48,164,108)' : 'rgba(255,255,255,0.2)',
-              lineHeight: 1,
-            }}>
+            <span style={{ fontFamily: 'var(--font-heading)', fontSize: item.gain > 0 ? '22px' : '15px', fontWeight: 700, color: item.gain > 0 ? 'rgb(48,164,108)' : 'rgba(255,255,255,0.2)', lineHeight: 1 }}>
               {item.gain > 0 ? `+${item.gain}` : '—'}
             </span>
-            {item.gain > 0 && (
-              <span style={{
-                fontSize: '10px', color: 'rgba(255,255,255,0.3)',
-                fontFamily: 'var(--font-mono)',
-              }}>
-                points
-              </span>
-            )}
+            {item.gain > 0 && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-mono)' }}>points</span>}
           </div>
         )}
       </div>
-
-      {/* Row 2: Description */}
-      <p style={{
-        fontSize: '12px', color: 'rgba(228,228,231,0.42)',
-        lineHeight: 1.65, margin: 0,
-      }}>
-        {item.detail}
-      </p>
-
-      {/* Row 3: Chips only (tags) */}
+      <p style={{ fontSize: '12px', color: 'rgba(228,228,231,0.42)', lineHeight: 1.65, margin: 0 }}>{item.detail}</p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: 'auto' }}>
         {item.tags && item.tags.map(tag => (
-          <span key={tag} style={{
-            padding: '4px 10px', borderRadius: '100px',
-            fontSize: '10px', fontWeight: 500,
-            color: 'rgb(48,164,108)',
-            border: '1px solid rgba(48,164,108,0.28)',
-            background: 'rgba(48,164,108,0.08)',
-          }}>
-            {tag}
-          </span>
+          <span key={tag} style={{ padding: '4px 10px', borderRadius: '100px', fontSize: '10px', fontWeight: 500, color: 'rgb(48,164,108)', border: '1px solid rgba(48,164,108,0.28)', background: 'rgba(48,164,108,0.08)' }}>{tag}</span>
         ))}
       </div>
     </div>
   );
 };
 
-// ── Main Component ───────────────────────────────────────────────
 const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsult }) => {
   const [selectedIds, setSelectedIds] = useState(() => computeNeeded(goalTarget));
   // 'all' is the default — shows every category's items in one view
@@ -230,16 +143,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
 
   const displayScore = projScore;
   const displayGain = displayScore - BASE_SCORE;
-
-  const badge = ptsNeeded <= 7
-    ? { text: 'Achievable · 8 wks', bg: 'rgba(48,164,108,0.15)', color: 'rgb(48,164,108)', border: 'rgba(48,164,108,0.28)' }
-    : ptsNeeded <= 12
-      ? { text: 'Stretch · 12 wks', bg: 'rgba(255,197,61,0.15)', color: 'rgb(255,197,61)', border: 'rgba(255,197,61,0.28)' }
-      : { text: 'Ambitious · 16+ wks', bg: 'rgba(241,121,104,0.15)', color: 'rgb(241,121,104)', border: 'rgba(241,121,104,0.28)' };
-
   const activeCategory = CATEGORIES.find(c => c.id === activeTab);
-
-  // Total selected across ALL categories (for header summary)
   const totalSelected = ALL_ITEMS.filter(i => selectedIds.has(i.id)).length;
 
   // ── Sorted item list for the active tab ──────────────────────────────────
@@ -263,15 +167,11 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
     onGoalChange(parseInt(val));
   };
 
-  // Clicking an item toggles selection, commits the resulting projected score as
-  // the new baseline, and saves the selection so drift/restore works correctly.
   const handleToggleItem = useCallback((id) => {
     const next = new Set(selectedIds);
     next.has(id) ? next.delete(id) : next.add(id);
-
     const newGained = ALL_ITEMS.filter(i => next.has(i.id)).reduce((s, i) => s + i.gain, 0);
     const newProjScore = Math.min(GOAL_MAX, Math.max(GOAL_MIN, BASE_SCORE + newGained));
-
     savedSelectedIdsRef.current = next;
     setSelectedIds(next);
     setBaselineScore(newProjScore);
@@ -370,92 +270,24 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
           {/* ── HealthScoreLimitCard — animated show/hide ── */}
           <AnimatePresence>
             {goalTarget > MAX_ACHIEVABLE && (
-              <motion.div
-                key="limit-card"
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-                style={{ gridColumn: '1 / -1', width: '100%' }}
-              >
-                <HealthScoreLimitCard
-                  score={goalTarget}
-                  onConsultClick={() => {/* navigate to consult flow */}}
-                />
+              <motion.div key="limit-card" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: 'easeOut' }} style={{ gridColumn: '1 / -1', width: '100%' }}>
+                <HealthScoreLimitCard score={goalTarget} onConsultClick={onBookConsult} />
               </motion.div>
             )}
           </AnimatePresence>
-      </div>
-
-      {/* ── PROGRESS BAR ── */}
-      {/* <div style={{
-        padding: '18px 44px',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
-        position: 'relative', zIndex: 1,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ flex: 1, height: '5px', background: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
-            <div style={{
-              height: '5px',
-              background: 'linear-gradient(90deg, rgb(43,127,255), rgb(255,197,61))',
-              borderRadius: '3px',
-              width: `${progressPct}%`,
-              transition: 'width 0.5s cubic-bezier(0.16,1,0.3,1)',
-            }} />
-          </div>
-          <div style={{
-            fontFamily: 'var(--font-mono)', fontSize: '10px',
-            color: 'rgba(228,228,231,0.3)', whiteSpace: 'nowrap',
-          }}>
-            {progressPct >= 100
-              ? <strong style={{ color: 'rgb(48,164,108)' }}>{gained} pts · Goal covered ✓</strong>
-              : <><strong style={{ color: 'rgba(228,228,231,0.7)' }}>{gained} / {ptsNeeded} pts</strong> to goal</>
-            }
-          </div>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '6px',
-            padding: '5px 12px', borderRadius: '100px',
-            fontSize: '10px', fontWeight: 600, whiteSpace: 'nowrap',
-            fontFamily: 'var(--font-mono)',
-            background: badge.bg, color: badge.color,
-            border: `1px solid ${badge.border}`,
-          }}>
-            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor' }} />
-            {badge.text}
-          </div>
         </div>
-      </div> */}
-
       </DashboardCard>
-      {/* ── ACTION PLAN: separate section ── */}
-      {/* Card container stays fully visible at all times — only item cards fade. */}
-      <DashboardCard style={{
-        margin: '20px 48px 0',
-        position: 'relative',
-        padding: 0,
-      }}>
-      <div style={{ padding: '28px 44px 40px', position: 'relative', zIndex: 1 }}>
 
-        {/* Section header */}
-        <div style={{
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          marginBottom: '20px',
-        }}>
-          {/* Left: title + subtitle */}
-          <div>
-            <div style={{
-              fontSize: '18px', fontWeight: 700,
-              color: 'rgb(var(--zinc-100))',
-              fontFamily: 'var(--font-main)',
-              marginBottom: '4px',
-            }}>
-              Your Action Plan
+      <DashboardCard style={{ margin: '20px 48px 0', position: 'relative', padding: 0 }}>
+        <div style={{ padding: '28px 44px 40px', position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <div>
+              <div style={{ fontSize: '18px', fontWeight: 700, color: 'rgb(var(--zinc-100))', fontFamily: 'var(--font-main)', marginBottom: '4px' }}>Your Action Plan</div>
+              <div style={{ fontSize: '13px', color: 'rgba(228,228,231,0.4)', fontFamily: 'var(--font-main)' }}>Select actions that fit your lifestyle and goals</div>
             </div>
-            <div style={{
-              fontSize: '13px', color: 'rgba(228,228,231,0.4)',
-              fontFamily: 'var(--font-main)',
-            }}>
-              Select actions that fit your lifestyle and goals
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+              {totalSelected > 0 && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'rgb(48,164,108)', fontWeight: 600, whiteSpace: 'nowrap' }}>+{gained} pts · {totalSelected} chosen</div>}
+              <ActionPlanDownloadButton onClick={onBookConsult} />
             </div>
           </div>
 
@@ -697,5 +529,4 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
     </>
   );
 };
-
 export default DesktopPlanPanel;

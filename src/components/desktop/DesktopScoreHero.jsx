@@ -11,7 +11,7 @@ const DesktopScoreHero = ({ onSimulate }) => {
       status="Stable"
       headline="You're doing well — but there's strong potential to improve your energy, appearance, and performance."
       topPercentage={35}
-      pointsToGrow={18}
+      pointsToGrow={10}
       onTap={onSimulate}
     />
   );
