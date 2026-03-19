@@ -2,8 +2,8 @@ import React, { useState, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
 // HealthScoreSlider (V1) is intentionally kept untouched for other screens.
-// The Playground panel uses the new V2 design.
-import HealthScoreSliderV2 from './HealthScoreSliderV2';
+// The Playground panel uses PlaygroundScoreSlider (Current vs Potential design).
+import PlaygroundScoreSlider from './PlaygroundScoreSlider';
 import DashboardCard from './DashboardCard';
 import PrimaryButton from './PrimaryButton';
 import ActionPlanDownloadButton from './ActionPlanDownloadButton';
@@ -12,7 +12,6 @@ import ActionPlanDownloadButton from './ActionPlanDownloadButton';
 import HealthScoreLimitCard from './HealthScoreLimitCard';
 import { InferenceBadge } from '../../ui/inference-badge';
 
-const TICK_VALS = [65, 70, 75, 80, 85, 90, 95, 100];
 const GOAL_MIN = BASE_SCORE;
 const GOAL_MAX = 100;
 
@@ -352,16 +351,17 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
 
           </div> 
 
-          {/* ── Health Score Slider V2 (new design) ── */}
-          <HealthScoreSliderV2
+          {/* ── Playground Slider: Current thumb + fixed Potential dashed marker ── */}
+          {/* initialScore = MAX_ACHIEVABLE (80) — the fixed "what you can reach"    */}
+          {/* value        = goalTarget      — the score the user is exploring       */}
+          <PlaygroundScoreSlider
+            initialScore={MAX_ACHIEVABLE}
+            value={goalTarget}
             min={GOAL_MIN}
             max={GOAL_MAX}
-            score={goalTarget}
-            minAllowedScore={GOAL_MIN}
-            maxRecommended={MAX_ACHIEVABLE}
-            ticks={TICK_VALS}
+            step={1}
             onChange={handleGoalChange}
-            onDragEnd={handleSliderRelease}
+            onChangeEnd={handleSliderRelease}
           />
         </div>
 
