@@ -247,10 +247,10 @@ const S = {
     outline: 'none', 
     transition: 'left 0.1s linear', 
     willChange: 'left', 
-    background: '#ffffff', 
-    border: '1px solid rgba(0,0,0,0.1)', 
+    background: '#1a1a2e', 
+    border: '2.5px solid rgba(255,255,255,0.85)', 
     borderRadius: '50%',
-    boxShadow: '0 3px 8px rgba(0,0,0,0.3), 0 0 0 4px rgba(255,255,255,0.1)'
+    boxShadow: '0 2px 6px rgba(0,0,0,0.5)'
   },
   tickRow: { 
     position: 'relative', 

@@ -45,7 +45,7 @@ const ItemCard = ({ item, isSelected, isNeeded, onToggle }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: 'rgba(20, 24, 35, 0.85)',
+        background: 'rgb(var(--card))',
         border: isSelected ? `1.5px solid ${borderColor}` : `1px solid ${borderColor}`,
         borderRadius: '20px',
         padding: '16px',
@@ -77,19 +77,40 @@ const ItemCard = ({ item, isSelected, isNeeded, onToggle }) => {
           </div>
         </div>
         {isSelected ? (
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', padding: '4px 8px', borderRadius: '100px',
-            fontSize: '10px', fontWeight: 600, fontFamily: 'var(--font-mono)', background: 'rgba(43,127,255,0.18)',
-            color: 'rgb(43,127,255)', border: '1px solid rgba(43,127,255,0.3)', flexShrink: 0,
-          }}>
-            ✓ Added
-          </span>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', flexShrink: 0 }}>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: item.gain > 0 ? '18px' : '14px', fontWeight: 700, color: item.gain > 0 ? 'rgb(48,164,108)' : 'rgba(255,255,255,0.2)' }}>
-              {item.gain > 0 ? `+${item.gain}` : '—'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            {item.gain > 0 && (
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-heading)' }}>
+                  +{item.gain}
+                </span>
+                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', fontFamily: 'var(--font-mono)' }}>pts</span>
+              </div>
+            )}
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '100px',
+              fontSize: '11px', fontWeight: 600, fontFamily: 'var(--font-mono)', background: 'rgba(255,255,255,0.06)',
+              color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)', flexShrink: 0,
+            }}>
+              ✓ Remove
             </span>
-            {item.gain > 0 && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-mono)' }}>pts</span>}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            {item.gain > 0 && (
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: 'rgb(48,164,108)', fontFamily: 'var(--font-heading)' }}>
+                  +{item.gain}
+                </span>
+                <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-mono)' }}>pts</span>
+              </div>
+            )}
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', padding: '4px 10px', borderRadius: '100px',
+              fontSize: '11px', fontWeight: 600, fontFamily: 'var(--font-mono)', background: 'rgba(43,127,255,0.18)',
+              color: 'rgb(43,127,255)', border: '1px solid rgba(43,127,255,0.3)', flexShrink: 0,
+            }}>
+              + Add
+            </span>
           </div>
         )}
       </div>
@@ -132,7 +153,7 @@ const ItemCard = ({ item, isSelected, isNeeded, onToggle }) => {
 
 const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) => {
   const [selectedIds, setSelectedIds] = useState(() => computeNeeded(goalTarget));
-  const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
+  const [activeTab, setActiveTab] = useState('all');
   const [isExtended, setIsExtended] = useState(true);
 
   const containerRef = useRef(null);
@@ -346,7 +367,7 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
             overflowX: 'auto', paddingBottom: '8px', WebkitOverflowScrolling: 'touch',
             scrollbarWidth: 'none', msOverflowStyle: 'none',
           }}>
-            {[{ id: 'all', name: 'All' }, ...CATEGORIES].map(cat => {
+            {[{ id: 'all', name: 'All', icon: '✨' }, ...CATEGORIES].map(cat => {
               const isActive = cat.id === activeTab;
               const catSelected = cat.id === 'all'
                 ? selectedIds.size
@@ -364,14 +385,12 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
                     padding: '8px 16px',
                     borderRadius: '100px',
                     border: isActive
-                      ? '1px solid rgba(43,127,255,0.5)'
-                      : catNeeded
-                        ? '1px solid rgba(255,197,61,0.25)'
-                        : '1px solid rgba(255,255,255,0.10)',
+                      ? '1px solid rgba(255,255,255,0.2)'
+                      : '1px solid transparent',
                     background: isActive
-                      ? 'rgba(43,127,255,0.18)'
-                      : 'rgba(255,255,255,0.04)',
-                    color: isActive ? 'rgb(43,127,255)' : 'rgba(255,255,255,0.7)',
+                      ? 'rgba(255,255,255,0.12)'
+                      : 'rgb(var(--card))',
+                    color: isActive ? '#ffffff' : 'rgba(255,255,255,0.5)',
                     fontSize: '12px', fontWeight: isActive ? 600 : 400,
                     fontFamily: 'var(--font-main)',
                     cursor: 'pointer',
@@ -382,21 +401,23 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
                   }}
                 >
                   {/* Name + count inline */}
-                  <span>
-                    {cat.name}
-                    {catSelected > 0 && (
-                      <span style={{
-                        marginLeft: '5px',
-                        fontSize: '11px',
-                        fontWeight: isActive ? 600 : 400,
-                        color: isActive ? 'rgba(43,127,255,0.8)' : 'rgba(255,255,255,0.4)',
-                        fontFamily: 'var(--font-mono)',
-                      }}>
-                        ({catSelected})
-                      </span>
-                    )}
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {cat.icon && <span style={{ fontSize: '13px' }}>{cat.icon}</span>}
+                    <span>
+                      {cat.name}
+                      {catSelected > 0 && (
+                        <span style={{
+                          marginLeft: '5px',
+                          fontSize: '11px',
+                          fontWeight: isActive ? 600 : 400,
+                          color: isActive ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)',
+                          fontFamily: 'var(--font-mono)',
+                        }}>
+                          ({catSelected})
+                        </span>
+                      )}
+                    </span>
                   </span>
-
                   {/* Green dot — items selected */}
                   {catSelected > 0 && (
                     <span style={{

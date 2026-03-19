@@ -13,7 +13,7 @@ const MobileDashboard = ({ onDetail, onSetGoal, onScoreClick, onSwitchView, goal
           <h1 className="text-[24px] font-medium text-white tracking-tight font-heading">Welcome Guest</h1>
         </div>
         <div className="flex gap-3">
-          <div 
+          <div
             onClick={onSwitchView}
             className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors"
           >

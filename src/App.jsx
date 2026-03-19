@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import Dashboard            from './components/Dashboard';
-import DesktopDashboard     from './components/desktop/DesktopDashboard';
-import ViewSelectorScreen   from './components/ViewSelectorScreen';
+import Dashboard from './components/Dashboard';
+import DesktopDashboard from './components/desktop/DesktopDashboard';
+import ViewSelectorScreen from './components/ViewSelectorScreen';
 import GoalPage from './components/GoalPage';
 import ActionPlan from './components/ActionPlan';
 
@@ -184,9 +184,9 @@ function App() {
         )}
         {view === 'mobile-plan' && (
           <motion.div key="mobile-plan" variants={pageVariants} initial="initial" animate="enter" exit="exit">
-            <MobilePlanPanel 
-              goalTarget={goalTarget} 
-              onGoalChange={setGoalTarget} 
+            <MobilePlanPanel
+              goalTarget={goalTarget}
+              onGoalChange={setGoalTarget}
               onBookConsult={() => setView('book-consultation')}
               onBack={() => setView('home')}
             />
@@ -195,9 +195,9 @@ function App() {
       </AnimatePresence>
 
       {view !== 'home' && view !== 'mobile-plan' && (
-        <BottomNav 
-          activeView={view} 
-          onNavigate={(newView) => setView(newView)} 
+        <BottomNav
+          activeView={view}
+          onNavigate={(newView) => setView(newView)}
         />
       )}
     </div>
