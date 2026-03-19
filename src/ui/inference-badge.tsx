@@ -5,7 +5,7 @@ import { cn } from "../lib/utils";
 
 
 const inferenceBadgeVariants = cva(
-  "inline-flex items-center rounded-md px-2.5 py-1 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full px-3 py-1 text-[11px] font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {

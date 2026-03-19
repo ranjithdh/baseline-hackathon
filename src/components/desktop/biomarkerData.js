@@ -31,7 +31,8 @@ export const BIOMARKERS = [
   { id: 'b11', category: 'Blood Health', name: 'Basophils',          value: 0.5,   unit: '%',          status: 'normal',          section: 'positive', range: [0, 1],       detail: 'Rare WBC involved in allergic responses.' },
   { id: 'b12', category: 'Blood Health', name: 'Ferritin',           value: 13,    unit: 'ng/mL',      status: 'low',             section: 'negative', range: [30, 300],    detail: 'Iron storage protein — critically low, risk of anemia.' },
   { id: 'b13', category: 'Blood Health', name: 'Serum Iron',         value: 55,    unit: 'µg/dL',      status: 'borderline_low',  section: 'watch',    range: [60, 170],    detail: 'Slightly below optimal. Monitor alongside ferritin.' },
-  { id: 'b14', category: 'Blood Health', name: 'TIBC',               value: 390,   unit: 'µg/dL',      status: 'borderline_high', section: 'watch',    range: [250, 370],   detail: 'Total iron-binding capacity — elevated in iron deficiency.' },
+  { id: 'b14', category: 'Blood Health', name: 'Iron Saturation',    value: 12,    unit: '%',          status: 'low',             section: 'negative', range: [20, 50],     detail: 'Critically low iron saturation — suggests iron deficiency.' },
+  { id: 'b15', category: 'Blood Health', name: 'TIBC',               value: 390,   unit: 'µg/dL',      status: 'borderline_high', section: 'watch',    range: [250, 370],   detail: 'Total iron-binding capacity — elevated in iron deficiency.' },
 
   // ── Heart Health ─────────────────────────────────────
   { id: 'h1',  category: 'Heart Health', name: 'LDL Cholesterol',    value: 142,   unit: 'mg/dL',      status: 'high',            section: 'negative', range: [0, 100],     detail: 'Too high. Major cardiovascular risk factor.' },
@@ -119,6 +120,7 @@ export const BIOMARKERS = [
   { id: 'n6',  category: 'Nutrients & Vitamins', name: 'Vitamin K',     value: 0.4,  unit: 'ng/mL',    status: 'borderline_low',  section: 'watch',    range: [0.5, 2.5],   detail: 'Slight deficiency — important for bone and clotting.' },
   { id: 'n7',  category: 'Nutrients & Vitamins', name: 'Omega-3 Index', value: 5.2,  unit: '%',         status: 'borderline_low',  section: 'watch',    range: [8, 12],      detail: 'Well below optimal. Increase fatty fish or supplementation.' },
   { id: 'n8',  category: 'Nutrients & Vitamins', name: 'CoQ10',         value: 0.48, unit: 'µg/mL',    status: 'borderline_low',  section: 'watch',    range: [0.6, 1.5],   detail: 'Below optimal — can cause fatigue and reduced cellular energy.' },
+  { id: 'n13', category: 'Nutrients & Vitamins', name: 'Omega 6/3 Ratio',value: 12.5, unit: 'ratio',    status: 'high',            section: 'negative', range: [1, 4],       detail: 'High pro-inflammatory fatty acid ratio.' },
   { id: 'n9',  category: 'Nutrients & Vitamins', name: 'Selenium',      value: 115,  unit: 'µg/L',     status: 'normal',          section: 'positive', range: [70, 150],    detail: 'Antioxidant trace mineral — good.' },
   { id: 'n10', category: 'Nutrients & Vitamins', name: 'Iodine (Urine)',value: 90,   unit: 'µg/L',     status: 'borderline_low',  section: 'watch',    range: [100, 199],   detail: 'Slightly insufficient. Impacts thyroid function.' },
   { id: 'n11', category: 'Nutrients & Vitamins', name: 'Calcium',       value: 9.5,  unit: 'mg/dL',    status: 'optimal',         section: 'positive', range: [8.5, 10.2],  detail: 'Bone and nerve mineral — excellent.' },
