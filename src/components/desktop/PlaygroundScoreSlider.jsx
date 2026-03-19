@@ -11,15 +11,12 @@ const WRAP_H            = THUMB_D + 20;  // px — track-area wrapper height
 const SEG_GAP           = 3;    // px — gap between adjacent segment pills
 
 // Marker geometry (everything lives ABOVE the track)
-const MARKER_LINE_H     = 40;   // px — dashed line height above track
+const MARKER_LINE_H     = 21;   // px — dashed line height above track (50% of original 42)
 const MARKER_LABEL_GAP  = 6;    // px — space between label bottom and line top
 const MARKER_LABEL_H    = 30;   // px — approximate label block height (score + text)
 // Total clear-space reserved above the track-area wrapper
 const MARKER_TOP_SPACE  = MARKER_LINE_H + MARKER_LABEL_GAP + MARKER_LABEL_H; // 76 px
 
-// Overlap nudge: if "Current" and "Potential" are within this % of each other,
-// shift the Current marker/label sideways so they don't collide.
-const LABEL_MIN_GAP_PCT = 13;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SEGMENTS — mirrors HealthScoreSliderV2 exactly (same CSS vars + glowRgb)
@@ -57,19 +54,6 @@ const buildVisibleSegments = (min, max) => {
     .filter(Boolean);
 };
 
-/**
- * Nudge the Current marker's `left` percentage away from the Potential marker
- * when they are too close, so labels never collide.
- * The dashed line on the track itself is unaffected — only the above-track
- * marker column (line + label) shifts.
- */
-const resolveCurrentPct = (currentPct, potentialPct) => {
-  const diff = currentPct - potentialPct;
-  if (Math.abs(diff) >= LABEL_MIN_GAP_PCT) return currentPct;
-  return diff <= 0
-    ? potentialPct - LABEL_MIN_GAP_PCT
-    : potentialPct + LABEL_MIN_GAP_PCT;
-};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared marker renderer
@@ -101,8 +85,8 @@ const MarkerColumn = ({ leftPct, score, label, glowRgb, color, transition }) => 
     >
       <span style={{
         fontFamily: 'var(--font-heading)',
-        fontSize:   '18px',
-        fontWeight: 700,
+        fontSize:   '14px',
+        fontWeight: 600,
         lineHeight: 1,
         color:      color,
         transition: 'color 0.25s',
@@ -111,7 +95,7 @@ const MarkerColumn = ({ leftPct, score, label, glowRgb, color, transition }) => 
       </span>
       <span style={{
         fontFamily:    'var(--font-mono)',
-        fontSize:      '9px',
+        fontSize:      '10px',
         letterSpacing: '0.12em',
         textTransform: 'uppercase',
         color:         `rgba(${glowRgb}, 0.5)`,
@@ -191,13 +175,15 @@ const PlaygroundScoreSlider = ({
   const lastValue   = useRef(value);
 
   // ── Derived geometry ──────────────────────────────────────────────────────
-  const currentPct   = ((value    - min) / span) * 100;
+  const currentPct   = ((value    - min) / span) * 100;  // thumb position only
   const potentialPct = ((potScore - min) / span) * 100;
 
-  // Nudge the Current marker column if it would overlap the Potential column
-  const currentMarkerPct = resolveCurrentPct(currentPct, potentialPct);
+  // "Current" marker is always pinned to the slider's start (min = 0 %).
+  // It does NOT follow the thumb — it is a fixed reference for the baseline score.
+  const currentMarkerPct = 0;
 
-  const currentSeg   = getSegment(value);
+  // Segment colour is derived from min (the fixed Current score).
+  const currentSeg   = getSegment(min);
   const potentialSeg = getSegment(potScore);
   const visSegs      = useMemo(() => buildVisibleSegments(min, max), [min, max]);
 
@@ -303,14 +289,14 @@ const PlaygroundScoreSlider = ({
           color={`rgba(${potentialSeg.glowRgb}, 0.42)`}
         />
 
-        {/* ── CURRENT marker (follows thumb, nudged for overlap) ──────────── */}
+        {/* ── CURRENT marker — fixed at the slider start (min score) ────────── */}
+        {/* leftPct is always 0: this marker never moves regardless of thumb position */}
         <MarkerColumn
           leftPct={currentMarkerPct}
-          score={value}
+          score={min}
           label="Current"
           glowRgb={currentSeg.glowRgb}
           color={currentSeg.color}
-          transition="left 0.04s linear"
         />
 
         {/* ── Segmented pill track ────────────────────────────────────────── */}
