@@ -148,16 +148,16 @@ const DesktopConsultBanner = ({ onBookNow }) => {
 
       <div className="dcb-root">
         <div className="dcb-glow" />
-        
+
         <div className="dcb-header-label">Free Expert Advice</div>
 
         <div className="dcb-layout">
           <div className="dcb-content">
-            <h2 className="dcb-title">Unlock Your<br/>Full Potential</h2>
+            <h2 className="dcb-title">Unlock Your<br />Full Potential</h2>
             <p className="dcb-sub">
               Get a personalized plan to improve your score, energy, and overall health.
             </p>
-            
+
             <div className="dcb-cta-wrap">
               <button className="dcb-cta-btn" onClick={onBookNow}>
                 Get Your Personalized Plan <span style={{ fontSize: '20px' }}>→</span>
@@ -172,7 +172,7 @@ const DesktopConsultBanner = ({ onBookNow }) => {
                 10,000+ Users
               </div>
               <div className="dcb-trust-item">
-                15-min free session
+                30-min free session
               </div>
             </div>
           </div>
