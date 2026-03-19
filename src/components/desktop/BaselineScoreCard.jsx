@@ -179,14 +179,12 @@ const BaselineScoreCard = ({
         }
 
         /* Arc ring */
-        .bsc-ring-wrap {
-          position: relative;
-          width: 104px;
-          height: 104px;
+        .bsc-score-area {
           flex-shrink: 0;
           display: flex;
-          align-items: center;
-          justify-content: center;
+          align-items: baseline;
+          gap: 6px;
+          padding-left: 4px;
         }
         .bsc-ring-svg {
           position: absolute;
@@ -202,13 +200,13 @@ const BaselineScoreCard = ({
         }
         .bsc-score-num {
           font-family: var(--font-heading);
-          font-size: 34px;
+          font-size: 56px;
           font-weight: 800;
           color: #ffffff;
-          line-height: 1.1;
+          line-height: 1;
           opacity: 0;
           transform: translateY(4px);
-          transition: opacity 0.5s 1.8s, transform 0.5s 1.8s;
+          transition: opacity 0.5s 0.8s, transform 0.5s 0.8s;
         }
         .bsc-score-num.visible {
           opacity: 1;
@@ -216,8 +214,9 @@ const BaselineScoreCard = ({
         }
         .bsc-score-denom {
           font-family: var(--font-mono);
-          font-size: 10px;
+          font-size: 16px;
           color: rgba(255,255,255,0.6);
+          margin-bottom: 6px;
         }
 
         /* Right‑side meta */
@@ -426,45 +425,9 @@ const BaselineScoreCard = ({
 
         {/* ── Score Ring + Meta ── */}
         <div className="bsc-main-row">
-          {/* Arc Ring */}
-          <div className="bsc-ring-wrap">
-            <svg className="bsc-ring-svg" viewBox="0 0 110 110" width={104} height={104}>
-              <defs>
-                <linearGradient id="bscRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor={ringColor} stopOpacity="0.6" />
-                  <stop offset="100%" stopColor={ringColor} />
-                </linearGradient>
-                <filter id="bscGlow">
-                  <feGaussianBlur stdDeviation="2" result="blur" />
-                  <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                </filter>
-              </defs>
-              {/* Track */}
-              <circle
-                cx="55" cy="55" r={RADIUS}
-                fill="none"
-                stroke="rgba(255,255,255,0.06)"
-                strokeWidth="9"
-                strokeLinecap="round"
-                strokeDasharray={`${ARC_VISIBLE} ${GAP}`}
-              />
-              {/* Fill */}
-              <circle
-                cx="55" cy="55" r={RADIUS}
-                fill="none"
-                stroke="url(#bscRingGrad)"
-                strokeWidth="9"
-                strokeLinecap="round"
-                strokeDasharray={String(CIRC)}
-                strokeDashoffset={arcOffset}
-                filter="url(#bscGlow)"
-                style={{ transition: 'stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s' }}
-              />
-            </svg>
-            <div className="bsc-ring-center">
-              <span className={`bsc-score-num ${revealed ? 'visible' : ''}`}>{score}</span>
-              <span className="bsc-score-denom">/ 100</span>
-            </div>
+          <div className="bsc-score-area">
+            <span className={`bsc-score-num ${revealed ? 'visible' : ''}`}>{score}</span>
+            <span className="bsc-score-denom">/ 100</span>
           </div>
 
           {/* Meta */}
@@ -540,8 +503,8 @@ const BaselineScoreCard = ({
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', lineHeight: 1 }}>
               {/* <span style={{ color: '#4ade80', fontSize: '11px', textShadow: '0 0 8px rgba(74,222,128,0.4)' }}>★</span> */}
-              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontFamily: 'var(--font-main)' }}>
-                Top 35% in age Group | Better than 65% of people your age
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontFamily: 'var(--font-main)', lineHeight: 1.4 }}>
+                Top <span style={{ color: '#fff', fontWeight: 800 }}>35%</span> in age Group | Better than <span style={{ color: '#fff', fontWeight: 800 }}>65%</span> of people your age
               </span>
             </div>
           </div>
