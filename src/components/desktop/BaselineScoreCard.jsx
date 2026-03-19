@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import BaselineScoreInfoOverlay from './BaselineScoreInfoOverlay';
 
+
 // ── Arc helpers ──────────────────────────────────────────────
-const RADIUS = 44;
+const RADIUS = 35;
 const CIRC = 2 * Math.PI * RADIUS;
 const ARC_VISIBLE = CIRC * (270 / 360);
 const GAP = CIRC - ARC_VISIBLE;
@@ -61,13 +62,13 @@ const BaselineScoreCard = ({
         /* ── Card Shell ── */
         .bsc-card {
           position: relative;
-          border-radius: 24px;
-          padding: 28px 30px 24px;
+          border-radius: 20px;
+          padding: 22px 24px 20px;
           height: 100%;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 16px;
           overflow: hidden;
           background: linear-gradient(135deg, #0f1729 0%, #111827 55%, #0e1a3a 100%);
           border: 1px solid rgba(99,102,241,0.22);
@@ -85,22 +86,22 @@ const BaselineScoreCard = ({
         .bsc-header {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
         .bsc-title {
           font-family: var(--font-heading);
-          font-size: 17px;
+          font-size: 14px;
           font-weight: 700;
           color: #ffffff;
           letter-spacing: -0.01em;
         }
         .bsc-beta {
           font-family: var(--font-mono);
-          font-size: 9px;
+          font-size: 8px;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          padding: 2px 8px;
+          padding: 1px 6px;
           border-radius: 100px;
           background: rgba(43, 127, 255, 0.12);
           color: #4c93ff;
@@ -108,15 +109,15 @@ const BaselineScoreCard = ({
         }
         .bsc-info-btn {
           margin-left: auto;
-          width: 22px;
-          height: 22px;
+          width: 20px;
+          height: 20px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           background: rgba(255,255,255,0.05);
           color: rgba(255,255,255,0.35);
-          font-size: 11px;
+          font-size: 10px;
           font-style: italic;
           font-weight: 700;
           border: 1px solid rgba(255,255,255,0.08);
@@ -133,14 +134,14 @@ const BaselineScoreCard = ({
         .bsc-main-row {
           display: flex;
           align-items: center;
-          gap: 28px;
+          gap: 22px;
         }
 
         /* Arc ring */
         .bsc-ring-wrap {
           position: relative;
-          width: 130px;
-          height: 130px;
+          width: 104px;
+          height: 104px;
           flex-shrink: 0;
           display: flex;
           align-items: center;
@@ -156,14 +157,14 @@ const BaselineScoreCard = ({
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 1px;
+          gap: 0;
         }
         .bsc-score-num {
           font-family: var(--font-heading);
-          font-size: 44px;
+          font-size: 34px;
           font-weight: 800;
           color: #ffffff;
-          line-height: 1;
+          line-height: 1.1;
           opacity: 0;
           transform: translateY(4px);
           transition: opacity 0.5s 1.8s, transform 0.5s 1.8s;
@@ -174,7 +175,7 @@ const BaselineScoreCard = ({
         }
         .bsc-score-denom {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: 10px;
           color: rgba(255,255,255,0.3);
         }
 
@@ -183,30 +184,30 @@ const BaselineScoreCard = ({
           flex: 1;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 10px;
           min-width: 0;
         }
         .bsc-status-pill {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          padding: 5px 14px;
+          gap: 5px;
+          padding: 4px 12px;
           border-radius: 100px;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 700;
           text-transform: uppercase;
-          letter-spacing: 0.06em;
+          letter-spacing: 0.05em;
           width: fit-content;
         }
         .bsc-dot {
-          width: 6px;
-          height: 6px;
+          width: 5px;
+          height: 5px;
           border-radius: 50%;
         }
         .bsc-headline {
           font-family: var(--font-main);
-          font-size: 14px;
-          line-height: 1.55;
+          font-size: 12px;
+          line-height: 1.5;
           color: rgba(255,255,255,0.55);
           font-weight: 400;
         }
@@ -252,7 +253,7 @@ const BaselineScoreCard = ({
           width: 0; height: 0;
           border-left: 5px solid transparent;
           border-right: 5px solid transparent;
-          border-top: 7px solid #ffffff;
+          border-top: 7px solid currentColor;
         }
         /* numeric markers */
         .bsc-markers {
@@ -333,14 +334,14 @@ const BaselineScoreCard = ({
           flex-shrink: 0;
           display: flex;
           align-items: center;
-          gap: 8px;
-          padding: 12px 22px;
-          border-radius: 14px;
+          gap: 7px;
+          padding: 10px 18px;
+          border-radius: 12px;
           background: linear-gradient(135deg, #1e40af 0%, #2b7fff 60%, #60a5fa 100%);
           color: #ffffff;
           font-family: var(--font-main);
           font-weight: 700;
-          font-size: 14px;
+          font-size: 13px;
           border: none;
           cursor: pointer;
           box-shadow: 0 4px 16px rgba(43,127,255,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
@@ -377,7 +378,7 @@ const BaselineScoreCard = ({
         <div className="bsc-main-row">
           {/* Arc Ring */}
           <div className="bsc-ring-wrap">
-            <svg className="bsc-ring-svg" viewBox="0 0 110 110" width={130} height={130}>
+            <svg className="bsc-ring-svg" viewBox="0 0 110 110" width={104} height={104}>
               <defs>
                 <linearGradient id="bscRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor={ringColor} stopOpacity="0.6" />
@@ -454,7 +455,7 @@ const BaselineScoreCard = ({
               className="bsc-needle-wrap"
               style={{ left: revealed ? `${indicatorPct}%` : `${indicatorPct}%` }}
             >
-              <div className="bsc-needle-tri" />
+              <div className="bsc-needle-tri" style={{ color: ringColor }} />
             </div>
           </div>
 
@@ -481,13 +482,18 @@ const BaselineScoreCard = ({
 
         {/* ── Footer ── */}
         <div className="bsc-footer">
-          <div className="bsc-potential">
-            <span className="bsc-pot-eyebrow">Improvement potential</span>
-            <div className="bsc-pot-main">
-              <span className="bsc-pot-accent">+{pointsToGrow} points</span>
-              {' '}to reach&nbsp;{targetLevel}
+          <div className="bsc-potential" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff', fontFamily: 'var(--font-heading)', paddingLeft: '19px', letterSpacing: '-0.01em' }}>
+              <span style={{ color: '#4ade80' }}>+{pointsToGrow} points</span> to reach&nbsp;{targetLevel}
             </div>
-            <div className="bsc-pot-sub">Just a few targeted changes needed</div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', lineHeight: 1 }}>
+              {/* <span style={{ color: '#4ade80', fontSize: '11px', textShadow: '0 0 8px rgba(74,222,128,0.4)' }}>★</span> */}
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontWeight: 600, fontFamily: 'var(--font-main)' }}>
+                Top 35% in age Group | Better than 65% of people your age
+              </span>
+            </div>
           </div>
 
           <button className="bsc-cta" onClick={onTap}>
