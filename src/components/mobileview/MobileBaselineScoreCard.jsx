@@ -37,49 +37,50 @@ const MobileBaselineScoreCard = ({
       <style>{`
         .mbsc-root {
           background: rgb(var(--card));
-          border-radius: 24px;
-          padding: 24px;
+          border-radius: 20px;
+          padding: 16px 20px;
           height: auto;
           box-sizing: border-box;
           position: relative;
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 16px;
         }
         .mbsc-header-row {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 8px;
         }
         .mbsc-main-row {
           display: flex;
           align-items: center;
-          gap: 20px;
+          gap: 12px;
         }
         .mbsc-stats-col {
           display: flex;
           flex-direction: column;
-          gap: 4px;
+          gap: 2px;
           flex: 1;
         }
         .mbsc-bottom-row {
           display: flex;
           flex-direction: column;
-          gap: 12px;
-          padding-top: 16px;
+          gap: 8px;
+          padding-top: 12px;
           border-top: 1px solid rgba(255,255,255,0.06);
         }
         .mb-insight-item {
           display: flex;
           align-items: flex-start;
-          gap: 10px;
-          font-size: 13px;
+          gap: 8px;
+          font-size: 12px;
           color: rgba(255,255,255,0.6);
           text-align: left;
+          line-height: 1.4;
         }
         .mb-insight-item span:first-of-type {
-          margin-top: 2px;
+          margin-top: 1px;
         }
         .mb-insight-item strong {
           color: #ffffff;
@@ -117,9 +118,9 @@ const MobileBaselineScoreCard = ({
         {/* Row 2: Arc + Score info */}
         <div className="mbsc-main-row">
           {/* Circular arc */}
-          <div style={{ position: 'relative', width: '120px', height: '120px', flexShrink: 0 }}>
+          <div style={{ position: 'relative', width: '100px', height: '100px', flexShrink: 0 }}>
             <svg
-              width="120" height="120"
+              width="100" height="100"
               viewBox="0 0 110 110"
               style={{ transform: 'rotate(-220deg)' }}
             >
@@ -152,50 +153,64 @@ const MobileBaselineScoreCard = ({
               position: 'absolute', inset: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <span style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '36px',
-                fontWeight: 800,
-                color: 'white',
-                lineHeight: 1,
-              }}>
-                {score}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'baseline' }}>
+                <span style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '30px',
+                  fontWeight: 400,
+                  color: 'white',
+                  lineHeight: 1,
+                }}>
+                  {score}
+                </span>
+                <span style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '11px',
+                  fontWeight: 400,
+                  color: 'rgba(255,255,255,0.4)',
+                  marginLeft: '2px',
+                }}>
+                  /100
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Score stats group */}
           <div className="mbsc-stats-col">
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px' }}>
-              <span style={{ fontSize: '26px', fontWeight: 700, color: '#30A46C', fontFamily: 'var(--font-heading)' }}>{status}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <span style={{
+                fontSize: '12px',
+                fontWeight: 700,
+                padding: '2px 8px',
+                borderRadius: '100px',
+                background: 'rgba(48, 164, 108, 0.15)',
+                color: '#30A46C',
+                border: '1px solid rgba(48, 164, 108, 0.2)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em'
+              }}>
+                {status}
+              </span>
+            </div>
+            <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
+              +10 points to reach <span style={{ color: '#ffffff', fontWeight: 600 }}>Robust</span>
             </div>
 
-            <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
-              Next Level: <span style={{ color: '#ffffff', fontWeight: 600 }}>{nextLevel}</span>
-            </div>
 
-            {/* Progress Bar Item */}
-            <div style={{ width: '100%', marginBottom: '4px' }}>
-              <div style={{ height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '100px', overflow: 'hidden', marginBottom: '6px' }}>
-                <div style={{ height: '100%', background: '#2B63FF', width: `${barPct}%`, borderRadius: '100px' }} />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-mono)' }}>
-                <span>{progress}/{progressMax}</span>
-              </div>
-            </div>
           </div>
         </div>
 
         {showRangeBar && (
-          <div style={{ padding: '0 4px' }}>
-            <ScoreRangeBar score={score} showLegend={false} maxWidth="100%" className="!px-0" />
+          <div style={{ padding: '0 4px', marginTop: '-12px' }}>
+            <ScoreRangeBar score={score} showLegend={true} maxWidth="100%" className="!px-0" />
           </div>
         )}
 
         <div className="mbsc-bottom-row">
           <div className="mb-insight-item">
             <span>🌟</span>
-            <span>Boost: <strong>{biggestBoost}</strong> (+{biggestBoostGain})</span>
+            <span>Biggest Boost: {biggestBoost} (+{biggestBoostGain})</span>
           </div>
           <div className="mb-insight-item">
             <span>🏆</span>
@@ -205,20 +220,20 @@ const MobileBaselineScoreCard = ({
 
         {/* Action Button */}
         {showActionButton && onImprove && (
-          <div style={{ marginTop: 'auto', paddingTop: '8px' }}>
+          <div style={{ marginTop: 'auto', paddingTop: '4px' }}>
             <PrimaryButton
               onClick={onImprove}
               style={{
                 width: '100%',
-                padding: '14px 20px',
-                fontSize: '14px',
-                borderRadius: '12px',
+                padding: '10px 16px',
+                fontSize: '13px',
+                borderRadius: '10px',
                 background: 'linear-gradient(to right, #253282 0%, 21.09704613685608%, #374DAE 42.19409227371216%, 71.09704613685608%, #537DD3 100%)',
                 justifyContent: 'space-between'
               }}
             >
-              <span>Build Action Plan</span>
-              <span style={{ fontSize: '18px' }}>→</span>
+              <span>See how to improve</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
             </PrimaryButton>
           </div>
         )}

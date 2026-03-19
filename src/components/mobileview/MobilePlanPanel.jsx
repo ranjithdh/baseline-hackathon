@@ -11,11 +11,11 @@ const GOAL_MIN = BASE_SCORE;
 const GOAL_MAX = 100;
 
 const getScoreStatus = (score) => {
-  if (score >= 85) return { text: 'Elite', tagBg: '#06b6d4', tagText: 'rgba(255,255,255,0.92)' };
-  if (score >= 75) return { text: 'Robust', tagBg: '#2b7fff', tagText: 'rgba(255,255,255,0.92)' };
-  if (score >= 65) return { text: 'Stable', tagBg: '#10b981', tagText: 'rgba(255,255,255,0.92)' };
-  if (score >= 50) return { text: 'Constrained', tagBg: '#f59e0b', tagText: 'rgba(255,255,255,0.92)' };
-  return { text: 'Compromised', tagBg: '#ef4444', tagText: 'rgba(255,255,255,0.92)' };
+  if (score >= 85) return { text: 'Elite', color: 'rgb(var(--chart-6))', colorRgb: '--chart-6' };
+  if (score >= 75) return { text: 'Robust', color: 'rgb(var(--chart-5))', colorRgb: '--chart-5' };
+  if (score >= 65) return { text: 'Stable', color: 'rgb(var(--chart-4))', colorRgb: '--chart-4' };
+  if (score >= 50) return { text: 'Constrained', color: 'rgb(var(--chart-3))', colorRgb: '--chart-3' };
+  return { text: 'Compromised', color: 'rgb(var(--chart-2))', colorRgb: '--chart-2' };
 };
 
 function computeNeeded(goalTarget) {
@@ -35,13 +35,11 @@ function computeNeeded(goalTarget) {
 const ItemCard = ({ item, isSelected, isNeeded, onToggle }) => {
   const [hovered, setHovered] = useState(false);
 
-  const bg = isSelected
-    ? 'rgba(43,127,255,0.07)'
-    : hovered ? 'rgba(255,255,255,0.055)' : 'rgba(255,255,255,0.03)';
+  const bg = hovered ? 'rgba(255,255,255,0.05)' : 'rgba(20, 24, 35, 0.85)';
 
   const borderColor = isSelected
     ? 'rgba(43,127,255,0.45)'
-    : hovered ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.07)';
+    : hovered ? 'rgba(255,255,255,0.13)' : 'rgba(255, 255, 255, 0.06)';
 
   return (
     <div
@@ -58,7 +56,7 @@ const ItemCard = ({ item, isSelected, isNeeded, onToggle }) => {
         display: 'flex',
         flexDirection: 'column',
         gap: '10px',
-        boxShadow: isSelected ? '0 0 0 2px rgba(43,127,255,0.08)' : 'none',
+        boxShadow: isSelected ? '0 0 0 4px rgba(43,127,255,0.08)' : 'none',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
@@ -96,16 +94,46 @@ const ItemCard = ({ item, isSelected, isNeeded, onToggle }) => {
           </div>
         )}
       </div>
-      <p style={{ fontSize: '11px', color: 'rgba(228,228,231,0.5)', lineHeight: 1.5, margin: 0 }}>
-        {item.detail}
-      </p>
+      <div style={{
+        marginTop: '12px',
+        padding: '12px 16px',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(0,0,0,0.15)',
+        margin: '0 -16px -16px',
+        borderRadius: '0 0 16px 16px'
+      }}>
+        {item.tags && item.tags.length > 0 && (
+          <div style={{
+            fontSize: '9px',
+            color: 'rgba(228,228,231,0.4)',
+            marginBottom: '6px',
+            letterSpacing: '0.05em',
+            fontWeight: 600
+          }}>
+            Related Biomarkers
+          </div>
+        )}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+          {item.tags && item.tags.map(tag => (
+            <span key={tag} style={{
+              padding: '4px 10px', borderRadius: '100px',
+              fontSize: '10px', fontWeight: 500,
+              color: 'rgb(48,164,108)',
+              background: 'rgba(48,164,108,0.08)',
+              border: '1px solid rgba(48,164,108,0.28)',
+            }}>
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
 
 const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) => {
   const [selectedIds, setSelectedIds] = useState(() => computeNeeded(goalTarget));
-  const [expandedCats, setExpandedCats] = useState({ supplements: true });
+  const [activeTab, setActiveTab] = useState(CATEGORIES[0].id);
   const [isExtended, setIsExtended] = useState(true);
 
   const containerRef = useRef(null);
@@ -148,6 +176,11 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
   const projScore = Math.min(100, BASE_SCORE + gained);
   const totalSelected = ALL_ITEMS.filter(i => selectedIds.has(i.id)).length;
 
+  // Live score that reflects slider movement OR chosen items
+  const displayScore = showActionPlanButton
+    ? goalTarget
+    : projScore;
+
   const handleToggleItem = useCallback((id) => {
     const next = new Set(selectedIds);
     next.has(id) ? next.delete(id) : next.add(id);
@@ -161,10 +194,7 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
     onGoalChange(newProjScore);
   }, [selectedIds, onGoalChange]);
 
-  const toggleCat = (id) => {
-    setExpandedCats(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
+  const activeCategory = CATEGORIES.find(c => c.id === activeTab);
   return (
     <div
       ref={containerRef}
@@ -215,48 +245,69 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
 
       <div className="w-full flex flex-col gap-6 px-4 mt-6 mb-24 relative z-10 box-border">
         {/* 1. Header Score Section */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '38px', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-heading)' }}>{projScore}</span>
-            <span style={{ fontSize: '24px', fontWeight: 600, color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-heading)' }}>/ {goalTarget}</span>
-            {(() => {
-              const status = getScoreStatus(goalTarget);
-              return (
-                <div style={{
-                  marginLeft: '12px',
-                  background: status.tagBg,
-                  color: status.tagText,
-                  padding: '4px 12px',
-                  borderRadius: '100px',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-                }}>
-                  {status.text}
-                </div>
-              );
-            })()}
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '4px 8px' }}>
+          <span style={{ fontSize: '42px', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-heading)', lineHeight: 1 }}>{displayScore}</span>
+
+          {(() => {
+            const status = getScoreStatus(displayScore);
+            return (
+              <motion.div
+                animate={{
+                  borderColor: `rgb(var(${status.colorRgb}) / 0.6)`,
+                  boxShadow: `0 0 20px rgb(var(${status.colorRgb}) / 0.15)`
+                }}
+                transition={{ duration: 0.4 }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '6px 16px',
+                  borderRadius: '40px',
+                  background: `rgb(var(${status.colorRgb}) / 0.2)`,
+                  backdropFilter: 'blur(32px)',
+                  border: `1px solid rgb(var(${status.colorRgb}) / 0.9)`,
+                  boxShadow: `0 4px 12px rgba(0, 0, 0, 0.2)`
+                }}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={status.text}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      letterSpacing: '1.2px',
+                      color: '#ffffff',
+                      fontFamily: "'FuturLuxe', sans-serif"
+                    }}
+                  >
+                    {status.text}
+                  </motion.span>
+                </AnimatePresence>
+              </motion.div>
+            );
+          })()}
         </div>
 
-          <MobileHealthScoreSlider
-            score={goalTarget}
-            onChange={(val) => {
-              const g = parseInt(val);
-              onGoalChange(g);
-              if (g === baselineScore) {
-                setSelectedIds(new Set(savedSelectedIdsRef.current));
-              } else {
-                setSelectedIds(new Set());
-              }
-            }}
-            min={BASE_SCORE}
-            max={100}
-            ticks={TICK_VALS}
-            minAllowedScore={BASE_SCORE}
-          />
+        <MobileHealthScoreSlider
+          score={goalTarget}
+          onChange={(val) => {
+            const g = parseInt(val);
+            onGoalChange(g);
+            if (g === baselineScore) {
+              setSelectedIds(new Set(savedSelectedIdsRef.current));
+            } else {
+              setSelectedIds(new Set());
+            }
+          }}
+          min={BASE_SCORE}
+          max={100}
+          ticks={TICK_VALS}
+          minAllowedScore={BASE_SCORE}
+        />
 
         {/* 2.5 Build Plan CTA */}
         <AnimatePresence>
@@ -290,65 +341,97 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {CATEGORIES.map(cat => {
-              const isExpanded = expandedCats[cat.id];
-              const catSelected = cat.items.filter(i => selectedIds.has(i.id)).length;
+          {/* ── TAB BAR ── */}
+          <div style={{
+            display: 'flex', gap: '8px', marginBottom: '20px',
+            overflowX: 'auto', paddingBottom: '8px', WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none', msOverflowStyle: 'none',
+          }}>
+            {[{ id: 'all', name: 'All' }, ...CATEGORIES].map(cat => {
+              const isActive = cat.id === activeTab;
+              const catSelected = cat.id === 'all'
+                ? selectedIds.size
+                : cat.items.filter(i => selectedIds.has(i.id)).length;
+              const catNeeded = cat.id === 'all'
+                ? neededIds.size > 0
+                : cat.items.some(i => neededIds.has(i.id));
 
               return (
-                <div key={cat.id} style={{
-                  background: '#121212',
-                  borderRadius: '24px',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  overflow: 'hidden'
-                }}>
-                  <div
-                    onClick={() => toggleCat(cat.id)}
-                    style={{ padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer' }}
-                  >
-                    <div style={{
-                      width: '40px', height: '40px', borderRadius: '12px',
-                      background: 'rgba(43,127,255,0.1)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center'
-                    }}>
-                      <span className="material-symbols-outlined" style={{ color: '#2B63FF' }}>
-                        {cat.id === 'supplements' ? 'pill' : cat.id === 'food' ? 'restaurant' : 'fitness_center'}
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveTab(cat.id)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '7px',
+                    padding: '8px 16px',
+                    borderRadius: '100px',
+                    border: isActive
+                      ? '1px solid rgba(43,127,255,0.5)'
+                      : catNeeded
+                        ? '1px solid rgba(255,197,61,0.25)'
+                        : '1px solid rgba(255,255,255,0.10)',
+                    background: isActive
+                      ? 'rgba(43,127,255,0.18)'
+                      : 'rgba(255,255,255,0.04)',
+                    color: isActive ? 'rgb(43,127,255)' : 'rgba(255,255,255,0.7)',
+                    fontSize: '12px', fontWeight: isActive ? 600 : 400,
+                    fontFamily: 'var(--font-main)',
+                    cursor: 'pointer',
+                    transition: 'all 0.18s',
+                    outline: 'none',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                  }}
+                >
+                  {/* Name + count inline */}
+                  <span>
+                    {cat.name}
+                    {catSelected > 0 && (
+                      <span style={{
+                        marginLeft: '5px',
+                        fontSize: '11px',
+                        fontWeight: isActive ? 600 : 400,
+                        color: isActive ? 'rgba(43,127,255,0.8)' : 'rgba(255,255,255,0.4)',
+                        fontFamily: 'var(--font-mono)',
+                      }}>
+                        ({catSelected})
                       </span>
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '16px', fontWeight: 800, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{cat.name}</div>
-                      <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-                        {catSelected > 0 ? `${catSelected} chosen` : `${cat.items.length} recommended`}
-                      </div>
-                    </div>
-                    <span className="material-symbols-outlined" style={{ color: 'rgba(255,255,255,0.3)', transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
-                      expand_more
-                    </span>
-                  </div>
-
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
-                        style={{ overflow: 'hidden' }}
-                      >
-                        <div style={{ padding: '0 16px 20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                          {cat.items.map(item => (
-                            <ItemCard
-                              key={item.id}
-                              item={item}
-                              isSelected={selectedIds.has(item.id)}
-                              isNeeded={neededIds.has(item.id)}
-                              onToggle={handleToggleItem}
-                            />
-                          ))}
-                        </div>
-                      </motion.div>
                     )}
-                  </AnimatePresence>
-                </div>
-              )
+                  </span>
+
+                  {/* Green dot — items selected */}
+                  {catSelected > 0 && (
+                    <span style={{
+                      width: '7px', height: '7px', borderRadius: '50%',
+                      background: 'rgb(48,164,108)',
+                      flexShrink: 0,
+                    }} />
+                  )}
+                </button>
+              );
             })}
+          </div>
+
+          {/* ── ACTIVE CATEGORY ITEMS ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <AnimatePresence mode="popLayout">
+              {(activeTab === 'all' ? ALL_ITEMS : activeCategory?.items || []).map(item => (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ItemCard
+                    item={item}
+                    isSelected={selectedIds.has(item.id)}
+                    isNeeded={neededIds.has(item.id)}
+                    onToggle={handleToggleItem}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -367,72 +450,72 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
                 pointerEvents: 'none',
               }}
             >
-            <motion.button
-              layout
-              initial={false}
-              whileHover={{ scale: 1.05, boxShadow: '0 8px 12px -2px rgba(0,0,0,0.3), 0 0 15px rgba(43,127,255,0.25)' }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onBookConsult}
-              animate={{ 
-                padding: isExtended ? '0 20px' : '0', 
-                gap: isExtended ? '12px' : '0'
-              }}
-              transition={{
-                layout: { type: 'spring', stiffness: 400, damping: 35 },
-                padding: { type: 'spring', stiffness: 400, damping: 35 },
-                gap: { type: 'spring', stiffness: 400, damping: 35 }
-              }}
-              style={{
-                height: '56px',
-                minWidth: '56px',
-                borderRadius: '28px',
-                background: 'linear-gradient(135deg, #253282 0%, #374DAE 50%, #537DD3 100%)',
-                color: '#ffffff',
-                border: 'none',
-                fontSize: '14px',
-                fontWeight: 700,
-                fontFamily: 'var(--font-heading)',
-                textTransform: 'none',
-                letterSpacing: '0.02em',
-                boxShadow: '0 4px 8px -2px rgba(0,0,0,0.2), 0 2px 4px -1px rgba(0,0,0,0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-                overflow: 'hidden',
-              }}
-            >
-              <motion.span
-                layout="position"
-                className="material-symbols-outlined"
-                style={{ fontSize: '24px', flexShrink: 0 }}
-              >
-                videocam
-              </motion.span>
-              
-              <motion.span
-                layout="position"
+              <motion.button
+                layout
                 initial={false}
+                whileHover={{ scale: 1.05, boxShadow: '0 8px 12px -2px rgba(0,0,0,0.3), 0 0 15px rgba(43,127,255,0.25)' }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onBookConsult}
                 animate={{
-                  opacity: isExtended ? 1 : 0,
-                  width: isExtended ? 'auto' : 0,
-                  visibility: isExtended ? 'visible' : 'hidden'
+                  padding: isExtended ? '0 20px' : '0',
+                  gap: isExtended ? '12px' : '0'
                 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                transition={{
+                  layout: { type: 'spring', stiffness: 400, damping: 35 },
+                  padding: { type: 'spring', stiffness: 400, damping: 35 },
+                  gap: { type: 'spring', stiffness: 400, damping: 35 }
+                }}
                 style={{
-                  fontWeight: 600,
-                  whiteSpace: 'nowrap',
+                  height: '56px',
+                  minWidth: '56px',
+                  borderRadius: '28px',
+                  background: 'linear-gradient(135deg, #253282 0%, #374DAE 50%, #537DD3 100%)',
+                  color: '#ffffff',
+                  border: 'none',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  fontFamily: 'var(--font-heading)',
+                  textTransform: 'none',
+                  letterSpacing: '0.02em',
+                  boxShadow: '0 4px 8px -2px rgba(0,0,0,0.2), 0 2px 4px -1px rgba(0,0,0,0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
                   overflow: 'hidden',
-                  display: 'inline-block'
                 }}
               >
-                Free Consultation
-              </motion.span>
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                <motion.span
+                  layout="position"
+                  className="material-symbols-outlined"
+                  style={{ fontSize: '24px', flexShrink: 0 }}
+                >
+                  videocam
+                </motion.span>
+
+                <motion.span
+                  layout="position"
+                  initial={false}
+                  animate={{
+                    opacity: isExtended ? 1 : 0,
+                    width: isExtended ? 'auto' : 0,
+                    visibility: isExtended ? 'visible' : 'hidden'
+                  }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                  style={{
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    display: 'inline-block'
+                  }}
+                >
+                  Free Consultation
+                </motion.span>
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </div>
     </div>

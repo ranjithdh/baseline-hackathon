@@ -3,11 +3,11 @@ import { motion } from 'framer-motion';
 
 const ScoreRangeBar = ({ score = 65, showLegend = true, maxWidth = "340px", className = "" }) => {
   const ranges = [
-    { label: 'Compromised', color: '#ef4444', min: 0, max: 50, basis: '50%' },
-    { label: 'Constrained', color: '#f59e0b', min: 50, max: 65, basis: '15%' },
-    { label: 'Stable', color: '#10b981', min: 65, max: 75, basis: '10%' },
-    { label: 'Robust', color: '#2b7fff', min: 75, max: 85, basis: '10%' },
-    { label: 'Elite', color: '#06b6d4', min: 85, max: 101, basis: '15%' }
+    { label: 'Compromised', color: 'rgb(var(--chart-2))', min: 0, max: 50, basis: '50%' },
+    { label: 'Constrained', color: 'rgb(var(--chart-3))', min: 50, max: 65, basis: '15%' },
+    { label: 'Stable', color: 'rgb(var(--chart-4))', min: 65, max: 75, basis: '10%' },
+    { label: 'Robust', color: 'rgb(var(--chart-5))', min: 75, max: 85, basis: '10%' },
+    { label: 'Elite', color: 'rgb(var(--chart-6))', min: 85, max: 101, basis: '15%' }
   ];
 
   return (
@@ -37,9 +37,9 @@ const ScoreRangeBar = ({ score = 65, showLegend = true, maxWidth = "340px", clas
         </div>
 
         {/* Ticks & Thresholds */}
-        <div className="relative mt-3 flex justify-between px-0 text-[8px] font-black text-zinc-600 tracking-tighter tabular-nums">
+        <div className="relative mt-3 flex justify-between px-0 text-[10px] font-normal text-white/40 tracking-tighter tabular-nums">
           <div className="absolute left-[50%] -translate-x-1/2">50</div>
-          <div className="absolute left-[65%] -translate-x-1/2 text-white">65</div>
+          <div className="absolute left-[65%] -translate-x-1/2">65</div>
           <div className="absolute left-[75%] -translate-x-1/2">75</div>
           <div className="absolute left-[85%] -translate-x-1/2">85</div>
         </div>
@@ -47,20 +47,22 @@ const ScoreRangeBar = ({ score = 65, showLegend = true, maxWidth = "340px", clas
 
       {/* Classification Legend */}
       {showLegend && (
-        <div className="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-3">
+        <div className="mt-8 flex flex-row flex-nowrap justify-between w-full px-1">
           {ranges.map((item, idx) => {
             const active = score >= item.min && score < item.max;
+            // Convert to literal camelCase (e.g. "compromised")
+            const camelCaseLabel = item.label.charAt(0).toUpperCase() + item.label.slice(1);
             return (
-              <div key={idx} className={`flex items-center gap-1.5 transition-all duration-500 ${active ? 'scale-105' : 'opacity-80'}`}>
+              <div key={idx} className="flex items-center gap-1 opacity-80">
                 <div
-                  className="w-1.5 h-1.5 rounded-full"
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
                   style={{
                     backgroundColor: item.color,
-                    boxShadow: active ? `0 0 10px ${item.color}` : 'none'
+                    boxShadow: 'none'
                   }}
                 />
-                <span className={`text-[8px] font-black uppercase tracking-[0.2em] ${active ? 'text-white' : 'text-zinc-400'}`}>
-                  {item.label}
+                <span className="text-[10px] font-normal tracking-tight text-white/40 whitespace-nowrap">
+                  {camelCaseLabel}
                 </span>
               </div>
             );

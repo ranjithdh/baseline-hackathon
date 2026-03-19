@@ -15,11 +15,11 @@ const R = D / 2;
 const WH = D + Math.round(D * 0.5);
 
 const SEGMENTS = [
-  { min: 0,  max: 50,  label: 'Compromised', color: '#ef4444', glowRgb: '239,68,68',   icon: 'heartbeat'   },
-  { min: 50, max: 65,  label: 'Constrained', color: '#f59e0b', glowRgb: '245,158,11',   icon: 'restriction' },
-  { min: 65, max: 75,  label: 'Stable',      color: '#10b981', glowRgb: '16,185,129',  icon: 'heart'       },
-  { min: 75, max: 85,  label: 'Robust',      color: '#2b7fff', glowRgb: '43,127,255',  icon: 'shield'      },
-  { min: 85, max: 100, label: 'Elite',       color: '#06b6d4', glowRgb: '6,182,212',   icon: 'crown'       },
+  { min: 0,  max: 50,  label: 'Compromised', color: 'rgb(var(--chart-2))', glowRgb: '241,121,104', icon: 'heartbeat' },
+  { min: 50, max: 65,  label: 'Constrained', color: 'rgb(var(--chart-3))', glowRgb: '244,199,100', icon: 'restriction' },
+  { min: 65, max: 75,  label: 'Stable',      color: 'rgb(var(--chart-4))', glowRgb: '141,226,141', icon: 'heart' },
+  { min: 75, max: 85,  label: 'Robust',      color: 'rgb(var(--chart-5))', glowRgb: '31,120,76',   icon: 'shield' },
+  { min: 85, max: 100, label: 'Elite',       color: 'rgb(var(--chart-6))', glowRgb: '0,158,148',   icon: 'crown' },
 ];
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
