@@ -74,14 +74,14 @@ const CollapsedCard = ({ sectionKey, onExpand, previewCount = 2 }) => {
       onClick={() => onExpand(sectionKey)}
       style={{
         background: 'rgba(14,14,22,0.97)',
-        border: `1px solid ${meta.color.border}`,
+        border: '1px solid rgba(255,255,255,0.1)',
         borderRadius: '14px',
         overflow: 'hidden',
         cursor: 'pointer',
         transition: 'border-color 0.2s, box-shadow 0.2s',
       }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = meta.color.accent + '66'; e.currentTarget.style.boxShadow = `0 0 16px ${meta.color.accent}18`; }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = meta.color.border; e.currentTarget.style.boxShadow = 'none'; }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.boxShadow = `0 0 16px ${meta.color.accent}18`; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.boxShadow = 'none'; }}
     >
       {/* Header */}
       <div style={{ padding: '16px 20px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -151,7 +151,7 @@ const BiomarkerPopup = ({ sectionKey, onClose }) => {
         style={{
           width: '100%', maxWidth: '1100px', maxHeight: '90vh',
           background: 'rgba(12,12,18,0.98)',
-          border: `1px solid ${meta.color.border}`,
+          border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: '24px',
           boxShadow: `0 32px 64px rgba(0,0,0,0.5), 0 0 40px ${meta.color.accent}15`,
           display: 'flex', flexDirection: 'column', overflow: 'hidden'
@@ -235,23 +235,6 @@ const DesktopBiomarkerRow = () => {
   return (
     <div style={{ padding: '24px 48px 0' }}>
 
-      {/* ── Summary strip ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '14px', flexWrap: 'wrap' }}>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', letterSpacing: '0.25em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>Biomarker Panel</span>
-        <div style={{ display: 'flex', gap: '6px' }}>
-          {[
-            { label: `${totalCount} Total`, bg: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.45)' },
-            { label: `${goodCount} Optimal`, bg: 'rgba(34,197,94,0.1)', color: 'rgb(74,222,128)' },
-            { label: `${watchCount} Watch`, bg: 'rgba(245,158,11,0.1)', color: 'rgb(251,191,36)' },
-            { label: `${alertCount} Alert`, bg: 'rgba(239,68,68,0.1)', color: 'rgb(252,165,165)' },
-          ].map(b => (
-            <span key={b.label} style={{ fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '100px', background: b.bg, color: b.color, fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
-              {b.label}
-            </span>
-          ))}
-        </div>
-        <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'rgba(255,255,255,0.18)', fontFamily: 'var(--font-main)' }}>Tap a card to switch view</span>
-      </div>
 
       {/* ── Layout: 3-column grid (2:1 split) ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', alignItems: 'start' }}>
@@ -265,7 +248,7 @@ const DesktopBiomarkerRow = () => {
           style={{
             gridColumn: 'span 2',
             background: 'rgba(14,14,22,0.97)',
-            border: `1px solid ${activeMeta.color.border}`,
+            border: '1px solid rgba(255,255,255,0.1)',
             borderRadius: '18px',
             overflow: 'hidden',
             boxShadow: `0 0 32px ${activeMeta.color.accent}18`,

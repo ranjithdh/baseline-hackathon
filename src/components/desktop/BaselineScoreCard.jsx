@@ -115,14 +115,14 @@ const BaselineScoreCard = ({
   border-radius: 50%;
   z-index: 999;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: auto !important;
   cursor: pointer !important;
-       display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(255,255,255,0.04);
-          color: rgba(255,255,255,0.25);
-          border: 1px solid rgba(255,255,255,0.07);
+          background: rgba(255,255,255,0.06);
+          color: #fff;
+          border: 1px solid rgba(255,255,255,0.12);
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
           flex-shrink: 0;
           box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -141,7 +141,7 @@ const BaselineScoreCard = ({
             135deg,
             transparent 0%,
             transparent 45%,
-            rgba(255, 255, 255, 0.15) 50%,
+            rgba(255, 255, 255, 0.1) 50%,
             transparent 55%,
             transparent 100%
           );
@@ -217,7 +217,7 @@ const BaselineScoreCard = ({
         .bsc-score-denom {
           font-family: var(--font-mono);
           font-size: 10px;
-          color: rgba(255,255,255,0.3);
+          color: rgba(255,255,255,0.6);
         }
 
         /* Right‑side meta */
@@ -534,13 +534,13 @@ const BaselineScoreCard = ({
         <div className="bsc-footer">
           <div className="bsc-potential" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
 
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff', fontFamily: 'var(--font-heading)', paddingLeft: '19px', letterSpacing: '-0.01em' }}>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff', fontFamily: 'var(--font-heading)', paddingLeft: '0px', letterSpacing: '-0.01em' }}>
               <span style={{ color: '#4ade80' }}>+{pointsToGrow} points</span> to reach&nbsp;{targetLevel}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', lineHeight: 1 }}>
               {/* <span style={{ color: '#4ade80', fontSize: '11px', textShadow: '0 0 8px rgba(74,222,128,0.4)' }}>★</span> */}
-              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontWeight: 600, fontFamily: 'var(--font-main)' }}>
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontFamily: 'var(--font-main)' }}>
                 Top 35% in age Group | Better than 65% of people your age
               </span>
             </div>
