@@ -184,7 +184,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
       <DashboardCard
         ref={planPanelRef}
         style={{
-          margin: '32px 48px 0',
+          margin: '20px 48px 0',
           position: 'relative',
           padding: 0,
         }}
