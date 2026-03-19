@@ -2,6 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BIOMARKERS, SECTION_META, getBySection, groupByCategory } from './biomarkerData';
 import BiomarkerStatusTag from './BiomarkerStatusTag';
+import { X } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Atoms
@@ -117,12 +118,15 @@ const BiomarkerPopup = ({ sectionKey, onClose }) => {
           <button
             onClick={onClose}
             style={{
-              padding: '8px 16px', borderRadius: '10px', background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '11px',
-              fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer'
+              width: '32px', height: '32px', borderRadius: '50%',
+              background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
+              color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', transition: 'all 0.2s', outline: 'none'
             }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.transform = 'scale(1)'; }}
           >
-            Close
+            <X size={16} strokeWidth={2.5} />
           </button>
         </div>
 
