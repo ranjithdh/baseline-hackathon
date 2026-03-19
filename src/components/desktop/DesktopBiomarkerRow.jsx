@@ -174,11 +174,11 @@ const ColHeaders = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Collapsed preview card (right column)
 // ─────────────────────────────────────────────────────────────────────────────
-const CollapsedCard = ({ sectionKey, onExpand }) => {
+const CollapsedCard = ({ sectionKey, onExpand, previewCount = 4 }) => {
   const meta = SECTION_META[sectionKey];
   const markers = useMemo(() => getBySection(sectionKey), [sectionKey]);
   const alertCount = markers.filter(m => ['high', 'low'].includes(m.status)).length;
-  const preview = markers.slice(0, 5); // 5 items for visual height balance
+  const preview = markers.slice(0, previewCount);
 
   return (
     <div
@@ -209,21 +209,28 @@ const CollapsedCard = ({ sectionKey, onExpand }) => {
         </div>
       </div>
 
-      {/* 5-item preview */}
+      {/* 4/6-item preview */}
       <div style={{ padding: '6px 10px 4px' }}>
+        <ColHeaders />
         {preview.map((m, idx) => (
           <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 0', borderBottom: idx < preview.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
-            <StatusDot status={m.status} />
-            <span style={{ flex: 1, fontSize: '11px', color: 'rgba(228,228,231,0.65)', fontFamily: 'var(--font-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
-            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '7px', minWidth: 0 }}>
+              <StatusDot status={m.status} />
+              <span style={{ fontSize: '11px', color: 'rgba(228,228,231,0.65)', fontFamily: 'var(--font-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
+            </div>
+            <RangeBar value={m.value} range={m.range} status={m.status} />
+            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap', flexShrink: 0, minWidth: '54px', textAlign: 'right' }}>
               {m.value}<span style={{ fontSize: '8px', color: 'rgba(255,255,255,0.25)', marginLeft: '2px' }}>{m.unit}</span>
             </span>
-            <StatusBadge status={m.status} />
+            <div style={{ width: '80px', display: 'flex', justifyContent: 'flex-start', flexShrink: 0 }}>
+              <StatusBadge status={m.status} />
+            </div>
+            <span style={{ width: '12px' }} />
           </div>
         ))}
-        {markers.length > 5 && (
+        {markers.length > previewCount && (
           <div style={{ padding: '5px 0 2px', fontSize: '10px', color: 'rgba(255,255,255,0.25)', fontFamily: 'var(--font-main)', textAlign: 'center' }}>
-            +{markers.length - 5} more — tap to expand
+            +{markers.length - previewCount} more — tap to expand
           </div>
         )}
       </div>
@@ -248,6 +255,7 @@ const DesktopBiomarkerRow = () => {
   const rightMarkers = activeMarkers.slice(mid);
 
   const collapsedSections = ['negative', 'watch', 'positive'].filter(s => s !== activeSection);
+  const previewCount = activeMarkers.length > 24 ? 6 : 3;
 
   // Summary counts
   const totalCount = BIOMARKERS.length;
@@ -357,7 +365,7 @@ const DesktopBiomarkerRow = () => {
           style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
         >
           {collapsedSections.map(sec => (
-            <CollapsedCard key={sec} sectionKey={sec} onExpand={handleExpand} />
+            <CollapsedCard key={sec} sectionKey={sec} onExpand={handleExpand} previewCount={previewCount} />
           ))}
         </motion.div>
 
