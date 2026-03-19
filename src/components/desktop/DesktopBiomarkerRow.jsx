@@ -25,23 +25,24 @@ const BiomarkerRow = React.memo(({ marker }) => {
       onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
     >
-      {/* Marker Name */}
+      {/* Marker Name (Fixed baseline for "straight" alignment of next col) */}
       <span style={{ 
-        flex: 1, 
+        width: '120px', 
         fontSize: '13px', 
         fontWeight: 600, 
         color: '#e4e4e7', 
         fontFamily: 'var(--font-main)',
         whiteSpace: 'nowrap',
         overflow: 'hidden',
-        textOverflow: 'ellipsis'
+        textOverflow: 'ellipsis',
+        flexShrink: 0
       }}>
         {marker.name}
       </span>
 
-      {/* Value (Fixed width for alignment) */}
-      <div style={{ width: '80px', display: 'flex', alignItems: 'baseline', justifyContent: 'flex-start', gap: '4px', flexShrink: 0 }}>
-        <span style={{ fontSize: '13px', color: '#fff', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
+      {/* Value (Left-aligned within its slot) */}
+      <div style={{ width: '70px', display: 'flex', alignItems: 'baseline', justifyContent: 'flex-start', gap: '4px', flexShrink: 0 }}>
+        <span style={{ fontSize: '12px', color: '#fff', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
           {marker.value}
         </span>
         <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
@@ -49,8 +50,8 @@ const BiomarkerRow = React.memo(({ marker }) => {
         </span>
       </div>
 
-      {/* Status Pill (Fixed width area but dynamic tag) */}
-      <div style={{ width: '110px', display: 'flex', justifyContent: 'flex-start', flexShrink: 0 }}>
+      {/* Inference (Status Pill) (Trailing alignment) */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
         <StatusBadge status={marker.status} />
       </div>
     </div>
