@@ -1,243 +1,526 @@
-import React, { useEffect, useState } from 'react';
-import PrimaryButton from './PrimaryButton';
-import ScoreRangeBar from '../ScoreRangeBar';
+import React, { useEffect, useRef, useState } from 'react';
+import { Info } from 'lucide-react';
+import BaselineScoreInfoOverlay from './BaselineScoreInfoOverlay';
 
-// ── Arc helpers (same pattern as DesktopScoreHero) ─────────────
-const ARC_CIRC    = 283;
-const ARC_VISIBLE = 226;
-const getArcOffset = (score) => ARC_CIRC - (score / 100) * ARC_VISIBLE;
 
+// ── Arc helpers ──────────────────────────────────────────────
+const RADIUS = 35;
+const CIRC = 2 * Math.PI * RADIUS;
+const ARC_VISIBLE = CIRC * (270 / 360);
+const GAP = CIRC - ARC_VISIBLE;
+const getArcOffset = (pct) => CIRC - (pct / 100) * ARC_VISIBLE;
+
+// ── Score ranges & colors ────────────────────────────────────
+const RANGES = [
+  { label: 'Compromised', min: 0, max: 50, color: '#ee7c64', flex: 5 },
+  { label: 'Constrained', min: 50, max: 65, color: '#f9c56b', flex: 1.5 },
+  { label: 'Stable', min: 65, max: 75, color: '#4ade80', flex: 1 },
+  { label: 'Robust', min: 75, max: 85, color: '#2d8a57', flex: 1 },
+  { label: 'Elite', min: 85, max: 100, color: '#139991', flex: 1.5 },
+];
+
+function getStatusColor(status) {
+  const map = {
+    Stable: '#4ade80',
+    Robust: '#2d8a57',
+    Elite: '#139991',
+    Constrained: '#f9c56b',
+    Compromised: '#ee7c64',
+  };
+  return map[status] || '#4ade80';
+}
+
+// Compute the % position of a score on the bar (0–100 mapped to 0%–100%)
+function scoreToPct(score) {
+  return Math.min(Math.max(score, 0), 100);
+}
+
+// ── Component ────────────────────────────────────────────────
 const BaselineScoreCard = ({
-  score          = 65,
-  status         = 'Stable',
-  nextLevel      = 'Strong (70)',
-  progress       = 65,
-  progressMax    = 70,
-  weeklyGain     = 4,
-  pointsToUnlock = 5,
-  topPercentage  = 35,
-  biggestBoost   = 'Vitamin D3 + K2',
-  biggestBoostGain = 7,
-  onImprove,
-  showRangeBar = true,
-  showActionButton = true,
+  score = 65,
+  status = 'Stable',
+  headline = "You're doing well — with a few focused changes you can move from Stable to Robust.",
+  pointsToGrow = 10,
+  targetLevel = 'Robust',
+  onTap,
 }) => {
   const [revealed, setRevealed] = useState(false);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const barRef = useRef(null);
 
   useEffect(() => {
-    const t = setTimeout(() => setRevealed(true), 300);
+    const t = setTimeout(() => setRevealed(true), 200);
     return () => clearTimeout(t);
   }, []);
 
-  const arcOffset = revealed ? getArcOffset(score) : ARC_CIRC;
-  const barPct    = Math.min((progress / progressMax) * 100, 100);
+  const arcOffset = revealed ? getArcOffset(score) : CIRC;
+  const indicatorPct = scoreToPct(score); // e.g. 65 → 65%
+  const ringColor = getStatusColor(status);
 
   return (
     <>
       <style>{`
-        .bsc-root {
-          background: #121212;
-          border-radius: 24px;
-          border: 1px solid rgba(255,255,255,0.08);
-          padding: 24px;
-          height: auto;
-          box-sizing: border-box;
+        /* ── Card Shell ── */
+        .bsc-card {
           position: relative;
-          overflow: hidden;
+          border-radius: 20px;
+          padding: 22px 24px 20px;
+          height: 100%;
+          box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 16px;
+          overflow: hidden;
+          background: linear-gradient(135deg, #0f1729 0%, #111827 55%, #0e1a3a 100%);
+          border: 1px solid rgba(99,102,241,0.22);
+          box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.06) inset;
         }
-        .bsc-header-row {
+        .bsc-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(ellipse at 85% 0%, rgba(99,102,241,0.12) 0%, transparent 55%);
+          pointer-events: none;
+        }
+
+        /* ── Header ── */
+        .bsc-header {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 8px;
         }
+        .bsc-title {
+          font-family: var(--font-heading);
+          font-size: 14px;
+          font-weight: 700;
+          color: #ffffff;
+          letter-spacing: -0.01em;
+        }
+        .bsc-beta {
+          font-family: var(--font-mono);
+          font-size: 8px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          padding: 1px 6px;
+          border-radius: 100px;
+          background: rgba(43, 127, 255, 0.12);
+          color: #4c93ff;
+          border: 1px solid rgba(43, 127, 255, 0.28);
+        }
+        .bsc-info-btn {
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  z-index: 999;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+          background: rgba(255,255,255,0.06);
+          color: #fff;
+          border: 1px solid rgba(255,255,255,0.12);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          flex-shrink: 0;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          backdrop-filter: blur(4px);
+          overflow: hidden;
+          animation: bsc-pulse 4s infinite ease-in-out;
+        }
+        .bsc-info-btn::after {
+          content: '';
+          position: absolute;
+          top: -100%;
+          left: -150%;
+          width: 200%;
+          height: 300%;
+          background: linear-gradient(
+            135deg,
+            transparent 0%,
+            transparent 45%,
+            rgba(255, 255, 255, 0.1) 50%,
+            transparent 55%,
+            transparent 100%
+          );
+          transform: rotate(45deg);
+          animation: bsc-glint 6s infinite ease-in-out;
+          pointer-events: none;
+        }
+        @keyframes bsc-glint {
+          0% { left: -150%; }
+          15% { left: 150%; }
+          100% { left: 150%; }
+        }
+        @keyframes bsc-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.03), 0 4px 12px rgba(0,0,0,0.1); }
+          50% { box-shadow: 0 0 0 8px rgba(255,255,255,0), 0 4px 12px rgba(0,0,0,0.1); }
+          100% { box-shadow: 0 0 0 0 rgba(255,255,255,0), 0 4px 12px rgba(0,0,0,0.1); }
+        }
+        .bsc-info-btn:hover {
+          background: rgba(255,255,255,0.1);
+          color: #fff;
+          border-color: rgba(255,255,255,0.2);
+          transform: scale(1.08);
+          box-shadow: 0 0 12px rgba(255,255,255,0.08);
+          animation-play-state: paused;
+        }
+        .bsc-info-btn:active {
+          transform: scale(0.95);
+        }
+
+        /* ── Score + Meta Row ── */
         .bsc-main-row {
           display: flex;
           align-items: center;
-          gap: 24px;
-        }
-        .bsc-stats-col {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          flex: 1;
-        }
-        .bsc-bottom-row {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          padding-top: 16px;
-          border-top: 1px solid rgba(255,255,255,0.06);
-        }
-        .insight-item {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-size: 13px;
-          color: rgba(255,255,255,0.6);
-        }
-        .insight-item strong {
-          color: #ffffff;
-          font-weight: 600;
+          gap: 22px;
         }
 
-        @media (max-width: 400px) {
-          .bsc-main-row { gap: 16px; }
-          .bsc-header-row { flex-wrap: wrap; }
+        /* Arc ring */
+        .bsc-score-area {
+          flex-shrink: 0;
+          display: flex;
+          align-items: baseline;
+          gap: 6px;
+          padding-left: 4px;
+        }
+        .bsc-ring-svg {
+          position: absolute;
+          inset: 0;
+          transform: rotate(135deg);
+        }
+        .bsc-ring-center {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 0;
+        }
+        .bsc-score-num {
+          font-family: var(--font-heading);
+          font-size: 56px;
+          font-weight: 800;
+          color: #ffffff;
+          line-height: 1;
+          opacity: 0;
+          transform: translateY(4px);
+          transition: opacity 0.5s 0.8s, transform 0.5s 0.8s;
+        }
+        .bsc-score-num.visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .bsc-score-denom {
+          font-family: var(--font-mono);
+          font-size: 16px;
+          color: rgba(255,255,255,0.6);
+          margin-bottom: 6px;
+        }
+
+        /* Right‑side meta */
+        .bsc-meta {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          min-width: 0;
+        }
+        .bsc-status-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 4px 12px;
+          border-radius: 100px;
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          width: fit-content;
+        }
+        .bsc-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+        }
+        .bsc-headline {
+          font-family: var(--font-main);
+          font-size: 12px;
+          line-height: 1.5;
+          color: rgba(255,255,255,0.55);
+          font-weight: 400;
+        }
+
+        /* ── Scale Bar ── */
+        .bsc-scale-wrap {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+        }
+        .bsc-scale-label {
+          font-family: var(--font-mono);
+          font-size: 10px;
+          letter-spacing: 0.1em;
+          color: rgba(255,255,255,0.3);
+          text-transform: uppercase;
+          margin-bottom: 10px;
+        }
+        .bsc-bar-outer {
+          position: relative;
+        }
+        .bsc-bar-segments {
+          display: flex;
+          gap: 3px;
+          height: 7px;
+        }
+        .bsc-seg {
+          height: 100%;
+          border-radius: 4px;
+        }
+        /* indicator needle */
+        .bsc-needle-wrap {
+          position: absolute;
+          top: -10px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          transform: translateX(-50%);
+          pointer-events: none;
+          transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s;
+        }
+        .bsc-needle-tri {
+          width: 0; height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-top: 7px solid currentColor;
+        }
+        /* numeric markers */
+        .bsc-markers {
+          position: relative;
+          height: 16px;
+          margin-top: 6px;
+          font-family: var(--font-mono);
+          font-size: 10px;
+          color: rgba(255,255,255,0.35);
+        }
+        .bsc-mark {
+          position: absolute;
+          transform: translateX(-50%);
+        }
+        /* legend dots row */
+        .bsc-legend {
+          display: flex;
+          gap: 14px;
+          flex-wrap: wrap;
+          margin-top: 10px;
+        }
+        .bsc-leg-item {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 11px;
+          color: rgba(255,255,255,0.45);
+        }
+        .bsc-leg-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        /* Divider */
+        .bsc-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.06);
+        }
+
+        /* ── Footer ── */
+        .bsc-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+        }
+        .bsc-potential {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .bsc-pot-eyebrow {
+          font-family: var(--font-mono);
+          font-size: 9px;
+          text-transform: uppercase;
+          letter-spacing: 0.14em;
+          color: rgba(255,255,255,0.3);
+        }
+        .bsc-pot-main {
+          font-family: var(--font-heading);
+          font-size: 20px;
+          font-weight: 800;
+          color: #ffffff;
+          line-height: 1;
+        }
+        .bsc-pot-accent {
+          color: #4ade80;
+          filter: drop-shadow(0 0 8px rgba(74,222,128,0.5));
+        }
+        .bsc-pot-sub {
+          font-size: 12px;
+          color: rgba(255,255,255,0.4);
+          margin-top: 3px;
+        }
+        .bsc-cta {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          padding: 10px 18px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, #1e40af 0%, #2b7fff 60%, #60a5fa 100%);
+          color: #ffffff;
+          font-family: var(--font-main);
+          font-weight: 700;
+          font-size: 13px;
+          border: none;
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(43,127,255,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+          transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+          white-space: nowrap;
+        }
+        .bsc-cta:hover {
+          transform: translateY(-2px) scale(1.03);
+          box-shadow: 0 8px 28px rgba(43,127,255,0.5);
+        }
+        .bsc-cta-arrow {
+          transition: transform 0.25s ease;
+        }
+        .bsc-cta:hover .bsc-cta-arrow {
+          transform: translateX(3px);
         }
       `}</style>
 
-      <div className="bsc-root">
-        {/* Row 1: Label + BETA + Weekly Gain */}
-        <div className="bsc-header-row">
-          <span style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '10px',
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.4)',
-          }}>
-            Baseline Score
-          </span>
-          <span style={{
-            fontSize: '10px',
-            fontWeight: 700,
-            padding: '2px 8px',
-            borderRadius: '100px',
-            background: 'rgba(255,255,255,0.1)',
-            color: 'rgba(255,255,255,0.8)',
-            border: '1px solid rgba(255,255,255,0.15)',
-          }}>
-            BETA
-          </span>
+      <div className="bsc-card" onClick={onTap}>
 
-          <div style={{
-            marginLeft: 'auto',
-            display: 'flex', alignItems: 'center', gap: '4px',
-            fontFamily: 'var(--font-main)',
-            fontSize: '12px',
-            color: '#30A46C',
-            fontWeight: 600,
-          }}>
-            <span style={{ fontSize: '10px' }}>▲</span>
-            {weeklyGain} this week
+        {/* ── Header ── */}
+        <div className="bsc-header">
+          <span className="bsc-title">Your Health Score</span>
+          <span className="bsc-beta">Beta</span>
+          <div
+      className="bsc-info-btn"
+      onMouseDown={(e) => { e.stopPropagation(); }}
+      onMouseUp={(e) => { e.stopPropagation(); }}
+      onClick={(e) => { 
+        console.log('Info clicked');
+        e.preventDefault();
+        e.stopPropagation(); 
+        setIsInfoOpen(true); 
+      }}
+      role="button"
+      aria-label="More information"
+    >
+      <Info size={16} strokeWidth={2.5} style={{ pointerEvents: 'none' }} />
+    </div>
+        </div>
+
+        {/* ── Score Ring + Meta ── */}
+        <div className="bsc-main-row">
+          <div className="bsc-score-area">
+            <span className={`bsc-score-num ${revealed ? 'visible' : ''}`}>{score}</span>
+            <span className="bsc-score-denom">/ 100</span>
+          </div>
+
+          {/* Meta */}
+          <div className="bsc-meta">
+            <div
+              className="bsc-status-pill"
+              style={{
+                background: `${ringColor}18`,
+                color: ringColor,
+                border: `1px solid ${ringColor}33`,
+              }}
+            >
+              <span className="bsc-dot" style={{ background: ringColor }} />
+              {status}
+            </div>
+            <p className="bsc-headline">{headline}</p>
           </div>
         </div>
 
-        {/* Row 2: Arc + Score info */}
-        <div className="bsc-main-row">
-          {/* Circular arc */}
-          <div style={{ position: 'relative', width: '130px', height: '130px', flexShrink: 0 }}>
-            <svg
-              width="130" height="130"
-              viewBox="0 0 110 110"
-              style={{ transform: 'rotate(-220deg)' }}
+        {/* ── Score Scale Bar ── */}
+        <div className="bsc-scale-wrap">
+          <span className="bsc-scale-label">Score Range</span>
+
+          <div className="bsc-bar-outer" ref={barRef}>
+            {/* Segments */}
+            <div className="bsc-bar-segments">
+              {RANGES.map((r) => (
+                <div
+                  key={r.label}
+                  className="bsc-seg"
+                  style={{ flex: r.flex, background: r.color }}
+                />
+              ))}
+            </div>
+
+            {/* Position needle */}
+            <div
+              className="bsc-needle-wrap"
+              style={{ left: revealed ? `${indicatorPct}%` : `${indicatorPct}%` }}
             >
-              <defs>
-                <linearGradient id="bscArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%"   stopColor="#2B63FF" />
-                  <stop offset="100%" stopColor="#38bdf8" />
-                </linearGradient>
-              </defs>
-              <circle
-                cx="55" cy="55" r="45"
-                fill="none"
-                stroke="rgba(255,255,255,0.05)"
-                strokeWidth="10"
-                strokeLinecap="round"
-                strokeDasharray="226 57"
-              />
-              <circle
-                cx="55" cy="55" r="45"
-                fill="none"
-                stroke="url(#bscArcGrad)"
-                strokeWidth="10"
-                strokeLinecap="round"
-                strokeDasharray={String(ARC_CIRC)}
-                strokeDashoffset={arcOffset}
-                style={{ transition: 'stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1)' }}
-              />
-            </svg>
-            <div style={{
-              position: 'absolute', inset: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <span style={{
-                fontFamily: 'var(--font-heading)',
-                fontSize: '40px',
-                fontWeight: 800,
-                color: 'white',
-                lineHeight: 1,
-              }}>
-                {score}
+              <div className="bsc-needle-tri" style={{ color: ringColor }} />
+            </div>
+          </div>
+
+          {/* Numeric markers */}
+          <div className="bsc-markers">
+            {[50, 65, 75, 85].map((v) => (
+              <span key={v} className="bsc-mark" style={{ left: `${v}%` }}>{v}</span>
+            ))}
+          </div>
+
+          {/* Legend */}
+          <div className="bsc-legend">
+            {RANGES.map((r) => (
+              <div key={r.label} className="bsc-leg-item">
+                <div className="bsc-leg-dot" style={{ background: r.color }} />
+                {r.label}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="bsc-divider" />
+
+        {/* ── Footer ── */}
+        <div className="bsc-footer">
+          <div className="bsc-potential" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+
+            <div style={{ fontSize: '18px', fontWeight: 800, color: '#fff', fontFamily: 'var(--font-heading)', paddingLeft: '0px', letterSpacing: '-0.01em' }}>
+              <span style={{ color: '#4ade80' }}>+{pointsToGrow} points</span> to reach&nbsp;{targetLevel}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', lineHeight: 1 }}>
+              {/* <span style={{ color: '#4ade80', fontSize: '11px', textShadow: '0 0 8px rgba(74,222,128,0.4)' }}>★</span> */}
+              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontWeight: 600, fontFamily: 'var(--font-main)', lineHeight: 1.4 }}>
+                Top <span style={{ color: '#fff', fontWeight: 800 }}>35%</span> in age Group | Better than <span style={{ color: '#fff', fontWeight: 800 }}>65%</span> of people your age
               </span>
             </div>
           </div>
 
-          {/* Score stats group */}
-          <div className="bsc-stats-col">
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-              <span style={{ fontSize: '42px', fontWeight: 800, color: '#ffffff', fontFamily: 'var(--font-heading)' }}>{score}</span>
-              <span style={{ fontSize: '24px', fontWeight: 700, color: '#30A46C', fontFamily: 'var(--font-heading)' }}>{status}</span>
-            </div>
-            
-            <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
-              Next Level: <span style={{ color: '#ffffff', fontWeight: 600 }}>{nextLevel}</span>
-            </div>
-
-            {/* Progress Bar Item */}
-            <div style={{ width: '100%', marginBottom: '4px' }}>
-               <div style={{ height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '100px', overflow: 'hidden', marginBottom: '6px' }}>
-                  <div style={{ height: '100%', background: '#2B63FF', width: `${barPct}%`, borderRadius: '100px' }} />
-               </div>
-               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-mono)' }}>
-                  <span>{progress}/{progressMax}</span>
-                  <span style={{ color: '#30A46C' }}>🔥 {pointsToUnlock} points to unlock</span>
-               </div>
-            </div>
-          </div>
+          <button className="bsc-cta" onClick={onTap}>
+            See how to improve
+            <span className="bsc-cta-arrow">→</span>
+          </button>
         </div>
 
-        {showRangeBar && (
-          <div style={{ padding: '0 4px' }}>
-            <ScoreRangeBar score={score} showLegend={false} maxWidth="100%" className="!px-0" />
-          </div>
-        )}
-
-        <div className="bsc-bottom-row">
-          <div className="insight-item">
-            <span>🏆</span>
-            <span>You are in top <strong>{topPercentage}%</strong> of your age group</span>
-          </div>
-          <div className="insight-item">
-            <span>🌟</span>
-            <span>Biggest Boost: <strong>{biggestBoost}</strong> (+{biggestBoostGain})</span>
-          </div>
-        </div>
-
-        {/* Action Button */}
-        {showActionButton && onImprove && (
-          <div style={{ marginTop: 'auto', paddingTop: '8px' }}>
-            <PrimaryButton 
-              onClick={onImprove} 
-              style={{ 
-                width: '100%', 
-                padding: '14px 20px', 
-                fontSize: '14px', 
-                borderRadius: '12px',
-                background: 'linear-gradient(to right, #253282 0%, 21.09704613685608%, #374DAE 42.19409227371216%, 71.09704613685608%, #537DD3 100%)',
-                justifyContent: 'space-between'
-              }}
-            >
-              <span>Build your Action Plan</span>
-              <span style={{ fontSize: '18px' }}>→</span>
-            </PrimaryButton>
-          </div>
-        )}
       </div>
 
+      <BaselineScoreInfoOverlay
+        isOpen={isInfoOpen}
+        onClose={() => setIsInfoOpen(false)}
+      />
     </>
   );
 };
