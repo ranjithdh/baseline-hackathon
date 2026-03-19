@@ -4,6 +4,7 @@ import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlan
 // HealthScoreSlider (V1) is intentionally kept untouched for other screens.
 // The Playground panel uses PlaygroundScoreSlider (Current vs Potential design).
 import PlaygroundScoreSlider from './PlaygroundScoreSlider';
+import SelectableItemCard from './SelectableItemCard';
 import DashboardCard from './DashboardCard';
 import ActionPlanDownloadButton from './ActionPlanDownloadButton';
 import HealthScoreLimitCard from './HealthScoreLimitCard';
@@ -34,70 +35,6 @@ function computeNeeded(goalTarget) {
   return needed;
 }
 
-const ItemCard = ({ item, catType, isSelected, isNeeded, onToggle }) => {
-  const [hovered, setHovered] = useState(false);
-  const bg = isSelected ? 'rgba(43,127,255,0.07)' : hovered ? 'rgba(255,255,255,0.055)' : 'rgba(255,255,255,0.03)';
-  const borderColor = isSelected ? 'rgba(43,127,255,0.45)' : hovered ? 'rgba(255,255,255,0.13)' : 'rgba(255,255,255,0.07)';
-
-  return (
-    <div
-      onClick={() => onToggle(item.id)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: bg,
-        border: `1px solid ${borderColor}`,
-        borderRadius: '16px',
-        padding: '20px',
-        cursor: 'pointer',
-        transition: 'background 0.18s, border-color 0.18s',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '12px',
-        boxShadow: isSelected ? '0 0 0 4px rgba(43,127,255,0.08)' : 'none',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '15px', fontWeight: 700, color: 'rgb(var(--zinc-100))', fontFamily: 'var(--font-main)', lineHeight: 1.3 }}>
-              {item.name}
-            </span>
-            {item.timeline && item.gain > 0 && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', borderRadius: '100px', fontSize: '10px', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)', fontFamily: 'var(--font-mono)', whiteSpace: 'nowrap' }}>
-                <span style={{ opacity: 0.6, fontSize: '16px', lineHeight: 1 }}>⊙</span>
-                {item.timeline}
-              </span>
-            )}
-            {isNeeded && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '100px', fontSize: '9px', fontWeight: 600, fontFamily: 'var(--font-mono)', letterSpacing: '0.07em', textTransform: 'uppercase', background: 'rgba(255,197,61,0.14)', color: 'rgb(255,197,61)', border: '1px solid rgba(255,197,61,0.28)', whiteSpace: 'nowrap' }}>
-                ★ needed
-              </span>
-            )}
-          </div>
-        </div>
-        {isSelected ? (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 12px', borderRadius: '100px', fontSize: '10px', fontWeight: 600, fontFamily: 'var(--font-mono)', background: 'rgba(43,127,255,0.18)', color: 'rgb(43,127,255)', border: '1px solid rgba(43,127,255,0.3)', letterSpacing: '0.04em', whiteSpace: 'nowrap', flexShrink: 0 }}>
-            ✓ Added
-          </span>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', flexShrink: 0 }}>
-            <span style={{ fontFamily: 'var(--font-heading)', fontSize: item.gain > 0 ? '22px' : '15px', fontWeight: 700, color: item.gain > 0 ? 'rgb(48,164,108)' : 'rgba(255,255,255,0.2)', lineHeight: 1 }}>
-              {item.gain > 0 ? `+${item.gain}` : '—'}
-            </span>
-            {item.gain > 0 && <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-mono)' }}>points</span>}
-          </div>
-        )}
-      </div>
-      <p style={{ fontSize: '12px', color: 'rgba(228,228,231,0.42)', lineHeight: 1.65, margin: 0 }}>{item.detail}</p>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: 'auto' }}>
-        {item.tags && item.tags.map(tag => (
-          <span key={tag} style={{ padding: '4px 10px', borderRadius: '100px', fontSize: '10px', fontWeight: 500, color: 'rgb(48,164,108)', border: '1px solid rgba(48,164,108,0.28)', background: 'rgba(48,164,108,0.08)' }}>{tag}</span>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsult }) => {
   const [selectedIds, setSelectedIds] = useState(() => computeNeeded(goalTarget));
@@ -455,7 +392,7 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
           gap: '12px',
         }}>
           {sortedTabItems.map(item => (
-            <ItemCard
+            <SelectableItemCard
               key={item.id}
               item={item}
               catType={item._catType}
