@@ -9,7 +9,6 @@ const HealthScoreLimitCard = React.memo(({ score, onConsultClick }) => {
       boxSizing:  'border-box',
       display:    'flex',
       alignItems: 'center',
-      gap:        '24px',
       padding:    '16px 32px',
       borderRadius: '20px',
       background: 'linear-gradient(to right, #253282 0%, 21.09704613685608%, #374DAE 42.19409227371216%, 71.09704613685608%, #537DD3 100%)',
