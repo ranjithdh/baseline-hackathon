@@ -63,7 +63,7 @@ const MarkerList = ({ markers }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 // Collapsed preview card (right column)
 // ─────────────────────────────────────────────────────────────────────────────
-const CollapsedCard = ({ sectionKey, onExpand, previewCount = 4 }) => {
+const CollapsedCard = ({ sectionKey, onExpand, previewCount = 2 }) => {
   const meta = SECTION_META[sectionKey];
   const markers = useMemo(() => getBySection(sectionKey), [sectionKey]);
   const alertCount = markers.filter(m => ['high', 'low'].includes(m.status)).length;
