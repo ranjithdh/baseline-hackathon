@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from './desktopPlanData';
 // HealthScoreSlider (V1) is intentionally kept untouched for other screens.
@@ -9,6 +9,7 @@ import DashboardCard from './DashboardCard';
 import ActionPlanDownloadButton from './ActionPlanDownloadButton';
 import HealthScoreLimitCard from './HealthScoreLimitCard';
 import { InferenceBadge } from '../../ui/inference-badge';
+import GeneratingState from './GeneratingState';
 
 const GOAL_MIN = BASE_SCORE;
 const GOAL_MAX = 100;
@@ -36,10 +37,26 @@ function computeNeeded(goalTarget) {
 }
 
 
+
 const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsult }) => {
   const [selectedIds, setSelectedIds] = useState(() => computeNeeded(goalTarget));
-  // 'all' is the default — shows every category's items in one view
   const [activeTab, setActiveTab] = useState('all');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const genTimerRef = useRef(null);
+  const actionPlanCardRef = useRef(null);
+
+  // ── localGoalTarget: live drag display value ──────────────────────────────
+  // Decouples the slider's visual score (updates every px) from the parent's
+  // goalTarget state (updates once on release). Without this separation,
+  // every drag tick called setGoalTarget in DesktopDashboard, re-rendering
+  // the entire dashboard and all its siblings on every mouse-move pixel.
+  const [localGoalTarget, setLocalGoalTarget] = useState(() => goalTarget);
+
+  // Keep localGoalTarget in sync if parent changes goalTarget externally
+  // (e.g. programmatic updates). Same-value setState is a React no-op.
+  useEffect(() => {
+    setLocalGoalTarget(goalTarget);
+  }, [goalTarget]);
 
   // ── Playground: baseline tracking ────────────────────────────────────────
   // baselineScore is the "confirmed" goal — updated automatically on slider release.
@@ -64,10 +81,20 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
     onGoalChange(score);
   }, [onGoalChange]);
 
-  // Called by HealthScoreSliderV2's onDragEnd — fires once per drag gesture.
+  // Shows Lottie generating animation for 1.2s, then reveals updated plan.
   const handleSliderRelease = useCallback((finalScore) => {
-    generateActionPlan(finalScore);
-  }, [generateActionPlan]);
+    if (genTimerRef.current) clearTimeout(genTimerRef.current);
+    // Sync local display and parent state immediately on release (single update)
+    setLocalGoalTarget(finalScore);
+    onGoalChange(finalScore);
+    setIsGenerating(true);
+    // Smooth-scroll the Action Plan card into view immediately on release
+    actionPlanCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    genTimerRef.current = setTimeout(() => {
+      generateActionPlan(finalScore);
+      setIsGenerating(false);
+    }, 1200);
+  }, [generateActionPlan, onGoalChange]);
 
   // Action plan computed values are driven by baselineScore (committed goal),
   // NOT goalTarget (live slider) — so the card never re-renders during drag.
@@ -98,11 +125,13 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
     ];
   }, [activeTab, selectedIds]);
 
-  // Live slider handler — updates display score only while dragging.
-  // Plan regeneration happens in handleSliderRelease (on drag end).
-  const handleGoalChange = (val) => {
-    onGoalChange(parseInt(val));
-  };
+  // Live slider handler — updates LOCAL display score only (no parent re-render).
+  // ❌ BEFORE: called onGoalChange() every pixel → re-rendered all of DesktopDashboard
+  // ✅ AFTER:  only setLocalGoalTarget() → re-renders only DesktopPlanPanel's header
+  // Plan regeneration happens exclusively in handleSliderRelease (on drag end).
+  const handleGoalChange = useCallback((val) => {
+    setLocalGoalTarget(parseInt(val));
+  }, []); // stable ref — no deps, no recreations during drag
 
   const handleToggleItem = useCallback((id) => {
     const next = new Set(selectedIds);
@@ -155,11 +184,11 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
               color: 'rgb(var(--foreground))', lineHeight: 1,
               transition: 'all 0.25s cubic-bezier(0.16,1,0.3,1)',
             }}>
-              {goalTarget}
+              {localGoalTarget}
             </div>
             {/* Status Tag — solid segment-color pill, matches reference design */}
             {(() => {
-              const status = getScoreStatus(goalTarget);
+              const status = getScoreStatus(localGoalTarget);
               return (
                 <div style={{
                   display:        'inline-flex',
@@ -206,16 +235,16 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
 
           {/* ── HealthScoreLimitCard — animated show/hide ── */}
           <AnimatePresence>
-            {goalTarget > MAX_ACHIEVABLE && (
+            {localGoalTarget > MAX_ACHIEVABLE && (
               <motion.div key="limit-card" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25, ease: 'easeOut' }} style={{ gridColumn: '1 / -1', width: '100%' }}>
-                <HealthScoreLimitCard score={goalTarget} onConsultClick={onBookConsult} />
+                <HealthScoreLimitCard score={localGoalTarget} onConsultClick={onBookConsult} />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </DashboardCard>
 
-      <DashboardCard style={{ margin: '20px 48px 0', position: 'relative', padding: 0 }}>
+      <DashboardCard ref={actionPlanCardRef} style={{ margin: '20px 48px 0', position: 'relative', padding: 0 }}>
         <div style={{ padding: '28px 44px 20px 40px', position: 'relative', zIndex: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0px' }}>
             <div>
@@ -224,7 +253,11 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
-              {totalSelected > 0 && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'rgb(48,164,108)', fontWeight: 600, whiteSpace: 'nowrap' }}> +{gained} pts · {totalSelected} action{totalSelected !== 1 ? 's' : ''} chosen</div>}
+              {!isGenerating && totalSelected > 0 && (
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'rgb(48,164,108)', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                  +{gained} pts · {totalSelected} action{totalSelected !== 1 ? 's' : ''} chosen
+                </div>
+              )}
               <ActionPlanDownloadButton onClick={onBookConsult} />
             </div>
           </div>
@@ -272,6 +305,18 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
         
 
 
+        {/* ── TAB BAR + CARDS: Lottie generating state while loading ── */}
+        <AnimatePresence mode="wait" initial={false}>
+        {isGenerating ? (
+          <GeneratingState key="generating" />
+        ) : (
+          <motion.div
+            key="content"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+          >
         {/* ── TAB BAR ── */}
         <div style={{
           display: 'flex', gap: '8px', marginBottom: '20px',margin:'0 40px 20px', flexWrap: 'wrap',
@@ -402,6 +447,9 @@ const DesktopPlanPanel = ({ planPanelRef, goalTarget, onGoalChange, onBookConsul
             />
           ))}
         </div>
+          </motion.div>
+        )}
+        </AnimatePresence>
 
       </DashboardCard>
     </>

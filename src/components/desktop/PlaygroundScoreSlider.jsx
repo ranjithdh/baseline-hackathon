@@ -1,25 +1,25 @@
-import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import React, {
+  useState, useRef, useCallback, useEffect,
+  useLayoutEffect, useMemo, memo,
+} from 'react';
 import sliderMarker from '../../assets/slider_marker.png';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // VISUAL CONSTANTS — change once, applies everywhere
 // ─────────────────────────────────────────────────────────────────────────────
-const TRACK_H           = 10;   // px — pill track height
-const THUMB_D           = 30;   // px — thumb diameter
-const THUMB_R           = THUMB_D / 2;
-const WRAP_H            = THUMB_D + 20;  // px — track-area wrapper height
-const SEG_GAP           = 3;    // px — gap between adjacent segment pills
+const TRACK_H        = 10;
+const THUMB_D        = 30;
+const THUMB_R        = THUMB_D / 2;
+const WRAP_H         = THUMB_D + 20;
+const SEG_GAP        = 3;
 
-// Marker geometry (everything lives ABOVE the track)
-const MARKER_LINE_H     = 21;   // px — dashed line height above track (50% of original 42)
-const MARKER_LABEL_GAP  = 6;    // px — space between label bottom and line top
-const MARKER_LABEL_H    = 30;   // px — approximate label block height (score + text)
-// Total clear-space reserved above the track-area wrapper
-const MARKER_TOP_SPACE  = MARKER_LINE_H + MARKER_LABEL_GAP + MARKER_LABEL_H; // 76 px
-
+const MARKER_LINE_H    = 21;
+const MARKER_LABEL_GAP = 6;
+const MARKER_LABEL_H   = 30;
+const MARKER_TOP_SPACE = MARKER_LINE_H + MARKER_LABEL_GAP + MARKER_LABEL_H; // 57 px
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SEGMENTS — mirrors HealthScoreSliderV2 exactly (same CSS vars + glowRgb)
+// SEGMENTS
 // ─────────────────────────────────────────────────────────────────────────────
 const SEGMENTS = [
   { min: 0,  max: 50,  label: 'Compromised', color: 'rgb(var(--chart-2))', glowRgb: '241,121,104' },
@@ -54,24 +54,15 @@ const buildVisibleSegments = (min, max) => {
     .filter(Boolean);
 };
 
-
 // ─────────────────────────────────────────────────────────────────────────────
-// Shared marker renderer
-//
-// Renders ONE marker column (dashed line + label) anchored ABOVE the track.
-// • The line's bottom edge sits exactly at the track-area top  (bottom: 100%)
-// • The label sits above the line                              (bottom: 100% + LINE_H + GAP)
+// MarkerColumn — purely presentational, no internal state
 // ─────────────────────────────────────────────────────────────────────────────
-const MarkerColumn = ({ leftPct, score, label, glowRgb, color, transition }) => (
+const MarkerColumn = memo(({ leftPct, score, label, glowRgb, color, transition }) => (
   <>
-    {/* Label — sits above the dashed line */}
     <div
       style={{
         position:      'absolute',
         left:          `${leftPct}%`,
-        // bottom: 100%  = top of track-area wrapper
-        // + MARKER_LINE_H = clears the full line
-        // + MARKER_LABEL_GAP = breathing room
         bottom:        `calc(100% + ${MARKER_LINE_H + MARKER_LABEL_GAP}px)`,
         transform:     'translateX(-50%)',
         display:       'flex',
@@ -105,17 +96,14 @@ const MarkerColumn = ({ leftPct, score, label, glowRgb, color, transition }) => 
       </span>
     </div>
 
-    {/* Dashed line — bottom edge anchored to track-area top, extends upward only */}
     <div
       style={{
         position:      'absolute',
         left:          `${leftPct}%`,
-        // bottom: 100% → bottom of this div = top of the track-area wrapper
         bottom:        '100%',
         transform:     'translateX(-50%)',
         width:         '2px',
         height:        `${MARKER_LINE_H}px`,
-        // Dashed stroke via repeating-gradient (no SVG, no extra DOM)
         backgroundImage: `repeating-linear-gradient(
           to bottom,
           rgba(${glowRgb}, 0.65) 0px,
@@ -130,24 +118,19 @@ const MarkerColumn = ({ leftPct, score, label, glowRgb, color, transition }) => 
       }}
     />
   </>
-);
+));
+MarkerColumn.displayName = 'MarkerColumn';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PlaygroundScoreSlider
 //
-// Renders a segmented health-score slider with two above-track markers:
-//   • "Current"   — follows the draggable thumb (controlled via `value`)
-//   • "Potential" — fixed dashed marker at `initialScore`
-//
-// Props
-//   initialScore   Fixed "Potential" score — shown as a dashed marker above the track
-//   value          Controlled current value — drives the draggable thumb + "Current" marker
-//   min / max      Track range  (default 0 / 100)
-//   step           Snap increment (default 1)
-//   onChange       Called on every drag tick with the live value
-//   onChangeEnd    Called once per interaction on release / click / key press
+// Performance contract:
+//   • During drag  → only internal setValue() fires; NO parent re-render
+//   • On release   → onChangeEnd(value) fires exactly once
+//   • RAF-batched  → at most one commitMove() per animation frame (~60fps)
+//   • Stable deps  → window event listeners NEVER re-register during drag
 // ─────────────────────────────────────────────────────────────────────────────
-const PlaygroundScoreSlider = ({
+const PlaygroundScoreSlider = memo(({
   initialScore,
   value: valueProp,
   min  = 0,
@@ -159,9 +142,13 @@ const PlaygroundScoreSlider = ({
   const span     = max - min;
   const potScore = clamp(initialScore, min, max);
 
-  // ── Internal controlled state ─────────────────────────────────────────────
-  const [value, setValue] = useState(() => clamp(snapTo(valueProp ?? min, step), min, max));
+  // ── Internal drag state (never escapes to parent during drag) ─────────────
+  const [value, setValue] = useState(
+    () => clamp(snapTo(valueProp ?? min, step), min, max)
+  );
 
+  // Sync from controlled prop — fires only when parent deliberately changes it
+  // (i.e. on release, NOT during drag, because we stopped calling onGoalChange live)
   useEffect(() => {
     const next = clamp(snapTo(valueProp ?? min, step), min, max);
     setValue(next);
@@ -171,67 +158,101 @@ const PlaygroundScoreSlider = ({
   // ── Refs ──────────────────────────────────────────────────────────────────
   const trackRef    = useRef(null);
   const dragging    = useRef(false);
-  const wasDragging = useRef(false); // suppresses double-commit on thumb click
+  const wasDragging = useRef(false);
   const lastValue   = useRef(value);
+  const rafRef      = useRef(null);   // pending animation frame ID
+  const pendingX    = useRef(null);   // latest clientX buffered for next RAF tick
+
+  // ── Stable callback refs ──────────────────────────────────────────────────
+  // Always hold the latest prop value, but their IDENTITY never changes.
+  // This breaks the dep-chain:  onChange → commitMove → effect → listener churn
+  const onChangeRef    = useRef(onChange);
+  const onChangeEndRef = useRef(onChangeEnd);
+  useLayoutEffect(() => { onChangeRef.current    = onChange;    }, [onChange]);
+  useLayoutEffect(() => { onChangeEndRef.current = onChangeEnd; }, [onChangeEnd]);
 
   // ── Derived geometry ──────────────────────────────────────────────────────
-  const currentPct   = ((value    - min) / span) * 100;  // thumb position only
-  const potentialPct = ((potScore - min) / span) * 100;
-
-  // "Current" marker is always pinned to the slider's start (min = 0 %).
-  // It does NOT follow the thumb — it is a fixed reference for the baseline score.
-  const currentMarkerPct = 0;
-
-  // Segment colour is derived from min (the fixed Current score).
-  const currentSeg   = getSegment(min);
-  const potentialSeg = getSegment(potScore);
-  const visSegs      = useMemo(() => buildVisibleSegments(min, max), [min, max]);
+  const currentPct       = ((value    - min) / span) * 100;
+  const potentialPct     = ((potScore - min) / span) * 100;
+  const currentMarkerPct = 0; // "Current" marker always pinned to track start
+  const currentSeg       = getSegment(min);
+  const potentialSeg     = getSegment(potScore);
+  const visSegs          = useMemo(() => buildVisibleSegments(min, max), [min, max]);
 
   // ── Pixel → score conversion ──────────────────────────────────────────────
+  // FIX: `value` removed from deps — it was only used as a fallback, which we
+  // now satisfy via `lastValue` ref.  This makes clientXToValue stable for the
+  // entire drag gesture (min/max/span/step never change mid-drag).
   const clientXToValue = useCallback((clientX) => {
     const rect = trackRef.current?.getBoundingClientRect();
-    if (!rect) return value;
+    if (!rect) return lastValue.current; // ← ref fallback, no stale closure
     const pct = clamp((clientX - rect.left) / rect.width, 0, 1);
     return clamp(snapTo(pct * span + min, step), min, max);
-  }, [min, max, span, step, value]);
+  }, [min, max, span, step]); // ← `value` intentionally excluded
 
-  // ── Commit helper (during drag) ───────────────────────────────────────────
+  // ── Commit a drag position ────────────────────────────────────────────────
+  // FIX: `onChange` removed from deps — we call it through the stable ref.
+  // commitMove is now stable for the entire drag gesture.
   const commitMove = useCallback((clientX) => {
     const next = clientXToValue(clientX);
     lastValue.current = next;
     setValue(next);
-    onChange?.(next);
-  }, [clientXToValue, onChange]);
+    onChangeRef.current?.(next); // ← ref, not closure — zero dep cost
+  }, [clientXToValue]); // ← `onChange` intentionally excluded
 
-  // ── Global mouse / touch listeners ───────────────────────────────────────
+  // ── RAF-batched global move / up listeners ────────────────────────────────
+  // FIX: Because commitMove is now stable for the entire drag, this effect
+  // registers its listeners ONCE on mount and never re-registers mid-drag.
   useEffect(() => {
-    const onMove      = (e) => { if (dragging.current) commitMove(e.clientX); };
-    const onTouchMove = (e) => { if (dragging.current) commitMove(e.touches[0].clientX); };
-    const onUp        = () => {
-      if (dragging.current) {
-        dragging.current    = false;
-        wasDragging.current = true;   // block the bubbled onClick from re-firing
-        onChangeEnd?.(lastValue.current);
+    // Flush the latest buffered clientX in the next animation frame.
+    // This caps DOM writes to 60fps even when the device polls at 1000Hz.
+    const scheduleCommit = (clientX) => {
+      pendingX.current = clientX;
+      if (rafRef.current !== null) return; // already scheduled this frame
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        if (dragging.current && pendingX.current !== null) {
+          commitMove(pendingX.current);
+        }
+      });
+    };
+
+    const onMove      = (e) => { if (dragging.current) scheduleCommit(e.clientX); };
+    const onTouchMove = (e) => { if (dragging.current) scheduleCommit(e.touches[0].clientX); };
+
+    const onUp = () => {
+      if (!dragging.current) return;
+      dragging.current    = false;
+      wasDragging.current = true;
+
+      // Cancel any pending RAF so we don't fire commitMove after release
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
       }
+
+      onChangeEndRef.current?.(lastValue.current); // ← ref, not closure
     };
 
     window.addEventListener('mousemove',  onMove);
     window.addEventListener('mouseup',    onUp);
     window.addEventListener('touchmove',  onTouchMove, { passive: true });
     window.addEventListener('touchend',   onUp);
+
     return () => {
       window.removeEventListener('mousemove',  onMove);
       window.removeEventListener('mouseup',    onUp);
       window.removeEventListener('touchmove',  onTouchMove);
       window.removeEventListener('touchend',   onUp);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
-  }, [commitMove, onChangeEnd]);
+  }, [commitMove]); // commitMove is now stable for entire drag — registers once
 
   // ── Keyboard navigation ───────────────────────────────────────────────────
-  const onKeyDown = (e) => {
+  const onKeyDown = useCallback((e) => {
     const delta = {
-      ArrowRight: step,  ArrowUp:    step,
-      ArrowLeft: -step,  ArrowDown: -step,
+      ArrowRight:  step,  ArrowUp:    step,
+      ArrowLeft:  -step,  ArrowDown: -step,
       Home: -(max - min), End: max - min,
     }[e.key];
     if (delta == null) return;
@@ -239,38 +260,42 @@ const PlaygroundScoreSlider = ({
     const next = clamp(snapTo(value + delta, step), min, max);
     lastValue.current = next;
     setValue(next);
-    onChange?.(next);
-    onChangeEnd?.(next);
-  };
+    onChangeRef.current?.(next);
+    onChangeEndRef.current?.(next);
+  }, [value, min, max, step]);
 
-  // ── Track / outer-wrapper click ───────────────────────────────────────────
-  const onTrackClick = (e) => {
+  // ── Track click ───────────────────────────────────────────────────────────
+  const onTrackClick = useCallback((e) => {
     if (wasDragging.current) { wasDragging.current = false; return; }
     const next = clientXToValue(e.clientX);
     lastValue.current = next;
     setValue(next);
-    onChange?.(next);
-    onChangeEnd?.(next);
-  };
+    onChangeRef.current?.(next);
+    onChangeEndRef.current?.(next);
+  }, [clientXToValue]);
+
+  // ── Thumb pointer-down ────────────────────────────────────────────────────
+  const onThumbMouseDown = useCallback((e) => {
+    e.preventDefault();
+    wasDragging.current = false;
+    dragging.current    = true;
+  }, []);
+
+  const onThumbTouchStart = useCallback(() => {
+    wasDragging.current = false;
+    dragging.current    = true;
+  }, []);
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div
       style={{
-        width:           '100%',
-        userSelect:      'none',
-        WebkitUserSelect:'none',
-        // Reserve exactly enough room above the track for both marker columns
-        paddingTop:      `${MARKER_TOP_SPACE}px`,
+        width:            '100%',
+        userSelect:       'none',
+        WebkitUserSelect: 'none',
+        paddingTop:       `${MARKER_TOP_SPACE}px`,
       }}
     >
-      {/*
-        Track-area wrapper
-        ─────────────────
-        All markers use `position: absolute; bottom: 100%` relative to THIS div.
-        That anchors their BOTTOM EDGE to the TOP of the track area, so they
-        extend upward only — never through or below the slider track.
-      */}
       <div
         style={{
           position: 'relative',
@@ -279,8 +304,7 @@ const PlaygroundScoreSlider = ({
         }}
         onClick={onTrackClick}
       >
-
-        {/* ── POTENTIAL marker (fixed) ────────────────────────────────────── */}
+        {/* ── POTENTIAL marker ── */}
         <MarkerColumn
           leftPct={potentialPct}
           score={potScore}
@@ -289,8 +313,7 @@ const PlaygroundScoreSlider = ({
           color={`rgba(${potentialSeg.glowRgb}, 0.42)`}
         />
 
-        {/* ── CURRENT marker — fixed at the slider start (min score) ────────── */}
-        {/* leftPct is always 0: this marker never moves regardless of thumb position */}
+        {/* ── CURRENT marker (fixed at track start) ── */}
         <MarkerColumn
           leftPct={currentMarkerPct}
           score={min}
@@ -299,7 +322,7 @@ const PlaygroundScoreSlider = ({
           color={currentSeg.color}
         />
 
-        {/* ── Segmented pill track ────────────────────────────────────────── */}
+        {/* ── Segmented pill track ── */}
         <div
           ref={trackRef}
           style={{
@@ -326,7 +349,7 @@ const PlaygroundScoreSlider = ({
           ))}
         </div>
 
-        {/* ── Draggable thumb ─────────────────────────────────────────────── */}
+        {/* ── Draggable thumb ── */}
         <div
           role="slider"
           aria-valuemin={min}
@@ -335,15 +358,8 @@ const PlaygroundScoreSlider = ({
           aria-label={`Current score: ${value}`}
           tabIndex={0}
           onKeyDown={onKeyDown}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            wasDragging.current = false;
-            dragging.current    = true;
-          }}
-          onTouchStart={() => {
-            wasDragging.current = false;
-            dragging.current    = true;
-          }}
+          onMouseDown={onThumbMouseDown}
+          onTouchStart={onThumbTouchStart}
           style={{
             position:       'absolute',
             top:            '50%',
@@ -359,7 +375,7 @@ const PlaygroundScoreSlider = ({
             display:        'flex',
             alignItems:     'center',
             justifyContent: 'center',
-            transition:     'left 0.04s linear',
+            // 'transform' hint keeps the thumb on its own compositor layer
             willChange:     'left',
           }}
         >
@@ -377,9 +393,10 @@ const PlaygroundScoreSlider = ({
           />
         </div>
 
-      </div>{/* end track-area wrapper */}
+      </div>
     </div>
   );
-};
+});
 
+PlaygroundScoreSlider.displayName = 'PlaygroundScoreSlider';
 export default PlaygroundScoreSlider;
