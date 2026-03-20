@@ -22,18 +22,18 @@ const MARKER_TOP_SPACE = MARKER_LINE_H + MARKER_LABEL_GAP + MARKER_LABEL_H; // 5
 // SEGMENTS
 // ─────────────────────────────────────────────────────────────────────────────
 const SEGMENTS = [
-  { min: 0,  max: 50,  label: 'Compromised', color: 'rgb(var(--chart-2))', glowRgb: '241,121,104' },
-  { min: 50, max: 65,  label: 'Constrained', color: 'rgb(var(--chart-3))', glowRgb: '244,199,100' },
-  { min: 65, max: 75,  label: 'Stable',      color: 'rgb(var(--chart-4))', glowRgb: '141,226,141' },
-  { min: 75, max: 85,  label: 'Strong',      color: 'rgb(var(--chart-5))', glowRgb: '31,120,76'   },
-  { min: 85, max: 100, label: 'Elite',       color: 'rgb(var(--chart-6))', glowRgb: '0,158,148'   },
+  { min: 0, max: 50, label: 'Compromised', color: 'rgb(var(--chart-2))', glowRgb: '241,121,104' },
+  { min: 50, max: 65, label: 'Constrained', color: 'rgb(var(--chart-3))', glowRgb: '244,199,100' },
+  { min: 65, max: 75, label: 'Stable', color: 'rgb(var(--chart-4))', glowRgb: '141,226,141' },
+  { min: 75, max: 85, label: 'Strong', color: 'rgb(var(--chart-5))', glowRgb: '31,120,76' },
+  { min: 85, max: 100, label: 'Elite', color: 'rgb(var(--chart-6))', glowRgb: '0,158,148' },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PURE HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
-const clamp  = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-const snapTo = (v, step)   => Math.round(v / step) * step;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const snapTo = (v, step) => Math.round(v / step) * step;
 
 const getSegment = (score) => {
   for (let i = 0; i < SEGMENTS.length - 1; i++) {
@@ -67,30 +67,30 @@ const MarkerColumn = memo(({ leftPct, score, label, glowRgb, color, transition }
         transform:     'translateX(-50%)',
         display:       'flex',
         flexDirection: 'column',
-        alignItems:    'center',
-        gap:           '3px',
+        alignItems: 'center',
+        gap: '3px',
         pointerEvents: 'none',
-        whiteSpace:    'nowrap',
-        transition:    transition || 'none',
+        whiteSpace: 'nowrap',
+        transition: transition || 'none',
       }}
     >
       <span style={{
         fontFamily: 'var(--font-heading)',
-        fontSize:   '14px',
+        fontSize: '14px',
         fontWeight: 600,
         lineHeight: 1,
-        color:      color,
+        color: color,
         transition: 'color 0.25s',
       }}>
         {score}
       </span>
       <span style={{
-        fontFamily:    'var(--font-mono)',
-        fontSize:      '10px',
+        fontFamily: 'var(--font-mono)',
+        fontSize: '10px',
         letterSpacing: '0.12em',
         textTransform: 'uppercase',
-        color:         `rgba(${glowRgb}, 0.5)`,
-        transition:    'color 0.25s',
+        color: `rgba(${glowRgb}, 0.5)`,
+        transition: 'color 0.25s',
       }}>
         {label}
       </span>
@@ -111,10 +111,10 @@ const MarkerColumn = memo(({ leftPct, score, label, glowRgb, color, transition }
           transparent 5px,
           transparent 9px
         )`,
-        filter:        `drop-shadow(0 0 3px rgba(${glowRgb}, 0.35))`,
-        zIndex:        5,
+        filter: `drop-shadow(0 0 3px rgba(${glowRgb}, 0.35))`,
+        zIndex: 5,
         pointerEvents: 'none',
-        transition:    transition || 'none',
+        transition: transition || 'none',
       }}
     />
   </>
@@ -133,13 +133,13 @@ MarkerColumn.displayName = 'MarkerColumn';
 const PlaygroundScoreSlider = memo(({
   initialScore,
   value: valueProp,
-  min  = 0,
-  max  = 100,
+  min = 0,
+  max = 100,
   step = 1,
   onChange,
   onChangeEnd,
 }) => {
-  const span     = max - min;
+  const span = max - min;
   const potScore = clamp(initialScore, min, max);
 
   // ── Internal drag state (never escapes to parent during drag) ─────────────
@@ -299,8 +299,8 @@ const PlaygroundScoreSlider = memo(({
       <div
         style={{
           position: 'relative',
-          height:   `${WRAP_H}px`,
-          cursor:   'pointer',
+          height: `${WRAP_H}px`,
+          cursor: 'pointer',
         }}
         onClick={onTrackClick}
       >
@@ -326,24 +326,24 @@ const PlaygroundScoreSlider = memo(({
         <div
           ref={trackRef}
           style={{
-            position:  'absolute',
-            top:       '50%',
-            left:      0,
-            right:     0,
+            position: 'absolute',
+            top: '50%',
+            left: 0,
+            right: 0,
             transform: 'translateY(-50%)',
-            height:    `${TRACK_H}px`,
-            display:   'flex',
-            gap:       `${SEG_GAP}px`,
+            height: `${TRACK_H}px`,
+            display: 'flex',
+            gap: `${SEG_GAP}px`,
           }}
         >
           {visSegs.map(seg => (
             <div
               key={seg.label}
               style={{
-                flex:         `${seg.widthPct} 0 0`,
-                height:       '100%',
+                flex: `${seg.widthPct} 0 0`,
+                height: '100%',
                 borderRadius: '999px',
-                background:   seg.color,
+                background: seg.color,
               }}
             />
           ))}
@@ -361,19 +361,19 @@ const PlaygroundScoreSlider = memo(({
           onMouseDown={onThumbMouseDown}
           onTouchStart={onThumbTouchStart}
           style={{
-            position:       'absolute',
-            top:            '50%',
-            left:           `calc(${currentPct}% - ${THUMB_R}px)`,
-            transform:      'translateY(-50%)',
-            width:          `${THUMB_D}px`,
-            height:         `${THUMB_D}px`,
-            zIndex:         10,
-            cursor:         'grab',
-            outline:        'none',
-            background:     'none',
-            border:         'none',
-            display:        'flex',
-            alignItems:     'center',
+            position: 'absolute',
+            top: '50%',
+            left: `calc(${currentPct}% - ${THUMB_R}px)`,
+            transform: 'translateY(-50%)',
+            width: `${THUMB_D}px`,
+            height: `${THUMB_D}px`,
+            zIndex: 10,
+            cursor: 'grab',
+            outline: 'none',
+            background: 'none',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             // 'transform' hint keeps the thumb on its own compositor layer
             willChange:     'left',
@@ -383,12 +383,12 @@ const PlaygroundScoreSlider = memo(({
             src={sliderMarker}
             alt=""
             style={{
-              width:         '100%',
-              height:        '100%',
-              objectFit:     'contain',
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
               pointerEvents: 'none',
-              userSelect:    'none',
-              draggable:     false,
+              userSelect: 'none',
+              draggable: false,
             }}
           />
         </div>

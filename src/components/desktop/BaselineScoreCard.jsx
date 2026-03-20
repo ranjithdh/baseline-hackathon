@@ -64,12 +64,12 @@ const BaselineScoreCard = ({
         .bsc-card {
           position: relative;
           border-radius: 20px;
-          padding: 22px 24px 20px;
+          padding: 18px 22px 16px;
           height: 100%;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 12px;
           overflow: hidden;
           background: linear-gradient(135deg, #0f1729 0%, #111827 55%, #0e1a3a 100%);
           border: 1px solid rgba(99,102,241,0.22);
@@ -91,7 +91,7 @@ const BaselineScoreCard = ({
         }
         .bsc-title {
           font-family: var(--font-heading);
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 700;
           color: #ffffff;
           letter-spacing: -0.01em;
@@ -109,17 +109,17 @@ const BaselineScoreCard = ({
           border: 1px solid rgba(43, 127, 255, 0.28);
         }
         .bsc-info-btn {
-  margin-left: auto;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  z-index: 999;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto !important;
-  cursor: pointer !important;
+          margin-left: auto;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          z-index: 999;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          pointer-events: auto !important;
+          cursor: pointer !important;
           background: rgba(255,255,255,0.06);
           color: #fff;
           border: 1px solid rgba(255,255,255,0.12);
@@ -175,7 +175,7 @@ const BaselineScoreCard = ({
         .bsc-main-row {
           display: flex;
           align-items: center;
-          gap: 22px;
+          gap: 18px;
         }
 
         /* Arc ring */
@@ -200,7 +200,7 @@ const BaselineScoreCard = ({
         }
         .bsc-score-num {
           font-family: var(--font-heading);
-          font-size: 56px;
+          font-size: 48px;
           font-weight: 800;
           color: #ffffff;
           line-height: 1;
@@ -214,9 +214,9 @@ const BaselineScoreCard = ({
         }
         .bsc-score-denom {
           font-family: var(--font-mono);
-          font-size: 16px;
+          font-size: 14px;
           color: rgba(255,255,255,0.6);
-          margin-bottom: 6px;
+          margin-bottom: 4px;
         }
 
         /* Right‑side meta */
@@ -224,16 +224,16 @@ const BaselineScoreCard = ({
           flex: 1;
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 8px;
           min-width: 0;
         }
         .bsc-status-pill {
           display: inline-flex;
           align-items: center;
           gap: 5px;
-          padding: 4px 12px;
+          padding: 3px 10px;
           border-radius: 100px;
-          font-size: 11px;
+          font-size: 10px;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.05em;
@@ -246,9 +246,9 @@ const BaselineScoreCard = ({
         }
         .bsc-headline {
           font-family: var(--font-main);
-          font-size: 12px;
-          line-height: 1.5;
-          color: rgba(255,255,255,0.55);
+          font-size: 11.5px;
+          line-height: 1.45;
+          color: rgba(255,255,255,0.5);
           font-weight: 400;
         }
 
@@ -260,11 +260,11 @@ const BaselineScoreCard = ({
         }
         .bsc-scale-label {
           font-family: var(--font-mono);
-          font-size: 10px;
+          font-size: 9px;
           letter-spacing: 0.1em;
           color: rgba(255,255,255,0.3);
           text-transform: uppercase;
-          margin-bottom: 10px;
+          margin-bottom: 8px;
         }
         .bsc-bar-outer {
           position: relative;
@@ -272,7 +272,7 @@ const BaselineScoreCard = ({
         .bsc-bar-segments {
           display: flex;
           gap: 3px;
-          height: 7px;
+          height: 6px;
         }
         .bsc-seg {
           height: 100%;
@@ -281,7 +281,7 @@ const BaselineScoreCard = ({
         /* indicator needle */
         .bsc-needle-wrap {
           position: absolute;
-          top: -10px;
+          top: -8px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -291,18 +291,18 @@ const BaselineScoreCard = ({
         }
         .bsc-needle-tri {
           width: 0; height: 0;
-          border-left: 5px solid transparent;
-          border-right: 5px solid transparent;
-          border-top: 7px solid currentColor;
+          border-left: 4.5px solid transparent;
+          border-right: 4.5px solid transparent;
+          border-top: 6px solid currentColor;
         }
         /* numeric markers */
         .bsc-markers {
           position: relative;
-          height: 16px;
-          margin-top: 6px;
+          height: 14px;
+          margin-top: 5px;
           font-family: var(--font-mono);
-          font-size: 10px;
-          color: rgba(255,255,255,0.35);
+          font-size: 9px;
+          color: rgba(255,255,255,0.3);
         }
         .bsc-mark {
           position: absolute;
@@ -311,20 +311,20 @@ const BaselineScoreCard = ({
         /* legend dots row */
         .bsc-legend {
           display: flex;
-          gap: 14px;
+          gap: 12px;
           flex-wrap: wrap;
-          margin-top: 10px;
+          margin-top: 8px;
         }
         .bsc-leg-item {
           display: flex;
           align-items: center;
-          gap: 5px;
-          font-size: 11px;
-          color: rgba(255,255,255,0.45);
+          gap: 4px;
+          font-size: 10px;
+          color: rgba(255,255,255,0.4);
         }
         .bsc-leg-dot {
-          width: 6px;
-          height: 6px;
+          width: 5px;
+          height: 5px;
           border-radius: 50%;
           flex-shrink: 0;
         }
@@ -340,7 +340,7 @@ const BaselineScoreCard = ({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 20px;
+          gap: 16px;
         }
         .bsc-potential {
           display: flex;
@@ -349,14 +349,14 @@ const BaselineScoreCard = ({
         }
         .bsc-pot-eyebrow {
           font-family: var(--font-mono);
-          font-size: 9px;
+          font-size: 8px;
           text-transform: uppercase;
           letter-spacing: 0.14em;
           color: rgba(255,255,255,0.3);
         }
         .bsc-pot-main {
           font-family: var(--font-heading);
-          font-size: 20px;
+          font-size: 16px;
           font-weight: 800;
           color: #ffffff;
           line-height: 1;
@@ -366,22 +366,22 @@ const BaselineScoreCard = ({
           filter: drop-shadow(0 0 8px rgba(74,222,128,0.5));
         }
         .bsc-pot-sub {
-          font-size: 12px;
+          font-size: 11px;
           color: rgba(255,255,255,0.4);
-          margin-top: 3px;
+          margin-top: 2px;
         }
         .bsc-cta {
           flex-shrink: 0;
           display: flex;
           align-items: center;
-          gap: 7px;
-          padding: 10px 18px;
-          border-radius: 12px;
+          gap: 6px;
+          padding: 8px 16px;
+          border-radius: 10px;
           background: linear-gradient(135deg, #1e40af 0%, #2b7fff 60%, #60a5fa 100%);
           color: #ffffff;
           font-family: var(--font-main);
           font-weight: 700;
-          font-size: 13px;
+          font-size: 12px;
           border: none;
           cursor: pointer;
           box-shadow: 0 4px 16px rgba(43,127,255,0.35), inset 0 1px 0 rgba(255,255,255,0.15);

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const GoalActionCombined = ({ onBack, onAnalyze, onViewDetailed, isEmpty = false }) => {
   const [goalScore, setGoalScore] = useState(88);
   const [completedProtocols, setCompletedProtocols] = useState(new Set());
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const baseScore = 65;
 
@@ -78,6 +79,20 @@ const GoalActionCombined = ({ onBack, onAnalyze, onViewDetailed, isEmpty = false
     });
   };
 
+  const handleSliderRelease = () => {
+    setIsGenerating(true);
+    setTimeout(() => {
+      const allItems = new Set();
+      protocolData.forEach(group => {
+        group.items.forEach(item => {
+          allItems.add(item.name);
+        });
+      });
+      setCompletedProtocols(allItems);
+      setIsGenerating(false);
+    }, 1500);
+  };
+
   const progressToGoal = ((currentLevel - baseScore) / (goalScore - baseScore)) * 100;
 
   return (
@@ -133,6 +148,8 @@ const GoalActionCombined = ({ onBack, onAnalyze, onViewDetailed, isEmpty = false
                     max="100"
                     value={goalScore}
                     onChange={(e) => setGoalScore(parseInt(e.target.value))}
+                    onMouseUp={handleSliderRelease}
+                    onTouchEnd={handleSliderRelease}
                     className="w-full h-1.5 bg-white/5 rounded-full appearance-none cursor-pointer accent-white"
                   />
                   <div className="flex justify-between mt-4 px-1 text-[8px] font-black tracking-widest text-zinc-600 tabular-nums opacity-60">
@@ -148,7 +165,20 @@ const GoalActionCombined = ({ onBack, onAnalyze, onViewDetailed, isEmpty = false
           </div>
 
           {/* Bottom Half: Protocols (55%) */}
-          <div className="h-[55%] overflow-y-auto no-scrollbar px-6 pt-10 pb-40 w-full">
+          <div className="h-[55%] overflow-y-auto no-scrollbar px-6 pt-10 pb-40 w-full relative">
+            <AnimatePresence>
+              {isGenerating && (
+                <motion.div 
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 flex flex-col items-center justify-center bg-[#070708]/90 z-20 backdrop-blur-sm"
+                >
+                  <div className="w-8 h-8 border-[3px] border-white/10 border-t-white rounded-full animate-spin mb-4" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 animate-pulse">Generating Action Items...</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
             <div className="max-w-lg mx-auto grid grid-cols-1 gap-10">
               {protocolData.map((group) => (
                 <div key={group.category} className="space-y-4">
