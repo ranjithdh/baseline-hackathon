@@ -7,13 +7,13 @@ const DesktopConsultBanner = ({ onBookNow }) => {
       <style>{`
         .dcb-root {
           position: relative;
-          border-radius: 24px;
-          padding: 32px;
+          border-radius: 20px;
+          padding: 24px 28px;
           height: 100%;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 18px;
           overflow: hidden;
           background: rgba(255, 255, 255, 0.02);
           backdrop-filter: blur(20px);
@@ -30,26 +30,26 @@ const DesktopConsultBanner = ({ onBookNow }) => {
 
         .dcb-glow {
           position: absolute;
-          width: 250px; height: 250px;
+          width: 200px; height: 200px;
           background: radial-gradient(circle, rgba(43, 127, 255, 0.12) 0%, transparent 70%);
-          right: -50px; top: -50px;
+          right: -40px; top: -40px;
           pointer-events: none;
         }
 
         .dcb-header-label {
           font-family: var(--font-mono);
-          font-size: 10px;
+          font-size: 9px;
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.15em;
           color: #4c93ff;
-          margin-bottom: 4px;
+          margin-bottom: 2px;
         }
 
         .dcb-layout {
           display: grid;
           grid-template-columns: 1fr auto;
-          gap: 24px;
+          gap: 20px;
           align-items: center;
           height: 100%;
         }
@@ -57,12 +57,12 @@ const DesktopConsultBanner = ({ onBookNow }) => {
         .dcb-content {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 12px;
         }
 
         .dcb-title {
           font-family: var(--font-heading);
-          font-size: 32px;
+          font-size: 26px;
           font-weight: 800;
           color: #ffffff;
           line-height: 1.1;
@@ -70,28 +70,28 @@ const DesktopConsultBanner = ({ onBookNow }) => {
         }
         .dcb-sub {
           font-family: var(--font-main);
-          font-size: 15px;
-          color: rgba(255, 255, 255, 0.5);
-          line-height: 1.5;
-          max-width: 280px;
+          font-size: 13.5px;
+          color: rgba(255, 255, 255, 0.45);
+          line-height: 1.45;
+          max-width: 260px;
         }
 
         /* ── Huge CTA ── */
         .dcb-cta-wrap {
-          margin-top: 8px;
+          margin-top: 4px;
         }
         .dcb-cta-btn {
           position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 12px;
-          padding: 16px 32px;
-          border-radius: 16px;
+          gap: 10px;
+          padding: 12px 24px;
+          border-radius: 14px;
           background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #8b5cf6 100%);
           color: #ffffff;
           font-weight: 800;
-          font-size: 16px;
+          font-size: 14px;
           border: none;
           cursor: pointer;
           transition: all 0.3s ease;
@@ -105,7 +105,7 @@ const DesktopConsultBanner = ({ onBookNow }) => {
 
         @keyframes pulse-glow {
           0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-          70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
+          70% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
           100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
         }
         .dcb-cta-btn { animation: pulse-glow 2s infinite; }
@@ -113,51 +113,51 @@ const DesktopConsultBanner = ({ onBookNow }) => {
         /* ── Trust Signals ── */
         .dcb-trust {
           display: flex;
-          gap: 20px;
-          margin-top: 16px;
+          gap: 16px;
+          margin-top: 12px;
         }
         .dcb-trust-item {
           display: flex;
           align-items: center;
-          gap: 6px;
-          font-size: 11px;
+          gap: 5px;
+          font-size: 10px;
           font-weight: 600;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.35);
         }
         .dcb-trust-item span { color: #facc15; }
 
         /* ── Floating Visual ── */
         .dcb-visual-wrap {
           position: relative;
-          width: 180px;
-          height: 180px;
+          width: 140px;
+          height: 140px;
         }
         @keyframes floating {
           0% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-15px) rotate(5deg); }
+          50% { transform: translateY(-12px) rotate(5deg); }
           100% { transform: translateY(0px) rotate(0deg); }
         }
         .dcb-crystal {
           width: 100%;
           height: 100%;
           object-fit: contain;
-          filter: drop-shadow(0 20px 40px rgba(59, 130, 246, 0.5));
+          filter: drop-shadow(0 15px 30px rgba(59, 130, 246, 0.4));
           animation: floating 6s ease-in-out infinite;
         }
       `}</style>
 
       <div className="dcb-root">
         <div className="dcb-glow" />
-        
+
         <div className="dcb-header-label">Free Expert Advice</div>
 
         <div className="dcb-layout">
           <div className="dcb-content">
-            <h2 className="dcb-title">Unlock Your<br/>Full Potential</h2>
+            <h2 className="dcb-title">Unlock Your<br />Full Potential</h2>
             <p className="dcb-sub">
               Get a personalized plan to improve your score, energy, and overall health.
             </p>
-            
+
             <div className="dcb-cta-wrap">
               <button className="dcb-cta-btn" onClick={onBookNow}>
                 Get Your Personalized Plan <span style={{ fontSize: '20px' }}>→</span>
@@ -166,13 +166,13 @@ const DesktopConsultBanner = ({ onBookNow }) => {
 
             <div className="dcb-trust">
               <div className="dcb-trust-item">
-                <span>★</span> 4.8 review
+                <span>★</span> 4.9 review
               </div>
               <div className="dcb-trust-item">
-                10,000+ Users
+                1,00,000+ Users
               </div>
               <div className="dcb-trust-item">
-                15-min free session
+                30-min free session
               </div>
             </div>
           </div>
