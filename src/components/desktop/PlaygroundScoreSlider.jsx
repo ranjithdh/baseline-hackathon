@@ -358,8 +358,15 @@ const PlaygroundScoreSlider = memo(({
           aria-label={`Current score: ${value}`}
           tabIndex={0}
           onKeyDown={onKeyDown}
-          onMouseDown={onThumbMouseDown}
-          onTouchStart={onThumbTouchStart}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            wasDragging.current = false;
+            dragging.current    = true;
+          }}
+          onTouchStart={() => {
+            wasDragging.current = false;
+            dragging.current    = true;
+          }}
           style={{
             position: 'absolute',
             top: '50%',
@@ -375,7 +382,7 @@ const PlaygroundScoreSlider = memo(({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            // 'transform' hint keeps the thumb on its own compositor layer
+            transition:     'left 0.04s linear',
             willChange:     'left',
           }}
         >
