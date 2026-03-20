@@ -52,15 +52,25 @@ const MobileHealthScoreSlider = ({
   minAllowedScore,
   maxRecommended,
   ticks = [],
+  onRelease,
 }) => {
   const floorVal = minAllowedScore != null ? clamp(minAllowedScore, min, max) : min;
   const [score, setScore] = useState(clamp(scoreProp, floorVal, max));
+  const scoreRef = useRef(score);
   const trackRef = useRef(null);
   const dragging = useRef(false);
 
   useEffect(() => {
-    setScore(clamp(scoreProp, floorVal, max));
+    const next = clamp(scoreProp, floorVal, max);
+    setScore(next);
+    scoreRef.current = next;
   }, [scoreProp, floorVal, max]);
+
+  const updateScore = useCallback((next) => {
+    setScore(next);
+    scoreRef.current = next;
+    onChange?.(next);
+  }, [onChange]);
 
   const activeSeg = getSegment(score, min, max);
   const visSegs = buildVisibleSegments(min, max);
@@ -76,14 +86,18 @@ const MobileHealthScoreSlider = ({
 
   const commit = useCallback((clientX) => {
     const next = clamp(clientXToScore(clientX), floorVal, max);
-    setScore(next);
-    onChange?.(next);
-  }, [clientXToScore, floorVal, max, onChange]);
+    updateScore(next);
+  }, [clientXToScore, floorVal, max, updateScore]);
 
   useEffect(() => {
     const onMove = (e) => { if (dragging.current) commit(e.clientX); };
     const onTouchMove = (e) => { if (dragging.current) commit(e.touches[0].clientX); };
-    const onUp = () => { dragging.current = false; };
+    const onUp = () => { 
+      if (dragging.current) {
+        onRelease?.(scoreRef.current);
+      }
+      dragging.current = false; 
+    };
 
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
@@ -106,15 +120,15 @@ const MobileHealthScoreSlider = ({
     if (delta == null) return;
     e.preventDefault();
     const next = clamp(score + delta, floorVal, max);
-    setScore(next);
-    onChange?.(next);
+    updateScore(next);
+    onRelease?.(next);
   };
 
   const glowColor = activeSeg.color;
 
   return (
     <div style={S.root}>
-      <div style={S.outerWrap} onClick={(e) => commit(e.clientX)}>
+      <div style={S.outerWrap} onClick={(e) => { commit(e.clientX); onRelease?.(scoreRef.current); }}>
         <div ref={trackRef} style={S.track}>
           {visSegs.map((seg) => (
             <div
@@ -149,8 +163,8 @@ const MobileHealthScoreSlider = ({
         <div style={{ position: 'absolute', left: 0, height: '100%', display: 'flex', alignItems: 'center' }}>
           <span
             onClick={() => {
-              setScore(min);
-              onChange?.(min);
+              updateScore(min);
+              onRelease?.(min);
             }}
             style={{
               ...S.tickLabel,
@@ -188,8 +202,8 @@ const MobileHealthScoreSlider = ({
                   <span
                     onClick={() => {
                       const next = clamp(labelVal, floorVal, max);
-                      setScore(next);
-                      onChange?.(next);
+                      updateScore(next);
+                      onRelease?.(next);
                     }}
                     style={{
                       ...S.tickLabel,
@@ -205,8 +219,8 @@ const MobileHealthScoreSlider = ({
                 <div style={{ position: 'absolute', right: 0, height: '100%', display: 'flex', alignItems: 'center' }}>
                   <span
                     onClick={() => {
-                      setScore(max);
-                      onChange?.(max);
+                      updateScore(max);
+                      onRelease?.(max);
                     }}
                     style={{
                       ...S.tickLabel,

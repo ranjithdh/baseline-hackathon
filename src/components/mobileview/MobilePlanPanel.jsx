@@ -1,10 +1,67 @@
-import React, { useState, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES, ALL_ITEMS, BASE_SCORE, MAX_ACHIEVABLE } from '../desktop/desktopPlanData';
 import MobileHealthScoreSlider from './MobileHealthScoreSlider';
 import DashboardCard from '../desktop/DashboardCard';
 import ActionPlanDownloadButton from '../desktop/ActionPlanDownloadButton';
 import BuildActionPlanBanner from '../desktop/BuildActionPlanBanner';
+import Lottie from 'lottie-react';
+import generationAnimation from '../../assets/generation_animation.json';
+
+const MobileGeneratingState = React.memo(() => {
+  const lottieRef = useRef(null);
+
+  useEffect(() => {
+    if (lottieRef.current) {
+      lottieRef.current.setSpeed(0.7);
+    }
+  }, []);
+
+  return (
+    <motion.div 
+      key="generating-overlay"
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      exit={{ opacity: 0 }}
+      style={{ 
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '250px',
+        gap: '16px'
+      }}
+    >
+      <div style={{
+        width:  '120px',
+        height: '120px',
+        flexShrink: 0,
+      }}>
+        <Lottie
+          lottieRef={lottieRef}
+          animationData={generationAnimation}
+          loop
+          autoplay
+          style={{ width: '100%', height: '100%' }}
+        />
+      </div>
+      <p 
+        className="animate-pulse"
+        style={{
+          margin: 0,
+          fontSize: '14px',
+          fontFamily: 'var(--font-main)',
+          fontWeight: 500,
+          letterSpacing: '0.08em',
+          color: 'rgba(161,161,170,1)', // zinc-400
+          textAlign: 'center'
+        }}
+      >
+        Your Action Plan Generating ....
+      </p>
+    </motion.div>
+  );
+});
 
 const TICK_VALS = [65, 75, 85, 100];
 const GOAL_MIN = BASE_SCORE;
@@ -161,7 +218,7 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
   const lastY = useRef(0);
 
   const [baselineScore, setBaselineScore] = useState(() => goalTarget);
-  const showActionPlanButton = goalTarget !== baselineScore;
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleScroll = useCallback(() => {
     if (!containerRef.current) return;
@@ -183,12 +240,17 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
     savedSelectedIdsRef.current = new Set(computeNeeded(goalTarget));
   }
 
-  const handleBuildActionPlan = useCallback(() => {
-    const newIds = new Set(computeNeeded(goalTarget));
-    savedSelectedIdsRef.current = newIds;
-    setBaselineScore(goalTarget);
-    setSelectedIds(newIds);
-  }, [goalTarget]);
+  const handleBuildActionPlan = useCallback((finalScore) => {
+    if (finalScore === baselineScore) return;
+    setIsGenerating(true);
+    setTimeout(() => {
+      const newIds = new Set(computeNeeded(finalScore));
+      savedSelectedIdsRef.current = newIds;
+      setBaselineScore(finalScore);
+      setSelectedIds(newIds);
+      setIsGenerating(false);
+    }, 1500);
+  }, [baselineScore]);
 
   const neededIds = useMemo(() => computeNeeded(baselineScore), [baselineScore]);
 
@@ -197,7 +259,7 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
   const totalSelected = ALL_ITEMS.filter(i => selectedIds.has(i.id)).length;
 
   // Live score that reflects slider movement OR chosen items
-  const displayScore = showActionPlanButton
+  const displayScore = (goalTarget !== baselineScore)
     ? goalTarget
     : projScore;
 
@@ -323,44 +385,39 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
               setSelectedIds(new Set());
             }
           }}
+          onRelease={(val) => {
+            handleBuildActionPlan(parseInt(val));
+          }}
           min={BASE_SCORE}
           max={100}
           ticks={TICK_VALS}
           minAllowedScore={BASE_SCORE}
         />
 
-        {/* 2.5 Build Plan CTA */}
-        <AnimatePresence>
-          {showActionPlanButton && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -4 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -4 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              style={{ padding: '0 4px', marginBottom: '8px' }}
-            >
-              <BuildActionPlanBanner
-                targetScore={goalTarget}
-                onClick={handleBuildActionPlan}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* 3. Action Plan Section */}
         <div style={{
           marginTop: '12px',
-          opacity: showActionPlanButton ? 0.4 : 1,
-          pointerEvents: showActionPlanButton ? 'none' : 'auto',
           transition: 'opacity 0.3s ease',
+          position: 'relative',
+          minHeight: '200px',
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '0 4px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '0.05em', color: '#ffffff', margin: 0, textTransform: 'uppercase' }}>Action Plan</h2>
             <span style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-mono)' }}>
-              {totalSelected} CHOSEN · +{gained} PTS
+              {isGenerating ? '--' : totalSelected} CHOSEN · {isGenerating ? '--' : `+${gained}`} PTS
             </span>
           </div>
 
+          <AnimatePresence mode="wait" initial={false}>
+            {isGenerating ? (
+              <MobileGeneratingState key="generating" />
+            ) : (
+              <motion.div
+                key="content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+              >
           {/* ── TAB BAR ── */}
           <div style={{
             display: 'flex', gap: '8px', marginBottom: '20px',
@@ -453,11 +510,14 @@ const MobilePlanPanel = ({ goalTarget, onGoalChange, onBookConsult, onBack }) =>
               ))}
             </AnimatePresence>
           </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Floating Consultation Button (Material Design 3 EFAB) - Only show if not building a new plan */}
         <AnimatePresence>
-          {!showActionPlanButton && (
+          {(goalTarget === baselineScore) && (
             <motion.div
               initial={{ opacity: 0, y: 20, x: '-50%', scale: 0.8 }}
               animate={{ opacity: 1, y: 0, x: '-50%', scale: 1 }}
