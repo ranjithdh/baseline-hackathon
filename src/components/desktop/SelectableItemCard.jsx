@@ -201,7 +201,8 @@ const SelectableItemCard = React.memo(({ item, catType, isSelected, isNeeded, on
                 display:      'inline-flex',
                 alignItems:   'center',
                 justifyContent: 'center',
-                width:        '54px',
+                gap:          '4px',
+                padding:      '0 12px',
                 height:       '32px',
                 borderRadius: '100px',
                 background:   'rgba(255,255,255,0.08)',
@@ -222,6 +223,13 @@ const SelectableItemCard = React.memo(({ item, catType, isSelected, isNeeded, on
                 marginTop:  '-1px',
               }}>
                 −
+              </span>
+              <span style={{
+                fontSize:   '13px',
+                fontWeight: 500,
+                color:      'rgba(255,255,255,0.65)',
+              }}>
+                Remove
               </span>
             </div>
           )}
