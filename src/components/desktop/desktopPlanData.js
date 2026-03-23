@@ -1,5 +1,5 @@
 // ── Desktop Plan Data ─────────────────────────────────────────────
-export const BASE_SCORE     = 65;
+export const BASE_SCORE = 65;
 export const MAX_ACHIEVABLE = 80;
 
 export const CATEGORIES = [
