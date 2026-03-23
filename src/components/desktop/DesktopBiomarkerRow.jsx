@@ -63,9 +63,9 @@ BiomarkerRow.displayName = 'BiomarkerRow';
 // ─────────────────────────────────────────────────────────────────────────────
 const MarkerList = ({ markers }) => {
   return (
-    <div>
+    <motion.div layout>
       {markers.map(m => <BiomarkerRow key={m.id} marker={m} />)}
-    </div>
+    </motion.div>
   );
 };
 
@@ -139,10 +139,13 @@ const BiomarkerPopup = ({ sectionKey, markers, onClose }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Primary (Expanded) Section Component
+// Unified Biomarker Section Wrapper
 // ─────────────────────────────────────────────────────────────────────────────
-const PrimarySection = ({ sectionKey, markers }) => {
+const BiomarkerSection = ({ sectionKey, markers, isExpanded, onExpand }) => {
   const meta = SECTION_META[sectionKey];
+  
+  // Logic for display items
+  const displayMarkers = isExpanded ? markers : markers.slice(0, 2);
   const mid = Math.ceil(markers.length / 2);
   const left = markers.slice(0, mid);
   const right = markers.slice(mid);
@@ -150,151 +153,117 @@ const PrimarySection = ({ sectionKey, markers }) => {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      layoutId={sectionKey}
+      transition={{ 
+        layout: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+        opacity: { duration: 0.4 }
+      }}
       style={{
         background: 'rgba(14,14,22,0.97)',
         border: '1px solid rgba(255,255,255,0.1)',
         borderRadius: '24px',
         overflow: 'hidden',
         boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-        height: '100%',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        height: '100%',
+        position: 'relative',
+        zIndex: isExpanded ? 2 : 1
       }}
     >
       {/* Header */}
-      <div style={{
-        padding: '24px 32px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: `linear-gradient(to bottom, ${meta.color.bg} 0%, transparent 100%)`
-      }}>
-        <div style={{
-          fontSize: '11px',
-          color: 'rgba(255,255,255,0.3)',
-          fontFamily: 'var(--font-mono)',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          fontWeight: 700
-        }}>
-          {meta.label}
-        </div>
-        <div style={{
-          fontSize: '11px',
-          color: meta.color.text,
-          background: meta.color.bg,
-          padding: '4px 12px',
-          borderRadius: '100px',
-          fontWeight: 700,
-          fontFamily: 'var(--font-mono)',
-          border: `1px solid ${meta.color.border}`
-        }}>
-          {markers.length} {sectionKey === 'negative' ? 'ALERTS' : sectionKey === 'watch' ? 'WATCH' : 'OPTIMAL'}
-        </div>
-      </div>
-
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '0px',
-        padding: '12px'
-      }}>
-        <div style={{ borderRight: '1px solid rgba(255,255,255,0.03)' }}>
-          <MarkerList markers={left} />
-        </div>
-        <div>
-          <MarkerList markers={right} />
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Secondary (Collapsed) Section Component
-// ─────────────────────────────────────────────────────────────────────────────
-const SecondarySection = ({ sectionKey, markers, onExpand }) => {
-  const meta = SECTION_META[sectionKey];
-  const preview = markers.slice(0, 3);
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      style={{
-        background: 'rgba(14,14,22,0.97)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '24px',
-        overflow: 'hidden',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-        transition: 'all 0.3s ease'
-      }}
-    >
-      <div style={{
-        padding: '20px 24px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: `linear-gradient(to bottom, ${meta.color.bg} 0%, transparent 100%)`
-      }}>
-        <div style={{
-          fontSize: '10px',
-          color: 'rgba(255,255,255,0.3)',
-          fontFamily: 'var(--font-mono)',
-          letterSpacing: '0.25em',
-          textTransform: 'uppercase',
-          fontWeight: 700
-        }}>
-          {meta.label}
-        </div>
-        <div style={{
-          fontSize: '10px',
-          color: meta.color.text,
-          background: meta.color.bg,
-          padding: '3px 10px',
-          borderRadius: '100px',
-          fontWeight: 700,
-          fontFamily: 'var(--font-mono)',
-          border: `1px solid ${meta.color.border}`
-        }}>
-          {markers.length} {sectionKey === 'negative' ? 'ALERTS' : sectionKey === 'watch' ? 'WATCH' : 'OPTIMAL'}
-        </div>
-      </div>
-
-      <div style={{ padding: '8px' }}>
-        <MarkerList markers={preview} />
-      </div>
-
-      <div
-        onClick={() => onExpand(sectionKey)}
+      <motion.div 
+        layout="position"
         style={{
-          padding: '12px 24px 18px',
-          fontSize: '10px',
-          color: 'rgb(var(--primary))',
-          fontWeight: 800,
-          textTransform: 'uppercase',
-          letterSpacing: '0.12em',
-          cursor: 'pointer',
-          opacity: 0.7,
-          transition: 'opacity 0.2s',
-          fontFamily: 'var(--font-main)',
+          padding: isExpanded ? '24px 32px' : '20px 24px',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
           display: 'flex',
           alignItems: 'center',
-          gap: '4px'
+          justifyContent: 'space-between',
+          background: `linear-gradient(to bottom, ${meta.color.bg} 0%, transparent 100%)`
         }}
-        onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-        onMouseLeave={e => e.currentTarget.style.opacity = '0.7'}
       >
-        View More ({markers.length - 3})
-      </div>
+        <div style={{
+          fontSize: isExpanded ? '11px' : '10px',
+          color: 'rgba(255,255,255,0.3)',
+          fontFamily: 'var(--font-mono)',
+          letterSpacing: isExpanded ? '0.3em' : '0.25em',
+          textTransform: 'uppercase',
+          fontWeight: 700
+        }}>
+          {meta.label}
+        </div>
+        <div style={{
+          fontSize: isExpanded ? '11px' : '10px',
+          color: meta.color.text,
+          background: meta.color.bg,
+          padding: isExpanded ? '4px 12px' : '3px 10px',
+          borderRadius: '100px',
+          fontWeight: 700,
+          fontFamily: 'var(--font-mono)',
+          border: `1px solid ${meta.color.border}`
+        }}>
+          {markers.length} {sectionKey === 'negative' ? 'ALERTS' : sectionKey === 'watch' ? 'WATCH' : 'OPTIMAL'}
+        </div>
+      </motion.div>
+
+      {/* Content Area */}
+      <motion.div 
+        layout
+        style={{ 
+          padding: isExpanded ? '12px' : '8px',
+          flex: 1
+        }}
+      >
+        {isExpanded ? (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '0px'
+            }}
+          >
+            <div style={{ borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+              <MarkerList markers={left} />
+            </div>
+            <div>
+              <MarkerList markers={right} />
+            </div>
+          </motion.div>
+        ) : (
+          <MarkerList markers={displayMarkers} />
+        )}
+      </motion.div>
+
+      {/* Footer / Interaction */}
+      {!isExpanded && (
+        <motion.div
+          layout="position"
+          onClick={() => onExpand(sectionKey)}
+          style={{
+            padding: '12px 24px 18px',
+            fontSize: '10px',
+            color: 'rgb(var(--primary))',
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            cursor: 'pointer',
+            opacity: 0.7,
+            transition: 'opacity 0.2s',
+            fontFamily: 'var(--font-main)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '0.7'}
+        >
+          View More ({markers.length - 2})
+          <ChevronRight size={12} strokeWidth={3} />
+        </motion.div>
+      )}
     </motion.div>
   );
 };
@@ -317,9 +286,6 @@ const DesktopBiomarkerRow = () => {
     positive: positiveAll
   };
 
-  const allKeys = ['negative', 'watch', 'positive'];
-  const secondaryKeys = allKeys.filter(k => k !== activeSection);
-
   const handleExpand = useCallback((key) => {
     const markers = dataMap[key];
     if (markers.length > 14) {
@@ -329,6 +295,9 @@ const DesktopBiomarkerRow = () => {
     }
   }, [dataMap]);
 
+  const allKeys = ['negative', 'watch', 'positive'];
+  const secondaryKeys = allKeys.filter(k => k !== activeSection);
+
   return (
     <div style={{ padding: '24px 48px 0' }}>
       <LayoutGroup>
@@ -336,35 +305,36 @@ const DesktopBiomarkerRow = () => {
           display: 'grid',
           gridTemplateColumns: '2fr 1fr',
           gap: '24px',
-          alignItems: 'start'
+          alignItems: 'stretch', // Ensure equal height for columns
+          minHeight: '400px'
         }}>
-          {/* ── PRIMARY SECTION (2/3 Width) ── */}
-          <div style={{ minHeight: '400px' }}>
-            <AnimatePresence mode="wait">
-              <PrimarySection
-                key={activeSection}
-                sectionKey={activeSection}
-                markers={dataMap[activeSection]}
-              />
-            </AnimatePresence>
+          {/* ── LEFT COLUMN (Active) ── */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <BiomarkerSection
+              key={activeSection}
+              sectionKey={activeSection}
+              markers={dataMap[activeSection]}
+              isExpanded={true}
+              onExpand={handleExpand}
+            />
           </div>
 
-          {/* ── SECONDARY SECTIONS (1/3 Width) ── */}
+          {/* ── RIGHT COLUMN (Stacked) ── */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <AnimatePresence mode="popLayout">
-              {secondaryKeys.map(key => (
-                <SecondarySection
-                  key={key}
-                  sectionKey={key}
-                  markers={dataMap[key]}
-                  onExpand={handleExpand}
-                />
-              ))}
-            </AnimatePresence>
+            {secondaryKeys.map(key => (
+              <BiomarkerSection
+                key={key}
+                sectionKey={key}
+                markers={dataMap[key]}
+                isExpanded={false}
+                onExpand={handleExpand}
+              />
+            ))}
           </div>
         </div>
       </LayoutGroup>
 
+      {/* ── Popup Modal ── */}
       <AnimatePresence>
         {popupSection && (
           <BiomarkerPopup
