@@ -2,13 +2,14 @@ import React, { useRef, useState } from 'react';
 import DesktopSidebar        from './DesktopSidebar';
 import DesktopTopBar         from './DesktopTopBar';
 import DesktopScoreHero      from './DesktopScoreHero';
-import DesktopBiomarkerRow   from './DesktopBiomarkerRow';
+import OldDesktopBiomarkerRow from './OldDesktopBiomarkerRow';
 import DesktopPlanPanel      from './DesktopPlanPanel';
 import DesktopConsultBanner  from './DesktopConsultBanner';
+import ExpertGuidanceCard    from './ExpertGuidanceCard';
 import { MAX_ACHIEVABLE }    from './desktopPlanData';
 
 
-const DesktopDashboard = ({ onSwitchView }) => {
+const OldDesktopDashboard = ({ onSwitchView }) => {
   const [activeNav, setActiveNav]  = useState('dashboard');
   const [goalTarget, setGoalTarget] = useState(70);
   const planPanelRef               = useRef(null);
@@ -38,6 +39,13 @@ const DesktopDashboard = ({ onSwitchView }) => {
         height: '100vh',
         overflowY: 'auto',
       }}>
+         {/* ── Expert Guidance sticky banner (only when goal exceeds achievable) ── */}
+        {/* {goalTarget > MAX_ACHIEVABLE && (
+          <div style={{ width:'calc(100% - 260px)',position: 'fixed', top: 10, zIndex: 100, padding:'0px 48px' }}>
+            <ExpertGuidanceCard targetScore={goalTarget} />
+          </div>
+        )} */}
+
         {/* Top bar */}
         <DesktopTopBar />
 
@@ -61,8 +69,10 @@ const DesktopDashboard = ({ onSwitchView }) => {
           </div>
         </>
 
-        {/* ── Row 2: Redesigned Biomarker cards ── */}
-        <DesktopBiomarkerRow />
+        {/* ── Row 2: Biomarker cards (Working For You / Needs Attention / Watch Closely) ── */}
+        <OldDesktopBiomarkerRow />
+
+       
 
         {/* ── Plan panel (goal slider + accordion) ── */}
         <DesktopPlanPanel
@@ -77,4 +87,4 @@ const DesktopDashboard = ({ onSwitchView }) => {
   );
 };
 
-export default DesktopDashboard;
+export default OldDesktopDashboard;

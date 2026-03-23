@@ -34,19 +34,19 @@ const GeneratingState = memo(function GeneratingState() {
       aria-live="polite"
       aria-busy="true"
       style={{
-        display:        'flex',
-        flexDirection:  'column',
-        alignItems:     'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         justifyContent: 'center',
-        minHeight:      '380px',
-        gap:            '16px',
-        padding:        '40px 0',
-        userSelect:     'none',
+        minHeight: '380px',
+        gap: '16px',
+        padding: '40px 0',
+        userSelect: 'none',
       }}
     >
       {/* Lottie animation */}
       <div style={{
-        width:  'clamp(100px, 12vw, 140px)',
+        width: 'clamp(100px, 12vw, 140px)',
         height: 'clamp(100px, 12vw, 140px)',
         flexShrink: 0,
       }}>
@@ -62,13 +62,13 @@ const GeneratingState = memo(function GeneratingState() {
       {/* Label */}
       <p
         style={{
-          margin:        0,
-          fontFamily:    'var(--font-main)',
-          fontSize:      '14px',
-          fontWeight:    500,
+          margin: 0,
+          fontFamily: 'var(--font-main)',
+          fontSize: '14px',
+          fontWeight: 500,
           letterSpacing: '0.08em',
-          color:         'rgba(var(--muted-foreground))',
-          animation:     'genTextPulse 2.2s ease-in-out infinite',
+          color: 'rgba(var(--muted-foreground))',
+          animation: 'genTextPulse 2.2s ease-in-out infinite',
         }}
       >
         Your Action Plan Generating ....
