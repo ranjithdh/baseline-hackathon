@@ -5,180 +5,152 @@ const DesktopConsultBanner = ({ onBookNow }) => {
   return (
     <>
       <style>{`
-        .dcb-root {
+        .dcb-container {
           position: relative;
-          border-radius: 20px;
-          padding: 24px 28px;
+          background: #09090b;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 20px; /* Reduced from 24 */
+          padding: 24px; /* Reduced from 32px */
           height: 100%;
-          box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 18px;
+          box-sizing: border-box;
           overflow: hidden;
-          background: rgba(255, 255, 255, 0.02);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          box-shadow: 
-            0 24px 64px rgba(0,0,0,0.4),
-            0 0 0 1px rgba(255,255,255,0.02) inset;
-          transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-        .dcb-root:hover {
-          transform: translateY(-4px);
-          border-color: rgba(43, 127, 255, 0.2);
+          font-family: var(--font-main);
         }
 
-        .dcb-glow {
-          position: absolute;
-          width: 200px; height: 200px;
-          background: radial-gradient(circle, rgba(43, 127, 255, 0.12) 0%, transparent 70%);
-          right: -40px; top: -40px;
-          pointer-events: none;
-        }
-
-        .dcb-header-label {
+        .dcb-eyebrow {
           font-family: var(--font-mono);
-          font-size: 9px;
-          font-weight: 700;
+          font-size: 8.5px; /* Reduced from 9px */
+          font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 0.15em;
-          color: #4c93ff;
-          margin-bottom: 2px;
+          color: #3b82f6;
+          margin-bottom: 12px; /* Reduced from 16px */
         }
 
         .dcb-layout {
           display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 20px;
-          align-items: center;
-          height: 100%;
-        }
-
-        .dcb-content {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
+          grid-template-columns: 1fr 120px; /* Reduced from 140px */
+          gap: 12px; /* Reduced from 16px */
+          flex: 1;
         }
 
         .dcb-title {
           font-family: var(--font-heading);
-          font-size: 26px;
+          font-size: 24px; /* Reduced from 28px */
           font-weight: 800;
-          color: #ffffff;
-          line-height: 1.1;
-          letter-spacing: -0.02em;
-        }
-        .dcb-sub {
-          font-family: var(--font-main);
-          font-size: 13.5px;
-          color: rgba(255, 255, 255, 0.45);
-          line-height: 1.45;
-          max-width: 260px;
+          color: #fff;
+          line-height: 1.15;
+          letter-spacing: -0.01em;
+          margin: 0 0 10px 0;
         }
 
-        /* ── Huge CTA ── */
-        .dcb-cta-wrap {
-          margin-top: 4px;
+        .dcb-desc {
+          font-size: 12px; /* Reduced from 13px */
+          line-height: 1.5;
+          color: rgba(255, 255, 255, 0.45);
+          max-width: 280px; /* Reduced from 320px */
+          margin: 0;
         }
-        .dcb-cta-btn {
-          position: relative;
+
+        .dcb-cta-gradient {
+          margin-top: 20px; /* Reduced from 24px */
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 10px;
-          padding: 12px 24px;
-          border-radius: 14px;
-          background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #8b5cf6 100%);
-          color: #ffffff;
+          gap: 8px;
+          width: fit-content;
+          padding: 10px 28px; /* Reduced from 12px 32px */
+          background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 40%, #8b5cf6 100%);
+          border-radius: 12px; /* Reduced from 14px */
+          color: #fff;
           font-weight: 800;
-          font-size: 14px;
+          font-size: 13px; /* Reduced from 14px */
           border: none;
           cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+          transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+          box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
         }
-        .dcb-cta-btn:hover {
-          transform: translateY(-2px) scale(1.02);
-          box-shadow: 0 12px 32px rgba(99, 102, 241, 0.6);
-        }
-        .dcb-cta-btn:active { transform: scale(0.98); }
 
-        @keyframes pulse-glow {
-          0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-          70% { box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
-        }
-        .dcb-cta-btn { animation: pulse-glow 2s infinite; }
-
-        /* ── Trust Signals ── */
-        .dcb-trust {
-          display: flex;
-          gap: 16px;
-          margin-top: 12px;
-        }
-        .dcb-trust-item {
+        .dcb-urgency {
+          font-size: 9px; /* Reduced from 10px */
+          font-weight: 700;
+          color: #fca5a5;
+          margin-top: 10px;
           display: flex;
           align-items: center;
           gap: 5px;
-          font-size: 10px;
-          font-weight: 600;
-          color: rgba(255, 255, 255, 0.35);
         }
-        .dcb-trust-item span { color: #facc15; }
 
-        /* ── Floating Visual ── */
-        .dcb-visual-wrap {
-          position: relative;
-          width: 140px;
-          height: 140px;
-        }
-        @keyframes floating {
-          0% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-12px) rotate(5deg); }
-          100% { transform: translateY(0px) rotate(0deg); }
+        .dcb-visual {
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .dcb-crystal {
-          width: 100%;
-          height: 100%;
+          width: 140px; /* Reduced from 170px */
+          height: 140px;
           object-fit: contain;
-          filter: drop-shadow(0 15px 30px rgba(59, 130, 246, 0.4));
-          animation: floating 6s ease-in-out infinite;
+          filter: drop-shadow(0 12px 24px rgba(59, 130, 246, 0.3));
+        }
+
+        .dcb-footer {
+          margin-top: auto;
+          display: flex;
+          align-items: center;
+          gap: 20px; /* Reduced from 24px */
+          padding-top: 20px; /* Reduced from 24px */
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .dcb-item {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          font-size: 10px; /* Reduced from 11px */
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.4);
         }
       `}</style>
 
-      <div className="dcb-root">
-        <div className="dcb-glow" />
-
-        <div className="dcb-header-label">Free Expert Advice</div>
+      <div className="dcb-container">
+        <div className="dcb-eyebrow">Free Expert Advice</div>
 
         <div className="dcb-layout">
-          <div className="dcb-content">
+          <div className="dcb-content-left">
             <h2 className="dcb-title">Unlock Your<br />Full Potential</h2>
-            <p className="dcb-sub">
+            <p className="dcb-desc">
               Get a personalized plan to improve your score, energy, and overall health.
             </p>
 
-            <div className="dcb-cta-wrap">
-              <button className="dcb-cta-btn" onClick={onBookNow}>
-                Get Your Personalized Plan <span style={{ fontSize: '20px' }}>→</span>
-              </button>
-            </div>
+            <button className="dcb-cta-gradient" onClick={onBookNow}>
+              Get Your Personalized Plan <span style={{ fontSize: '20px' }}>→</span>
+            </button>
 
-            <div className="dcb-trust">
-              <div className="dcb-trust-item">
-                <span>★</span> 4.9 review
-              </div>
-              <div className="dcb-trust-item">
-                1,00,000+ Users
-              </div>
-              <div className="dcb-trust-item">
-                30-min free session
-              </div>
-            </div>
+            {/* <div className="dcb-urgency">
+              <span className="dcb-pulse" />
+              Limited free consultations today
+            </div> */}
           </div>
 
-          <div className="dcb-visual-wrap">
-            <img src={consultCrystal} alt="crystal" className="dcb-crystal" />
+          <div className="dcb-visual">
+            <img
+              src={consultCrystal}
+              alt="crystal"
+              className="dcb-crystal"
+            />
+          </div>
+        </div>
+
+        <div className="dcb-footer">
+          <div className="dcb-item">
+            <span style={{ color: '#facc15' }}>★</span> 4.9 rating by community
+          </div>
+          <div className="dcb-item">
+            <span style={{ opacity: 0.6 }}>👤</span> 100,000+ healthy users
+          </div>
+          <div className="dcb-item">
+            <span style={{ opacity: 0.6 }}>📞</span> 30-min free consultation
           </div>
         </div>
       </div>

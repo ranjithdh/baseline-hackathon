@@ -107,7 +107,7 @@ const ScoreRange = ({ score }) => {
         }
 
         .range-label-main {
-          color: #888;
+          color: rgba(228,228,231,0.4);
           font-size: 0.9rem;
           font-weight: 600;
           margin-bottom: 12px;
