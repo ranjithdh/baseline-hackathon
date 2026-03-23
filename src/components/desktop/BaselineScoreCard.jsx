@@ -262,7 +262,7 @@ const BaselineScoreCard = ({
           font-family: var(--font-mono);
           font-size: 9px;
           letter-spacing: 0.1em;
-          color: rgba(255,255,255,0.3);
+          color: rgba(228,228,231,0.4);
           text-transform: uppercase;
           margin-bottom: 8px;
         }
@@ -302,7 +302,7 @@ const BaselineScoreCard = ({
           margin-top: 5px;
           font-family: var(--font-mono);
           font-size: 9px;
-          color: rgba(255,255,255,0.3);
+          color: rgba(228,228,231,0.4);
         }
         .bsc-mark {
           position: absolute;
@@ -320,7 +320,7 @@ const BaselineScoreCard = ({
           align-items: center;
           gap: 4px;
           font-size: 10px;
-          color: rgba(255,255,255,0.4);
+          color: rgba(228,228,231,0.4);
         }
         .bsc-leg-dot {
           width: 5px;
