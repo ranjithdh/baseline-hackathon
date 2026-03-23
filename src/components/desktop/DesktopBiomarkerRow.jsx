@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BIOMARKERS, SECTION_META, getBySection, groupByCategory } from './biomarkerData';
+import { BIOMARKERS, SECTION_META, getBySection } from './biomarkerData';
 import BiomarkerStatusTag from './BiomarkerStatusTag';
-import { X } from 'lucide-react';
+import { X, ChevronRight, Maximize2 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Atoms
@@ -11,9 +11,6 @@ const StatusBadge = ({ status }) => {
   return <BiomarkerStatusTag status={status} />;
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Expandable biomarker row
-// ─────────────────────────────────────────────────────────────────────────────
 const BiomarkerRow = React.memo(({ marker }) => {
   return (
     <div
@@ -26,12 +23,12 @@ const BiomarkerRow = React.memo(({ marker }) => {
       onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
     >
-      {/* Marker Name (Leading) */}
+      {/* Marker Name */}
       <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
-        <span style={{ 
-          fontSize: '13px', 
-          fontWeight: 600, 
-          color: '#e4e4e7', 
+        <span style={{
+          fontSize: '13px',
+          fontWeight: 600,
+          color: '#e4e4e7',
           fontFamily: 'var(--font-main)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
@@ -41,7 +38,7 @@ const BiomarkerRow = React.memo(({ marker }) => {
         </span>
       </div>
 
-      {/* Value (Center-aligned) */}
+      {/* Value */}
       <div style={{ width: '80px', display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: '4px', flexShrink: 0 }}>
         <span style={{ fontSize: '13px', color: '#fff', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
           {marker.value}
@@ -51,7 +48,7 @@ const BiomarkerRow = React.memo(({ marker }) => {
         </span>
       </div>
 
-      {/* Inference (Status Pill) (Trailing) */}
+      {/* Status Badge */}
       <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', flexShrink: 0 }}>
         <StatusBadge status={marker.status} />
       </div>
@@ -61,7 +58,7 @@ const BiomarkerRow = React.memo(({ marker }) => {
 BiomarkerRow.displayName = 'BiomarkerRow';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Renders a flat list of markers
+// Renders a list of markers
 // ─────────────────────────────────────────────────────────────────────────────
 const MarkerList = ({ markers }) => {
   return (
@@ -71,13 +68,11 @@ const MarkerList = ({ markers }) => {
   );
 };
 
-
 // ─────────────────────────────────────────────────────────────────────────────
-// Popup Overlay for large sections (>15 markers)
+// Popup Overlay for large sections
 // ─────────────────────────────────────────────────────────────────────────────
-const BiomarkerPopup = ({ sectionKey, onClose }) => {
+const BiomarkerPopup = ({ sectionKey, markers, onClose }) => {
   const meta = SECTION_META[sectionKey];
-  const markers = useMemo(() => getBySection(sectionKey), [sectionKey]);
   const mid = Math.ceil(markers.length / 2);
   const left = markers.slice(0, mid);
   const right = markers.slice(mid);
@@ -123,8 +118,6 @@ const BiomarkerPopup = ({ sectionKey, onClose }) => {
               color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: 'pointer', transition: 'all 0.2s', outline: 'none'
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.transform = 'scale(1.1)'; }}
-            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.transform = 'scale(1)'; }}
           >
             <X size={16} strokeWidth={2.5} />
           </button>
@@ -145,118 +138,224 @@ const BiomarkerPopup = ({ sectionKey, onClose }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Section Column Component
-// ─────────────────────────────────────────────────────────────────────────────
-const SectionColumn = ({ sectionKey, onExpand }) => {
-  const meta = SECTION_META[sectionKey];
-  const markers = useMemo(() => getBySection(sectionKey), [sectionKey]);
-  const preview = markers.slice(0, 4);
-
-  return (
-    <div
-      style={{
-        background: 'rgba(14,14,22,0.97)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '18px',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 0 20px ${meta.color.accent}08`,
-      }}
-    >
-      {/* Header */}
-      <div style={{
-        padding: '18px 20px 16px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        flexShrink: 0,
-        background: `linear-gradient(to bottom, ${meta.color.bg} 0%, transparent 100%)`,
-      }}>
-        <div style={{ 
-          fontSize: '10px', 
-          color: 'rgba(255,255,255,0.35)', 
-          fontFamily: 'var(--font-mono)', 
-          letterSpacing: '0.25em', 
-          textTransform: 'uppercase',
-          fontWeight: 700
-        }}>
-          {meta.label}
-        </div>
-        <div style={{
-          fontSize: '10px', color: meta.color.text, background: meta.color.bg,
-          padding: '3px 10px', borderRadius: '100px', fontWeight: 700, fontFamily: 'var(--font-mono)',
-          border: `1px solid ${meta.color.border}`
-        }}>
-          {sectionKey === 'negative' ? `${markers.length} ALERTS` :
-           sectionKey === 'watch' ? `${markers.length} WATCH` :
-           `${markers.length} OPTIMAL`}
-        </div>
-      </div>
-
-      {/* List content (Limited to 4 items) */}
-      <div style={{ 
-        padding: '8px 4px',
-      }}>
-        <MarkerList markers={preview} />
-      </div>
-
-      {/* Footer / View More popup */}
-      {markers.length > 4 && (
-         <div 
-          onClick={() => onExpand(sectionKey)}
-          style={{
-            padding: '12px 20px 18px',
-            fontSize: '10px',
-            color: 'rgb(var(--primary))',
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            letterSpacing: '0.12em',
-            cursor: 'pointer',
-            textAlign: 'left',
-            opacity: 0.6,
-            transition: 'opacity 0.2s',
-            fontFamily: 'var(--font-main)'
-          }}
-          onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-          onMouseLeave={e => e.currentTarget.style.opacity = '0.6'}
-         >
-           View More ({markers.length - 4})
-         </div>
-      )}
-    </div>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main export
+// New Main Row Component
 // ─────────────────────────────────────────────────────────────────────────────
 const DesktopBiomarkerRow = () => {
+  const [expandedSection, setExpandedSection] = useState('negative'); // 'negative' expanded by default
   const [popupSection, setPopupSection] = useState(null);
 
-  const handleOpenPopup = useCallback((key) => {
-    setPopupSection(key);
-  }, []);
+  // Sliced data based on requirements
+  const negativeAll = useMemo(() => getBySection('negative').slice(0, 14), []);
+  const watchAll = useMemo(() => getBySection('watch').slice(0, 15), []);
+  const positiveAll = useMemo(() => getBySection('positive').slice(0, 11), []);
+
+  const dataMap = {
+    negative: negativeAll,
+    watch: watchAll,
+    positive: positiveAll
+  };
+
+  const handleViewMore = (sectionKey) => {
+    const markers = dataMap[sectionKey];
+    if (markers.length > 14) {
+      setPopupSection(sectionKey);
+    } else {
+      setExpandedSection(sectionKey);
+    }
+  };
 
   return (
     <div style={{ padding: '24px 48px 0' }}>
-
-      {/* ── Layout: 3-column grid (Equal split) ── */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(3, 1fr)', 
-        gap: '20px', 
-        alignItems: 'start' 
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '2fr 1fr',
+        gap: '24px',
+        alignItems: 'start'
       }}>
-        <SectionColumn sectionKey="negative" onExpand={handleOpenPopup} />
-        <SectionColumn sectionKey="watch" onExpand={handleOpenPopup} />
-        <SectionColumn sectionKey="positive" onExpand={handleOpenPopup} />
+        {/* ── LEFT SECTION (2 Columns - 2/3 Width) ── */}
+        <div style={{
+          background: 'rgba(14,14,22,0.97)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: '24px',
+          overflow: 'hidden',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          {/* Header */}
+          <div style={{
+            padding: '24px 32px',
+            borderBottom: '1px solid rgba(255,255,255,0.06)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: `linear-gradient(to bottom, ${SECTION_META.negative.color.bg} 0%, transparent 100%)`
+          }}>
+            <div style={{
+              fontSize: '11px',
+              color: 'rgba(255,255,255,0.3)',
+              fontFamily: 'var(--font-mono)',
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              fontWeight: 700
+            }}>
+              {SECTION_META.negative.label}
+            </div>
+            <div style={{
+              fontSize: '11px',
+              color: SECTION_META.negative.color.text,
+              background: SECTION_META.negative.color.bg,
+              padding: '4px 12px',
+              borderRadius: '100px',
+              fontWeight: 700,
+              fontFamily: 'var(--font-mono)',
+              border: `1px solid ${SECTION_META.negative.color.border}`
+            }}>
+              14 ALERTS
+            </div>
+          </div>
+
+          <div style={{
+            display: (expandedSection === 'negative') ? 'grid' : 'none',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '0px',
+            padding: '12px'
+          }}>
+            <div style={{ borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+              <MarkerList markers={negativeAll.slice(0, 7)} />
+            </div>
+            <div>
+              <MarkerList markers={negativeAll.slice(7, 14)} />
+            </div>
+          </div>
+
+          {(expandedSection !== 'negative') && (
+            <div
+              onClick={() => handleViewMore('negative')}
+              style={{
+                padding: '20px 32px',
+                color: 'rgb(var(--primary))',
+                fontSize: '12px',
+                fontWeight: 800,
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-main)'
+              }}
+            >
+              Focus on Alerts
+            </div>
+          )}
+        </div>
+
+        {/* ── RIGHT SECTION (1 Column - 1/3 Width) ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {['watch', 'positive'].map(key => {
+            const meta = SECTION_META[key];
+            const markers = dataMap[key];
+            const isExpanded = expandedSection === key;
+            const displayMarkers = isExpanded ? markers : markers.slice(0, 3);
+
+            return (
+              <div
+                key={key}
+                style={{
+                  background: 'rgba(14,14,22,0.97)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <div style={{
+                  padding: '20px 24px',
+                  borderBottom: '1px solid rgba(255,255,255,0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: `linear-gradient(to bottom, ${meta.color.bg} 0%, transparent 100%)`
+                }}>
+                  <div style={{
+                    fontSize: '10px',
+                    color: 'rgba(255,255,255,0.3)',
+                    fontFamily: 'var(--font-mono)',
+                    letterSpacing: '0.25em',
+                    textTransform: 'uppercase',
+                    fontWeight: 700
+                  }}>
+                    {meta.label}
+                  </div>
+                  <div style={{
+                    fontSize: '10px',
+                    color: meta.color.text,
+                    background: meta.color.bg,
+                    padding: '3px 10px',
+                    borderRadius: '100px',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-mono)',
+                    border: `1px solid ${meta.color.border}`
+                  }}>
+                    {markers.length} {key === 'watch' ? 'WATCH' : 'OPTIMAL'}
+                  </div>
+                </div>
+
+                <div style={{ padding: '8px' }}>
+                  <MarkerList markers={displayMarkers} />
+                </div>
+
+                {!isExpanded && markers.length > 3 && (
+                  <div
+                    onClick={() => handleViewMore(key)}
+                    style={{
+                      padding: '12px 24px 18px',
+                      fontSize: '10px',
+                      color: 'rgb(var(--primary))',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.12em',
+                      cursor: 'pointer',
+                      opacity: 0.7,
+                      transition: 'opacity 0.2s',
+                      fontFamily: 'var(--font-main)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+                    onMouseLeave={e => e.currentTarget.style.opacity = '0.7'}
+                  >
+                    View More ({markers.length - 3})
+                  </div>
+                )}
+
+                {isExpanded && (
+                  <div
+                    onClick={() => setExpandedSection('negative')}
+                    style={{
+                      padding: '12px 24px 18px',
+                      fontSize: '10px',
+                      color: 'rgba(255,255,255,0.3)',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      cursor: 'pointer',
+                      fontFamily: 'var(--font-main)'
+                    }}
+                  >
+                    View Less
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* ── Popup Modal for deep dives ── */}
       <AnimatePresence>
         {popupSection && (
           <BiomarkerPopup
             sectionKey={popupSection}
+            markers={dataMap[popupSection]}
             onClose={() => setPopupSection(null)}
           />
         )}

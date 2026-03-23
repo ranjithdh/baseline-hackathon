@@ -2,6 +2,26 @@ import React from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BiomarkerStatusTag
+//
+// Reusable status pill used inside DesktopBiomarkerRow marker rows.
+// Colour mapping mirrors the Playground "Status Tag" pill exactly —
+// both components use the same --chart-N / --chart-N-foreground CSS vars
+// so they stay in sync if the design tokens ever change.
+//
+// Status → chart tier mapping
+//   optimal          → chart-5  (Working For You  — best)
+//   normal           → chart-4  (Working For You  — good)
+//   borderline_high  → chart-3  (Needs Attention  — caution)
+//   moderately_high  → chart-3  (Needs Attention  — caution)
+//   low              → chart-2  (Watch Closely    — alert)
+//   high             → chart-2  (Watch Closely    — alert)
+//
+// Props
+//   status  {string}  One of the keys above (case-sensitive)
+//
+// Usage
+//   <BiomarkerStatusTag status="optimal" />
+//   <BiomarkerStatusTag status="borderline_high" />
 // ─────────────────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG = {
@@ -16,7 +36,7 @@ const STATUS_CONFIG = {
   critical_low:    { label: 'Critical Low',     bg: 'rgb(var(--chart-1))', text: 'rgb(var(--chart-1-foreground))' },
 };
 
-const BiomarkerStatusTag = React.memo(({ status }) => {
+const OldBiomarkerStatusTag = React.memo(({ status }) => {
   const config = STATUS_CONFIG[status];
   if (!config) return null;
 
@@ -40,5 +60,5 @@ const BiomarkerStatusTag = React.memo(({ status }) => {
   );
 });
 
-BiomarkerStatusTag.displayName = 'BiomarkerStatusTag';
-export default BiomarkerStatusTag;
+OldBiomarkerStatusTag.displayName = 'OldBiomarkerStatusTag';
+export default OldBiomarkerStatusTag;
