@@ -74,9 +74,9 @@ const MarkerList = ({ markers }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 const BiomarkerPopup = ({ sectionKey, markers, onClose }) => {
   const meta = SECTION_META[sectionKey];
-  const mid = Math.ceil(markers.length / 2);
-  const left = markers.slice(0, mid);
-  const right = markers.slice(mid);
+  const left = markers.slice(0, 7);
+  const right = markers.slice(7, 14);
+  const hasRight = markers.length > 7;
 
   return (
     <div style={{
@@ -125,13 +125,15 @@ const BiomarkerPopup = ({ sectionKey, markers, onClose }) => {
         </div>
 
         {/* 2-column list */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', flex: 1, overflow: 'hidden' }}>
-          <div style={{ padding: '20px 24px', overflowY: 'auto', borderRight: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: hasRight ? '1fr 1fr' : '1fr', flex: 1, overflow: 'hidden' }}>
+          <div style={{ padding: '20px 24px', overflowY: 'auto', borderRight: hasRight ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
             <MarkerList markers={left} />
           </div>
-          <div style={{ padding: '20px 24px', overflowY: 'auto' }}>
-            <MarkerList markers={right} />
-          </div>
+          {hasRight && (
+            <div style={{ padding: '20px 24px', overflowY: 'auto' }}>
+              <MarkerList markers={right} />
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
@@ -146,9 +148,9 @@ const BiomarkerSection = ({ sectionKey, markers, isExpanded, onExpand }) => {
   
   // Logic for display items
   const displayMarkers = isExpanded ? markers : markers.slice(0, 2);
-  const mid = Math.ceil(markers.length / 2);
-  const left = markers.slice(0, mid);
-  const right = markers.slice(mid);
+  const left = markers.slice(0, 7);
+  const right = markers.slice(7, 14);
+  const hasRight = markers.length > 7;
 
   return (
     <motion.div
@@ -221,16 +223,18 @@ const BiomarkerSection = ({ sectionKey, markers, isExpanded, onExpand }) => {
             animate={{ opacity: 1 }}
             style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns: hasRight ? '1fr 1fr' : '1fr',
               gap: '0px'
             }}
           >
-            <div style={{ borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+            <div style={{ borderRight: hasRight ? '1px solid rgba(255,255,255,0.03)' : 'none' }}>
               <MarkerList markers={left} />
             </div>
-            <div>
-              <MarkerList markers={right} />
-            </div>
+            {hasRight && (
+              <div>
+                <MarkerList markers={right} />
+              </div>
+            )}
           </motion.div>
         ) : (
           <MarkerList markers={displayMarkers} />
