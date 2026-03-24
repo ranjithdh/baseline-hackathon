@@ -31,24 +31,31 @@ const CARD_HEIGHT = 500;   // px — locked
 const VISIBLE_ROWS = 7;
 const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
-// ─── BioRow ───────────────────────────────────────────────────────────────────
-const BioRow = React.memo(({ marker, slim = false }) => (
+// ─── BioRow — fixed height so compact & expanded rows are always identical ────
+// Single source of truth: no slim variant, value always shown & centred.
+const ROW_HEIGHT = 52;
+
+const BioRow = React.memo(({ marker }) => (
   <div
     style={{
       display: 'flex',
       alignItems: 'center',
+      height: `${ROW_HEIGHT}px`,
+      flexShrink: 0,
       gap: '8px',
-      padding: slim ? '9px 10px' : '11px 12px',
+      padding: '0 12px',
       borderRadius: '9px',
       borderBottom: '1px solid rgba(255,255,255,0.03)',
       transition: 'background 0.15s',
+      boxSizing: 'border-box',
     }}
     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
   >
+    {/* Name */}
     <span style={{
       flex: 1,
-      fontSize: slim ? '11.5px' : '12.5px',
+      fontSize: '12.5px',
       fontWeight: 600,
       color: '#e4e4e7',
       fontFamily: 'var(--font-main)',
@@ -60,17 +67,24 @@ const BioRow = React.memo(({ marker, slim = false }) => (
       {marker.name}
     </span>
 
-    {!slim && (
-      <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: '3px', flexShrink: 0 }}>
-        <span style={{ fontSize: '13px', color: '#fff', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
-          {marker.value}
-        </span>
-        <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.28)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
-          {marker.unit}
-        </span>
+    {/* Value — fixed width, always centred */}
+    <div style={{
+      width: '76px',
+      display: 'flex',
+      alignItems: 'baseline',
+      justifyContent: 'center',
+      gap: '3px',
+      flexShrink: 0,
+    }}>
+      <span style={{ fontSize: '13px', color: '#fff', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
+        {marker.value}
       </span>
-    )}
+      <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.26)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
+        {marker.unit}
+      </span>
+    </div>
 
+    {/* Badge */}
     <div style={{ flexShrink: 0 }}>
       <BiomarkerStatusTag status={marker.status} />
     </div>
@@ -78,14 +92,9 @@ const BioRow = React.memo(({ marker, slim = false }) => (
 ));
 BioRow.displayName = 'BioRow';
 
-// ─── CompactBody — rows distributed to fill card height evenly ───────────────
-const CompactBody = ({ markers, availableHeight }) => (
-  <div style={{
-    display: 'flex',
-    flexDirection: 'column',
-    height: availableHeight ? `${availableHeight}px` : '100%',
-    justifyContent: 'space-between',
-  }}>
+// ─── CompactBody ────────────────────────────────────────────────────────────
+const CompactBody = ({ markers }) => (
+  <div style={{ display: 'flex', flexDirection: 'column' }}>
     {markers.slice(0, VISIBLE_ROWS).map(m => (
       <BioRow key={m.id} marker={m} />
     ))}
