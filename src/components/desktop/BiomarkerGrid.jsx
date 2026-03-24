@@ -362,18 +362,7 @@ const SectionCard = React.memo(({ sectionKey, markers, cardState, cssOrder, onTo
             <ExpandedBody markers={markers} />
           </div>
         ) : (
-          <>
-            <CompactBody markers={markers} />
-
-            {/* Subtle bottom gradient fade — indicates more content below */}
-            <div style={{
-              position: 'absolute',
-              bottom: 0, left: 0, right: 0,
-              height: '56px',
-              background: 'linear-gradient(to top, rgba(14,14,22,0.95) 0%, transparent 100%)',
-              pointerEvents: 'none',
-            }} />
-          </>
+          <CompactBody markers={markers} />
         )}
       </div>
     </div>
