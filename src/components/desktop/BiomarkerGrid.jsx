@@ -27,7 +27,6 @@ const LABEL_MAP = { negative: 'ALERTS', watch: 'WATCH', positive: 'OPTIMAL' };
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 const POPUP_THRESHOLD = 14;  // > 14 items → modal (so 15 triggers popup)
-const CARD_HEIGHT = 500;   // px — locked
 const VISIBLE_ROWS = 7;
 const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
@@ -35,7 +34,7 @@ const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
 // Single source of truth: no slim variant, value always shown & centred.
 const ROW_HEIGHT = 52;
 
-const BioRow = React.memo(({ marker }) => (
+const BioRow = React.memo(({ marker, showValue = true }) => (
   <div
     style={{
       display: 'flex',
@@ -67,22 +66,24 @@ const BioRow = React.memo(({ marker }) => (
       {marker.name}
     </span>
 
-    {/* Value — fixed width, always centred */}
-    <div style={{
-      width: '76px',
-      display: 'flex',
-      alignItems: 'baseline',
-      justifyContent: 'center',
-      gap: '3px',
-      flexShrink: 0,
-    }}>
-      <span style={{ fontSize: '13px', color: '#fff', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
-        {marker.value}
-      </span>
-      <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.26)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
-        {marker.unit}
-      </span>
-    </div>
+    {/* Value — only shown when expanded */}
+    {showValue && (
+      <div style={{
+        width: '76px',
+        display: 'flex',
+        alignItems: 'baseline',
+        justifyContent: 'center',
+        gap: '3px',
+        flexShrink: 0,
+      }}>
+        <span style={{ fontSize: '13px', color: '#fff', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
+          {marker.value}
+        </span>
+        <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.26)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase' }}>
+          {marker.unit}
+        </span>
+      </div>
+    )}
 
     {/* Badge */}
     <div style={{ flexShrink: 0 }}>
@@ -94,9 +95,9 @@ BioRow.displayName = 'BioRow';
 
 // ─── CompactBody ────────────────────────────────────────────────────────────
 const CompactBody = ({ markers }) => (
-  <div style={{ display: 'flex', flexDirection: 'column' }}>
+  <div style={{ display: 'flex', flexDirection: 'column', alignSelf: 'flex-start', width: '100%' }}>
     {markers.slice(0, VISIBLE_ROWS).map(m => (
-      <BioRow key={m.id} marker={m} />
+      <BioRow key={m.id} marker={m} showValue={false} />
     ))}
   </div>
 );
@@ -114,12 +115,13 @@ const ExpandedBody = ({ markers }) => {
       height: '100%',
       overflowY: 'auto',
       overflowX: 'hidden',
+      alignContent: 'start',
     }}>
-      <div style={{ borderRight: '1px solid rgba(255,255,255,0.04)', paddingRight: '4px' }}>
-        {colA.map(m => <BioRow key={m.id} marker={m} />)}
+      <div style={{ borderRight: '1px solid rgba(255,255,255,0.04)', paddingRight: '4px', alignSelf: 'start' }}>
+        {colA.map(m => <BioRow key={m.id} marker={m} showValue={true} />)}
       </div>
-      <div style={{ paddingLeft: '4px' }}>
-        {colB.map(m => <BioRow key={m.id} marker={m} />)}
+      <div style={{ paddingLeft: '4px', alignSelf: 'start' }}>
+        {colB.map(m => <BioRow key={m.id} marker={m} showValue={true} />)}
       </div>
     </div>
   );
@@ -184,11 +186,11 @@ const BiomarkerModal = ({ sectionKey, markers, onClose }) => {
             <X size={14} strokeWidth={2.5} />
           </button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', flex: 1, overflow: 'hidden' }}>
-          <div style={{ padding: '14px 18px', overflowY: 'auto', borderRight: '1px solid rgba(255,255,255,0.04)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', flex: '0 1 auto', overflow: 'hidden' }}>
+          <div style={{ padding: '14px 18px', overflowY: 'auto', borderRight: '1px solid rgba(255,255,255,0.04)', alignSelf: 'start' }}>
             {markers.slice(0, mid).map(m => <BioRow key={m.id} marker={m} />)}
           </div>
-          <div style={{ padding: '14px 18px', overflowY: 'auto' }}>
+          <div style={{ padding: '14px 18px', overflowY: 'auto', alignSelf: 'start' }}>
             {markers.slice(mid).map(m => <BioRow key={m.id} marker={m} />)}
           </div>
         </div>
@@ -240,10 +242,6 @@ const SectionCard = React.memo(({ sectionKey, markers, cardState, cssOrder, onTo
 
   const flexGrow = isExpanded ? 2 : isShrunk ? 0.5 : 1;
 
-  // Approximate body height for even row distribution
-  // CARD_HEIGHT − header(~58px) − body padding(~8px)
-  const bodyHeight = CARD_HEIGHT - 58;
-
   return (
     <div
       onMouseEnter={() => setCardHover(true)}
@@ -254,7 +252,7 @@ const SectionCard = React.memo(({ sectionKey, markers, cardState, cssOrder, onTo
         flexShrink: 1,
         flexBasis: 0,
         minWidth: 0,
-        height: `${CARD_HEIGHT}px`,
+        height: 'fit-content',
         transition: `flex-grow 0.42s ${EASE}, box-shadow 0.3s ease, border-color 0.3s ease`,
         background: 'rgba(14,14,22,0.97)',
         border: `1px solid ${isExpanded
@@ -344,20 +342,22 @@ const SectionCard = React.memo(({ sectionKey, markers, cardState, cssOrder, onTo
       {/* ── Body ── */}
       <div style={{
         flex: 1,
-        overflow: 'hidden',
+        overflow: isExpanded ? 'hidden' : 'visible',
         padding: '0 8px',
         minWidth: 0,
         position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
       }}>
         {isExpanded ? (
-          <div style={{ height: '100%', animation: 'contentFadeIn 0.22s ease' }}>
+          <div style={{ flex: 1, overflow: 'hidden', animation: 'contentFadeIn 0.22s ease' }}>
             <ExpandedBody markers={markers} />
           </div>
         ) : (
           <>
-            <CompactBody markers={markers} availableHeight={bodyHeight} />
+            <CompactBody markers={markers} />
 
-            {/* Subtle bottom gradient fills space + indicates scrollable content */}
+            {/* Subtle bottom gradient fade — indicates more content below */}
             <div style={{
               position: 'absolute',
               bottom: 0, left: 0, right: 0,
@@ -424,6 +424,7 @@ const BiomarkerGrid = () => {
       <div style={{
         padding: '20px 48px 24px',
         display: 'flex',
+        alignItems: 'flex-start',
         gap: '16px',
         width: '100%',
         boxSizing: 'border-box',
