@@ -17,8 +17,8 @@ import BiomarkerStatusTag from './BiomarkerStatusTag';
 
 // ─── Data (sliced to exact counts) ───────────────────────────────────────────
 const DATA = {
-  negative: getBySection('negative').slice(0, 14),
-  watch: getBySection('watch').slice(0, 15),
+  negative: getBySection('negative').slice(0, 10),
+  watch: getBySection('watch').slice(0, 19),
   positive: getBySection('positive').slice(0, 11),
 };
 
@@ -26,8 +26,8 @@ const SECTION_ORDER = ['negative', 'watch', 'positive'];
 const LABEL_MAP = { negative: 'ALERTS', watch: 'WATCH', positive: 'OPTIMAL' };
 
 // ─── Config ───────────────────────────────────────────────────────────────────
-const POPUP_THRESHOLD = 14;  // > 14 items → modal (so 15 triggers popup)
-const VISIBLE_ROWS = 7;
+const POPUP_THRESHOLD = 10;
+const VISIBLE_ROWS = 5;
 const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
 // ─── BioRow — fixed height so compact & expanded rows are always identical ────
@@ -110,7 +110,7 @@ const CompactBody = ({ markers }) => (
 
 // ─── ExpandedBody ─────────────────────────────────────────────────────────────
 const ExpandedBody = ({ markers }) => {
-  const split = markers.length > 14 ? Math.ceil(markers.length / 2) : 7;
+  const split = markers.length > 10 ? Math.ceil(markers.length / 2) : 5;
   const colA = markers.slice(0, split);
   const colB = markers.slice(split);
   return (
@@ -119,7 +119,7 @@ const ExpandedBody = ({ markers }) => {
       gridTemplateColumns: '1fr 1fr',
       gap: '0 2px',
       height: 'auto',
-      minHeight: '364px',
+      minHeight: '260px',
       overflowY: 'auto',
       overflowX: 'hidden',
       alignContent: 'start',
@@ -137,7 +137,7 @@ const ExpandedBody = ({ markers }) => {
 // ─── Modal ────────────────────────────────────────────────────────────────────
 const BiomarkerModal = ({ sectionKey, markers, onClose }) => {
   const meta = SECTION_META[sectionKey];
-  const split = markers.length > 14 ? Math.ceil(markers.length / 2) : 7;
+  const split = markers.length > 10 ? Math.ceil(markers.length / 2) : 5;
 
   useEffect(() => {
     const h = e => { if (e.key === 'Escape') onClose(); };
@@ -352,7 +352,7 @@ const SectionCard = React.memo(({ sectionKey, markers, cardState, cssOrder, onTo
         overflow: isExpanded ? 'hidden' : 'visible',
         padding: '0 8px',
         minWidth: 0,
-        minHeight: '364px',
+        minHeight: '260px',
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
