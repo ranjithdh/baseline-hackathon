@@ -26,7 +26,7 @@ const SECTION_ORDER = ['negative', 'watch', 'positive'];
 const LABEL_MAP = { negative: 'ALERTS', watch: 'WATCH', positive: 'OPTIMAL' };
 
 // ─── Config ───────────────────────────────────────────────────────────────────
-const POPUP_THRESHOLD = 15;
+const POPUP_THRESHOLD = 14;  // > 14 items → modal (so 15 triggers popup)
 const CARD_HEIGHT = 500;   // px — locked
 const VISIBLE_ROWS = 7;
 const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
@@ -107,10 +107,10 @@ const ExpandedBody = ({ markers }) => {
       overflowX: 'hidden',
     }}>
       <div style={{ borderRight: '1px solid rgba(255,255,255,0.04)', paddingRight: '4px' }}>
-        {colA.map(m => <BioRow key={m.id} marker={m} slim />)}
+        {colA.map(m => <BioRow key={m.id} marker={m} />)}
       </div>
       <div style={{ paddingLeft: '4px' }}>
-        {colB.map(m => <BioRow key={m.id} marker={m} slim />)}
+        {colB.map(m => <BioRow key={m.id} marker={m} />)}
       </div>
     </div>
   );
@@ -249,10 +249,10 @@ const SectionCard = React.memo(({ sectionKey, markers, cardState, cssOrder, onTo
         transition: `flex-grow 0.42s ${EASE}, box-shadow 0.3s ease, border-color 0.3s ease`,
         background: 'rgba(14,14,22,0.97)',
         border: `1px solid ${isExpanded
+          ? meta.color.border
+          : cardHover
             ? meta.color.border
-            : cardHover
-              ? meta.color.border
-              : 'rgba(255,255,255,0.09)'
+            : 'rgba(255,255,255,0.09)'
           }`,
         borderRadius: '20px',
         boxShadow: isExpanded
