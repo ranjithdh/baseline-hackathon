@@ -19,7 +19,7 @@ import BiomarkerStatusTag from './BiomarkerStatusTag';
 const DATA = {
   negative: getBySection('negative').slice(0, 10),
   watch: getBySection('watch').slice(0, 19),
-  positive: getBySection('positive').slice(0, 11),
+  positive: getBySection('positive').slice(0, 7),
 };
 
 const SECTION_ORDER = ['negative', 'watch', 'positive'];

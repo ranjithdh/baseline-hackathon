@@ -282,7 +282,7 @@ const DesktopBiomarkerRow = () => {
   // Sliced data based on requirements
   const negativeAll = useMemo(() => getBySection('negative').slice(0, 14), []);
   const watchAll = useMemo(() => getBySection('watch').slice(0, 15), []);
-  const positiveAll = useMemo(() => getBySection('positive').slice(0, 11), []);
+  const positiveAll = useMemo(() => getBySection('positive').slice(0, 7), []);
 
   const dataMap = {
     negative: negativeAll,
