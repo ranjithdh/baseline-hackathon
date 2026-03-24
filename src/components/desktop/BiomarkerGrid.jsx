@@ -104,15 +104,16 @@ const CompactBody = ({ markers }) => (
 
 // ─── ExpandedBody ─────────────────────────────────────────────────────────────
 const ExpandedBody = ({ markers }) => {
-  const mid = Math.ceil(markers.length / 2);
-  const colA = markers.slice(0, mid);
-  const colB = markers.slice(mid);
+  const split = markers.length > 14 ? Math.ceil(markers.length / 2) : 7;
+  const colA = markers.slice(0, split);
+  const colB = markers.slice(split);
   return (
     <div style={{
       display: 'grid',
       gridTemplateColumns: '1fr 1fr',
       gap: '0 2px',
-      height: '100%',
+      height: 'auto',
+      minHeight: '364px',
       overflowY: 'auto',
       overflowX: 'hidden',
       alignContent: 'start',
@@ -130,7 +131,7 @@ const ExpandedBody = ({ markers }) => {
 // ─── Modal ────────────────────────────────────────────────────────────────────
 const BiomarkerModal = ({ sectionKey, markers, onClose }) => {
   const meta = SECTION_META[sectionKey];
-  const mid = Math.ceil(markers.length / 2);
+  const split = markers.length > 14 ? Math.ceil(markers.length / 2) : 7;
 
   useEffect(() => {
     const h = e => { if (e.key === 'Escape') onClose(); };
@@ -188,10 +189,10 @@ const BiomarkerModal = ({ sectionKey, markers, onClose }) => {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', flex: '0 1 auto', overflow: 'hidden' }}>
           <div style={{ padding: '14px 18px', overflowY: 'auto', borderRight: '1px solid rgba(255,255,255,0.04)', alignSelf: 'start' }}>
-            {markers.slice(0, mid).map(m => <BioRow key={m.id} marker={m} />)}
+            {markers.slice(0, split).map(m => <BioRow key={m.id} marker={m} />)}
           </div>
           <div style={{ padding: '14px 18px', overflowY: 'auto', alignSelf: 'start' }}>
-            {markers.slice(mid).map(m => <BioRow key={m.id} marker={m} />)}
+            {markers.slice(split).map(m => <BioRow key={m.id} marker={m} />)}
           </div>
         </div>
       </div>
@@ -345,6 +346,7 @@ const SectionCard = React.memo(({ sectionKey, markers, cardState, cssOrder, onTo
         overflow: isExpanded ? 'hidden' : 'visible',
         padding: '0 8px',
         minWidth: 0,
+        minHeight: '364px',
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
