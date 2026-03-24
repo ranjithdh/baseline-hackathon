@@ -41,7 +41,7 @@ const BioRow = React.memo(({ marker, showValue = true }) => (
       alignItems: 'center',
       height: `${ROW_HEIGHT}px`,
       flexShrink: 0,
-      gap: '8px',
+      gap: '4px',
       padding: '0 12px',
       borderRadius: '9px',
       borderBottom: '1px solid rgba(255,255,255,0.03)',
@@ -51,30 +51,30 @@ const BioRow = React.memo(({ marker, showValue = true }) => (
     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
   >
-    {/* Name */}
-    <span style={{
-      flex: 1,
-      fontSize: '12.5px',
-      fontWeight: 600,
-      color: '#e4e4e7',
-      fontFamily: 'var(--font-main)',
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      textOverflow: 'ellipsis',
-      minWidth: 0,
-    }}>
-      {marker.name}
-    </span>
+    {/* Left: Name */}
+    <div style={{ flex: 1.2, minWidth: 0, display: 'flex' }}>
+      <span style={{
+        fontSize: '12.5px',
+        fontWeight: 600,
+        color: '#e4e4e7',
+        fontFamily: 'var(--font-main)',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+      }}>
+        {marker.name}
+      </span>
+    </div>
 
-    {/* Value — only shown when expanded */}
+    {/* Center: Value (only if showValue) */}
     {showValue && (
       <div style={{
-        width: '76px',
+        flex: 1,
         display: 'flex',
         alignItems: 'baseline',
         justifyContent: 'center',
-        gap: '3px',
-        flexShrink: 0,
+        gap: '4px',
+        minWidth: 0,
       }}>
         <span style={{ fontSize: '13px', color: '#fff', fontFamily: 'var(--font-mono)', fontWeight: 800 }}>
           {marker.value}
@@ -85,8 +85,14 @@ const BioRow = React.memo(({ marker, showValue = true }) => (
       </div>
     )}
 
-    {/* Badge */}
-    <div style={{ flexShrink: 0 }}>
+    {/* Right: Badge */}
+    <div style={{
+      flex: showValue ? 1.2 : 0,
+      display: 'flex',
+      justifyContent: 'flex-end',
+      flexShrink: 0,
+      marginLeft: showValue ? 0 : 'auto',
+    }}>
       <BiomarkerStatusTag status={marker.status} />
     </div>
   </div>
