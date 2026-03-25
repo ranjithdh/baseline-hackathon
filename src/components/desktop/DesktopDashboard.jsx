@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import DesktopSidebar        from './DesktopSidebar';
 import DesktopTopBar         from './DesktopTopBar';
 import DesktopScoreHero      from './DesktopScoreHero';
-import DesktopBiomarkerRow   from './DesktopBiomarkerRow';
+import BiomarkerGrid         from './BiomarkerGrid';
 import DesktopPlanPanel      from './DesktopPlanPanel';
 import DesktopConsultBanner  from './DesktopConsultBanner';
 import { MAX_ACHIEVABLE }    from './desktopPlanData';
@@ -62,7 +62,7 @@ const DesktopDashboard = ({ onSwitchView }) => {
         </>
 
         {/* ── Row 2: Redesigned Biomarker cards ── */}
-        <DesktopBiomarkerRow />
+        <BiomarkerGrid />
 
         {/* ── Plan panel (goal slider + accordion) ── */}
         <DesktopPlanPanel
