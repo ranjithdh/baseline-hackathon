@@ -7,109 +7,150 @@ const DesktopConsultBanner = ({ onBookNow }) => {
       <style>{`
         .dcb-container {
           position: relative;
-          background: #09090b;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 20px; /* Reduced from 24 */
-          padding: 24px; /* Reduced from 32px */
+          background: var(--ui-bg-gradient);
+          border: 1px solid var(--ui-border);
+          border-radius: var(--ui-radius);
+          padding: var(--ui-card-padding);
           height: 100%;
           display: flex;
           flex-direction: column;
           box-sizing: border-box;
           overflow: hidden;
           font-family: var(--font-main);
+          box-shadow: var(--ui-shadow-elevated);
+        }
+
+        /* Radial glow to match BaselineScoreCard */
+        .dcb-container::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(ellipse at 85% 0%, rgba(59, 130, 246, 0.12) 0%, transparent 60%);
+          pointer-events: none;
         }
 
         .dcb-eyebrow {
           font-family: var(--font-mono);
-          font-size: 8.5px; /* Reduced from 9px */
+          font-size: var(--ui-font-size-xs);
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 0.15em;
-          color: #3b82f6;
-          margin-bottom: 12px; /* Reduced from 16px */
+          color: var(--ui-accent);
+          margin-bottom: 16px;
+          opacity: 0.9;
         }
 
         .dcb-layout {
           display: grid;
-          grid-template-columns: 1fr 120px; /* Reduced from 140px */
-          gap: 12px; /* Reduced from 16px */
+          grid-template-columns: 1fr 160px;
+          gap: 20px;
           flex: 1;
+          align-items: center;
         }
 
         .dcb-title {
           font-family: var(--font-heading);
-          font-size: 24px; /* Reduced from 28px */
+          font-size: 32px;
           font-weight: 800;
           color: #fff;
-          line-height: 1.15;
-          letter-spacing: -0.01em;
-          margin: 0 0 10px 0;
+          line-height: 1.1;
+          letter-spacing: -0.02em;
+          margin: 0 0 12px 0;
         }
 
         .dcb-desc {
-          font-size: 12px; /* Reduced from 13px */
-          line-height: 1.5;
-          color: rgba(255, 255, 255, 0.45);
-          max-width: 280px; /* Reduced from 320px */
+          font-size: 14px;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.5);
+          max-width: 320px;
           margin: 0;
         }
 
         .dcb-cta-gradient {
-          margin-top: 20px; /* Reduced from 24px */
+          margin-top: 24px;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 8px;
+          gap: 10px;
           width: fit-content;
-          padding: 10px 28px; /* Reduced from 12px 32px */
-          background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 40%, #8b5cf6 100%);
-          border-radius: 12px; /* Reduced from 14px */
+          padding: 12px 32px;
+          background: var(--ui-accent-gradient);
+          border-radius: 14px;
           color: #fff;
           font-weight: 800;
-          font-size: 13px; /* Reduced from 14px */
+          font-size: 15px;
           border: none;
           cursor: pointer;
           transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-          box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 8px 24px var(--ui-accent-glow);
         }
 
-        .dcb-urgency {
-          font-size: 9px; /* Reduced from 10px */
-          font-weight: 700;
-          color: #fca5a5;
-          margin-top: 10px;
-          display: flex;
-          align-items: center;
-          gap: 5px;
+        .dcb-cta-gradient:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px var(--ui-accent-glow);
+        }
+
+        .dcb-cta-arrow {
+          transition: transform 0.25s ease;
+          font-size: 20px;
+        }
+
+        .dcb-cta-gradient:hover .dcb-cta-arrow {
+          transform: translateX(4px);
         }
 
         .dcb-visual {
           display: flex;
           align-items: center;
           justify-content: center;
+          position: relative;
         }
+        
+        .dcb-visual::after {
+          content: '';
+          position: absolute;
+          width: 120px;
+          height: 120px;
+          background: var(--ui-accent);
+          filter: blur(60px);
+          opacity: 0.15;
+          z-index: 0;
+        }
+
         .dcb-crystal {
-          width: 140px; /* Reduced from 170px */
-          height: 140px;
+          width: 180px;
+          height: 180px;
           object-fit: contain;
-          filter: drop-shadow(0 12px 24px rgba(59, 130, 246, 0.3));
+          z-index: 1;
+          filter: drop-shadow(0 12px 32px rgba(59, 130, 246, 0.2));
+          transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .dcb-container:hover .dcb-crystal {
+          transform: scale(1.05) rotate(5deg);
         }
 
         .dcb-footer {
           margin-top: auto;
           display: flex;
           align-items: center;
-          gap: 20px; /* Reduced from 24px */
-          padding-top: 20px; /* Reduced from 24px */
+          gap: 24px;
+          padding-top: 20px;
           border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
+
         .dcb-item {
           display: flex;
           align-items: center;
-          gap: 5px;
-          font-size: 10px; /* Reduced from 11px */
+          gap: 6px;
+          font-size: 11px;
           font-weight: 600;
-          color: rgba(255, 255, 255, 0.4);
+          color: rgba(255, 255, 255, 0.35);
+        }
+
+        .dcb-icon {
+          font-size: 12px;
+          opacity: 0.7;
         }
       `}</style>
 
@@ -124,13 +165,8 @@ const DesktopConsultBanner = ({ onBookNow }) => {
             </p>
 
             <button className="dcb-cta-gradient" onClick={onBookNow}>
-              Get Your Personalized Plan <span style={{ fontSize: '20px' }}>→</span>
+              Get Your Personalized Plan <span className="dcb-cta-arrow">→</span>
             </button>
-
-            {/* <div className="dcb-urgency">
-              <span className="dcb-pulse" />
-              Limited free consultations today
-            </div> */}
           </div>
 
           <div className="dcb-visual">
@@ -147,10 +183,10 @@ const DesktopConsultBanner = ({ onBookNow }) => {
             <span style={{ color: '#facc15' }}>★</span> 4.9 rating by community
           </div>
           <div className="dcb-item">
-            <span style={{ opacity: 0.6 }}>👤</span> 100,000+ healthy users
+            <span className="dcb-icon">👤</span> 100,000+ healthy users
           </div>
           <div className="dcb-item">
-            <span style={{ opacity: 0.6 }}>📞</span> 30-min free consultation
+            <span className="dcb-icon">📞</span> 30-min free consultation
           </div>
         </div>
       </div>

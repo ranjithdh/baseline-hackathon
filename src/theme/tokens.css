@@ -238,11 +238,6 @@
   --inference-yellow: var(--amber-9);
   --inference-red: var(--red-9);
 
-  /* Fonts */
-  --font-main: 'FuturLuxe', 'Inter', sans-serif;
-  --font-heading: 'FuturLuxe', 'Outfit', sans-serif;
-  --font-mono: 'Space Mono', monospace;
-
   /* Gradients */
   --gradient-score: linear-gradient(135deg, #1E40AF 0%, #3B82F6 40%, #8B5CF6 100%);
   --gradient-action: linear-gradient(90deg, #3B82F6 0%, #2563EB 100%);
@@ -250,4 +245,43 @@
   /* Effects */
   --glass-blur: 32px;
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+
+  /* ═══════════════════════════════════════════════════════════
+     PIXEL-PERFECT UNIFIED DESIGN SYSTEM
+     ═══════════════════════════════════════════════════════════ */
+  --ui-radius: 16px;
+  --ui-card-padding: 24px;
+  --ui-item-padding: 12px;
+  
+  /* Surface Treatments */
+  --ui-bg-main: #09090b;
+  --ui-bg-gradient: linear-gradient(135deg, #09090b 0%, #0f172a 100%);
+  --ui-border: rgba(255, 255, 255, 0.08); /* Identical across all components */
+  --ui-border-accent: rgba(59, 130, 246, 0.2);
+  --ui-shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --ui-shadow-elevated: 0 20px 48px rgba(0, 0, 0, 0.4);
+  
+  /* Semantic Palette (Normalized) */
+  --ui-success: #4ade80;
+  --ui-warning: #facc15;
+  --ui-error: #f87171;
+  --ui-accent: #3b82f6;
+  --ui-accent-light: #60a5fa;
+  --ui-accent-gradient: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 40%, #8b5cf6 100%);
+  --ui-accent-glow: rgba(59, 130, 246, 0.25);
+  
+  /* Typography Scale (80/20 Rule) */
+  --ui-heading: 700;
+  --ui-body: 400;
+  --ui-font-size-2xl: 48px;
+  --ui-font-size-xl: 24px;
+  --ui-font-size-lg: 18px;
+  --ui-font-size-base: 14px;
+  --ui-font-size-sm: 12px;
+  --ui-font-size-xs: 10px;
+
+  /* Global Overrides */
+  --font-main: 'Inter', -apple-system, sans-serif;
+  --font-heading: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'Space Mono', monospace;
 }

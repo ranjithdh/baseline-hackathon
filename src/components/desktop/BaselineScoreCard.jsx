@@ -63,23 +63,24 @@ const BaselineScoreCard = ({
         /* ── Card Shell ── */
         .bsc-card {
           position: relative;
-          border-radius: 20px;
-          padding: 18px 22px 16px;
+          border-radius: var(--ui-radius);
+          padding: var(--ui-card-padding);
           height: 100%;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 20px;
           overflow: hidden;
-          background: linear-gradient(135deg, #0f1729 0%, #111827 55%, #0e1a3a 100%);
-          border: 1px solid rgba(99,102,241,0.22);
-          box-shadow: 0 24px 64px rgba(0,0,0,0.5), 0 0 40px rgba(99,102,241,0.06) inset;
+          background: var(--ui-bg-gradient);
+          border: 1px solid var(--ui-border);
+          box-shadow: var(--ui-shadow-elevated);
+          font-family: var(--font-main);
         }
         .bsc-card::before {
           content: '';
           position: absolute;
           inset: 0;
-          background: radial-gradient(ellipse at 85% 0%, rgba(99,102,241,0.12) 0%, transparent 55%);
+          background: radial-gradient(ellipse at 85% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
           pointer-events: none;
         }
 
@@ -90,82 +91,39 @@ const BaselineScoreCard = ({
           gap: 8px;
         }
         .bsc-title {
-          font-family: var(--font-heading);
-          font-size: 13px;
-          font-weight: 700;
-          color: #ffffff;
+          font-size: var(--ui-font-size-sm);
+          font-weight: var(--ui-heading);
+          color: #fff;
           letter-spacing: -0.01em;
         }
         .bsc-beta {
           font-family: var(--font-mono);
-          font-size: 8px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          padding: 1px 6px;
-          border-radius: 100px;
-          background: rgba(43, 127, 255, 0.12);
-          color: #4c93ff;
-          border: 1px solid rgba(43, 127, 255, 0.28);
+          font-size: var(--ui-font-size-xs);
+          font-weight: 800;
+          padding: 2px 8px;
+          border-radius: 999px;
+          background: rgba(59, 130, 246, 0.12);
+          color: var(--ui-accent);
+          border: 1px solid rgba(59, 130, 246, 0.15);
         }
         .bsc-info-btn {
           margin-left: auto;
           width: 28px;
           height: 28px;
           border-radius: 50%;
-          z-index: 999;
-          position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
-          pointer-events: auto !important;
-          cursor: pointer !important;
-          background: rgba(255,255,255,0.06);
-          color: #fff;
-          border: 1px solid rgba(255,255,255,0.12);
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-          flex-shrink: 0;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-          backdrop-filter: blur(4px);
-          overflow: hidden;
-          animation: bsc-pulse 4s infinite ease-in-out;
-        }
-        .bsc-info-btn::after {
-          content: '';
-          position: absolute;
-          top: -100%;
-          left: -150%;
-          width: 200%;
-          height: 300%;
-          background: linear-gradient(
-            135deg,
-            transparent 0%,
-            transparent 45%,
-            rgba(255, 255, 255, 0.1) 50%,
-            transparent 55%,
-            transparent 100%
-          );
-          transform: rotate(45deg);
-          animation: bsc-glint 6s infinite ease-in-out;
-          pointer-events: none;
-        }
-        @keyframes bsc-glint {
-          0% { left: -150%; }
-          15% { left: 150%; }
-          100% { left: 150%; }
-        }
-        @keyframes bsc-pulse {
-          0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.03), 0 4px 12px rgba(0,0,0,0.1); }
-          50% { box-shadow: 0 0 0 8px rgba(255,255,255,0), 0 4px 12px rgba(0,0,0,0.1); }
-          100% { box-shadow: 0 0 0 0 rgba(255,255,255,0), 0 4px 12px rgba(0,0,0,0.1); }
+          background: rgba(255,255,255,0.04);
+          color: rgba(255,255,255,0.4);
+          border: 1px solid var(--ui-border);
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .bsc-info-btn:hover {
           background: rgba(255,255,255,0.1);
           color: #fff;
           border-color: rgba(255,255,255,0.2);
-          transform: scale(1.08);
-          box-shadow: 0 0 12px rgba(255,255,255,0.08);
-          animation-play-state: paused;
+          transform: scale(1.05);
         }
         .bsc-info-btn:active {
           transform: scale(0.95);
@@ -230,26 +188,23 @@ const BaselineScoreCard = ({
         .bsc-status-pill {
           display: inline-flex;
           align-items: center;
-          gap: 5px;
-          padding: 3px 10px;
-          border-radius: 100px;
-          font-size: 10px;
-          font-weight: 700;
+          gap: 6px;
+          padding: 4px 12px;
+          border-radius: 999px;
+          font-size: var(--ui-font-size-xs);
+          font-weight: 800;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
           width: fit-content;
         }
         .bsc-dot {
-          width: 5px;
-          height: 5px;
+          width: 6px;
+          height: 6px;
           border-radius: 50%;
         }
         .bsc-headline {
-          font-family: var(--font-main);
-          font-size: 11.5px;
-          line-height: 1.45;
-          color: rgba(255,255,255,0.5);
-          font-weight: 400;
+          font-size: var(--ui-font-size-sm);
+          line-height: 1.5;
+          color: rgba(255, 255, 255, 0.45);
         }
 
         /* ── Scale Bar ── */
@@ -374,26 +329,26 @@ const BaselineScoreCard = ({
           flex-shrink: 0;
           display: flex;
           align-items: center;
-          gap: 6px;
-          padding: 8px 16px;
-          border-radius: 10px;
-          background: linear-gradient(135deg, #1e40af 0%, #2b7fff 60%, #60a5fa 100%);
-          color: #ffffff;
-          font-family: var(--font-main);
-          font-weight: 700;
-          font-size: 12px;
+          gap: 8px;
+          padding: 10px 24px;
+          border-radius: 12px;
+          background: var(--ui-accent-gradient);
+          color: #fff;
+          font-size: var(--ui-font-size-sm);
+          font-weight: 800;
           border: none;
           cursor: pointer;
-          box-shadow: 0 4px 16px rgba(43,127,255,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
-          transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+          box-shadow: 0 8px 24px var(--ui-accent-glow);
+          transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
           white-space: nowrap;
         }
         .bsc-cta:hover {
-          transform: translateY(-2px) scale(1.03);
-          box-shadow: 0 8px 28px rgba(43,127,255,0.5);
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px var(--ui-accent-glow);
         }
         .bsc-cta-arrow {
           transition: transform 0.25s ease;
+          font-size: 18px;
         }
         .bsc-cta:hover .bsc-cta-arrow {
           transform: translateX(3px);

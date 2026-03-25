@@ -47,8 +47,8 @@ const DesktopDashboard = ({ onSwitchView }) => {
             .hero-consult-row {
               display: grid;
               grid-template-columns: 1fr 1fr;
-              gap: 28px;
-              padding: 48px 48px 0;
+              gap: 32px;
+              padding: 40px 48px 0;
               align-items: stretch;
             }
             @media (max-width: 900px) {
